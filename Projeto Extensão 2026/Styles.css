@@ -191,3 +191,127 @@ header input:focus {
 .card button {
   margin-top: 8px;
 }
+
+/* TÍTULO */
+.titulo-pagina {
+  text-align: center;
+  margin-top: 20px;
+  color: #1B1464;
+}
+
+/* CATEGORIAS */
+.categorias {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px;
+  flex-wrap: wrap;
+}
+
+.categorias button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 20px;
+
+  background: #e0e0e0;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.categorias button:hover {
+  background: #FFC20E;
+  color: #1B1464;
+  font-weight: bold;
+}
+
+/* GRID */
+.grid {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+/* CARD NOVO */
+.card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+}
+
+/* IMAGEM */
+.capa {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* CONTEÚDO */
+.card-content {
+  padding: 15px;
+}
+
+.card h3 {
+  color: #2E3192;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* CATEGORIA TAG */
+.categoria {
+  display: inline-block;
+  margin: 8px 0;
+  padding: 4px 10px;
+
+  background: #FFC20E;
+  color: #1B1464;
+
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* BOTÕES */
+.card button {
+  margin-top: 8px;
+  padding: 8px;
+  width: 100%;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+/* CORES DIFERENTES PRA CADA AÇÃO */
+.btn-pdf {
+  background: #2E3192;
+  color: white;
+}
+
+.btn-biblioteca {
+  background: #888;
+  color: white;
+}
+
+.btn-emprestar {
+  background: #FFC20E;
+  color: #1B1464;
+  font-weight: bold;
+}
+
+.card button:hover {
+  opacity: 0.85;
+}

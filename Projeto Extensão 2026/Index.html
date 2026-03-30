@@ -6,12 +6,11 @@
   <title>Biblioteca Escolar</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
 <header>
   <div class="header-left">
-    <img src="img/logo.png" class="logo">
+    <img src="imagens/imagem2.png" class="logo">
 
     <div class="titulo-escola">
       Escola Estadual <br>
@@ -23,9 +22,19 @@
 </header>
 
 <main>
+
   <h2 class="titulo-pagina">📚 Acervo da Biblioteca</h2>
 
+  <!-- CATEGORIAS -->
+  <div class="categorias">
+    <button onclick="filtrarCategoria('Todos')">Todos</button>
+    <button onclick="filtrarCategoria('Romance')">Romance</button>
+    <button onclick="filtrarCategoria('Realismo')">Realismo</button>
+    <button onclick="filtrarCategoria('Drama')">Drama</button>
+  </div>
+
   <section id="livros" class="grid"></section>
+
 </main>
 
 <script src="script.js"></script>
