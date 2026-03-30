@@ -22,9 +22,9 @@ if (window.location.pathname.includes("index.html")) {
 
 // ================= LIVROS =================
 const livros = [
-    { titulo: "Dom Casmurro", autor: "Machado de Assis", categoria: "Romance", img: "img/domcasmurro.jpg", pdf: "pdf/domcasmurro.pdf" },
-    { titulo: "O Cortiço", autor: "Aluísio Azevedo", categoria: "Realismo", img: "img/cortico.jpg", pdf: "pdf/cortico.pdf" },
-    { titulo: "Capitães da Areia", autor: "Jorge Amado", categoria: "Drama", img: "img/capitaes.jpg", pdf: "pdf/capitaes.pdf" },
+    { titulo: "Dom Casmurro", autor: "Machado de Assis", categoria: "Romance", img: "imagens/domcasmurro.png", pdf: "pdf/domcasmurro.pdf" },
+    { titulo: "O Cortiço", autor: "Aluísio Azevedo", categoria: "Realismo", img: "imagens/ocortico.png", pdf: "pdf/cortico.pdf" },
+    { titulo: "Capitães da Areia", autor: "Jorge Amado", categoria: "Drama", img: "imagens/capitaesdeareia.png", pdf: "pdf/capitaes.pdf" },
     { titulo: "Memórias Póstumas", autor: "Machado de Assis", categoria: "Romance", img: "img/memorias.jpg", pdf: "pdf/memorias.pdf" }
 ];
 
