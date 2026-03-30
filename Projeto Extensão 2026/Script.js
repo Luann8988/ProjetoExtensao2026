@@ -1,25 +1,18 @@
-const loginForm = document.getElementById("loginForm");
-const loginContainer = document.getElementById("loginContainer");
-const bibliotecaContainer = document.getElementById("bibliotecaContainer");
-
-loginForm.addEventListener("submit", e => {
+// ================= LOGIN =================
+function login(e) {
     e.preventDefault();
+
     const usuario = document.getElementById("usuario").value;
     const senha = document.getElementById("senha").value;
 
-    if(usuario === "admin" && senha === "1234") {
-        loginContainer.style.display = "none";
-        bibliotecaContainer.style.display = "block";
-        iniciarBiblioteca();
+    if (usuario === "admin" && senha === "1234") {
+        localStorage.setItem("logado", true);
+        window.location.href = "index.html";
     } else {
         alert("Usuário ou senha incorretos!");
     }
-});
-
-// ================= BIBLIOTECA =================
-function iniciarBiblioteca() {
-    // JS completo da biblioteca (carregar livros, busca, filtros, modal, empréstimos)
 }
+
 // ================= PROTEÇÃO DE ACESSO =================
 if (window.location.pathname.includes("index.html")) {
     if (!localStorage.getItem("logado")) {

@@ -4,52 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Biblioteca Escolar</title>
-<link rel="stylesheet" href="Login.html">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css"> <!-- Somente CSS -->
 </head>
 <body>
 
-<header>
-  <div class="header-left">
-    <img src="img/logo.png" class="logo">
-    <div class="titulo-escola">
-      Escola Estadual <br>
-      <strong>Professor Gonçalves Couto</strong>
+<!-- ================= BIBLIOTECA ================= -->
+<div id="bibliotecaContainer">
+
+  <header>
+    <div class="header-left">
+      <img src="imagens/imagem2.png" class="logo">
+      <div class="titulo-escola">
+        Escola Estadual <br>
+        <strong>Professor Gonçalves Couto</strong>
+      </div>
+    </div>
+
+    <!-- Campo de busca -->
+    <input type="text" id="search" placeholder="🔍 Buscar livros...">
+    <button onclick="logout()" class="btn-logout">Sair</button>
+  </header>
+
+  <main>
+    <!-- SIDEBAR DE CATEGORIAS -->
+    <aside class="sidebar">
+      <h3>Categorias</h3>
+      <ul>
+        <li onclick="filtrarCategoria('Todos')">Todos</li>
+        <li onclick="filtrarCategoria('Romance')">Romance</li>
+        <li onclick="filtrarCategoria('Realismo')">Realismo</li>
+        <li onclick="filtrarCategoria('Drama')">Drama</li>
+      </ul>
+    </aside>
+
+    <!-- GRID DE LIVROS -->
+    <section id="livros" class="grid"></section>
+  </main>
+
+  <!-- MODAL DE EMPRÉSTIMO -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="fecharModal()">&times;</span>
+      <h2>Emprestar Livro</h2>
+      <form id="emprestimoForm">
+        <input type="text" id="nomeAluno" placeholder="Nome do aluno" required>
+        <input type="text" id="serieAluno" placeholder="Série/Ano" required>
+        <input type="hidden" id="livroSelecionado">
+        <button type="submit">Confirmar Empréstimo</button>
+      </form>
     </div>
   </div>
 
-  <input type="text" id="search" placeholder="🔍 Buscar livros...">
-  <button onclick="logout()" class="btn-logout">Sair</button>
-</header>
-
-<main>
-  <!-- SIDEBAR DE CATEGORIAS -->
-  <aside class="sidebar">
-    <h3>Categorias</h3>
-    <ul>
-      <li onclick="filtrarCategoria('Todos')">Todos</li>
-      <li onclick="filtrarCategoria('Romance')">Romance</li>
-      <li onclick="filtrarCategoria('Realismo')">Realismo</li>
-      <li onclick="filtrarCategoria('Drama')">Drama</li>
-    </ul>
-  </aside>
-
-  <!-- GRID DE LIVROS -->
-  <section id="livros" class="grid"></section>
-</main>
-
-<!-- MODAL DE EMPRÉSTIMO -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="fecharModal()">&times;</span>
-    <h2>Emprestar Livro</h2>
-    <form id="emprestimoForm">
-      <input type="text" id="nomeAluno" placeholder="Nome do aluno" required>
-      <input type="text" id="serieAluno" placeholder="Série/Ano" required>
-      <input type="hidden" id="livroSelecionado">
-      <button type="submit">Confirmar Empréstimo</button>
-    </form>
-  </div>
 </div>
 
-</div>
+<script src="script.js"></script> <!-- Script da biblioteca -->
+</body>
+</html>
