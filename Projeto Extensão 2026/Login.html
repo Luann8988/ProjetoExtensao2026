@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Biblioteca</title>
-    <link rel="stylesheet" href="Styles.css">
+  <meta charset="UTF-8">
+  <title>Login - Biblioteca Escolar</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="login-body">
-    <div class="login-container">
-        <img src="img///" class="logo">
-        <h2>Biblioteca Escolar</h2>
-        
 
-        <form onsubmit="login(event)">
-            <input type="tex" id="usuario" placeholder="Usuário" required>
-            <input type="password" id="senha" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
+  <div class="login-container">
+    <img src="img/logo.png" class="logo">
 
-        <p class="info-login">Usuário: admin | Senha: 1234</p>
-    </div>
+    <h2>Portal do Aluno</h2>
+    <p>Biblioteca Escolar</p>
 
-    <script src="Script.js"></script>
+    <form onsubmit="login(event)">
+      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <p class="info-login">Use: admin / 1234</p>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

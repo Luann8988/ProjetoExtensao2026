@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biblioteca</title>
-    <link rel="stylesheet" href="Styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca Escolar</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
 <header>
-    <div class="logo-area">
-            <img src="img/logo.png">
-        <h1>Biblioteca Escolar</h1>
+  <div class="header-left">
+    <img src="img/logo.png" class="logo">
+
+    <div class="titulo-escola">
+      Escola Estadual <br>
+      <strong>Professor Gonçalves Couto</strong>
     </div>
+  </div>
 
-     <input type="text" id="search" placeholder="Buscar Livros......">
+  <input type="text" id="search" placeholder="🔍 Buscar livros...">
 </header>
-       
 
-    <main>
-        <section id="livros" class="grid"></section>
-    </main>
+<main>
+  <h2 class="titulo-pagina">📚 Acervo da Biblioteca</h2>
 
-    <script src="Script.js"></script>
-    
+  <section id="livros" class="grid"></section>
+</main>
+
+<script src="script.js"></script>
 </body>
 </html>
