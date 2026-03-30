@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal do Professor - Biblioteca</title>
+<link rel="stylesheet" href="Styles.css">
+</head>
+<body>
+
+<div id="professorContainer">
+
+  <header>
+    <div class="header-left">
+      <img src="imagens/imagem1.png" alt="Logo Escola" class="logo">
+      <div class="titulo-escola">
+        Escola Estadual <br>
+        <strong>Professor Gonçalves Couto</strong>
+      </div>
+    </div>
+    <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
+    <button onclick="logout()" class="btn-logout">Sair</button>
+  </header>
+
+  <main>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Dashboard</h3>
+      <ul>
+        <li class="active">📊 Estatísticas</li>
+        <li onclick="window.location.href='gerenciar_alunos.html'">👥 Alunos</li>
+        <li onclick="window.location.href='relatorios.html'">📈 Relatórios</li>
+        <li onclick="window.location.href='gerenciar_livros.html'">📚 Livros</li>
+      </ul>
+    </aside>
+
+    <!-- DASHBOARD CONTENT -->
+    <section class="dashboard-content">
+      
+      <!-- ESTATÍSTICAS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="total-emp">0</div>
+          <div class="stat-label">Total Empréstimos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="ativos">0</div>
+          <div class="stat-label">Ativos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="atrasados">0</div>
+          <div class="stat-label">Atrasados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="devolucoes">0</div>
+          <div class="stat-label">Devoluções Hoje</div>
+        </div>
+      </div>
+
+      <!-- RECENTES EMPRÉSTIMOS -->
+      <div class="data-section">
+        <div class="data-header">📋 Empréstimos Recentes</div>
+        <table class="data-table" id="emprestimos-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Aluno</th>
+              <th>Série</th>
+              <th>Livro</th>
+              <th>Data Emp.</th>
+              <th>Data Dev.</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Loaded by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- AÇÕES RÁPIDAS -->
+      <div class="data-section">
+        <div class="data-header">⚡ Ações Rápidas</div>
+        <div class="admin-actions">
+          <a href="#" class="admin-btn btn-primary" onclick="verTodosEmprestimos()">Ver Todos Empréstimos</a>
+          <a href="#" class="admin-btn btn-secondary" onclick="gerarRelatorio()">Gerar Relatório</a>
+          <a href="#" class="admin-btn btn-primary" onclick="adicionarLivro()">Adicionar Livro</a>
+          <a href="#" class="admin-btn btn-secondary" onclick="registrarDevolucao()">Registrar Devolução</a>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+</div>
+
+<script src="Script.js"></script>
+
+</body>
+</html>

@@ -14,21 +14,61 @@ function login(e) {
 }
 
 // ================= PROTEÇÃO DE ACESSO =================
-if (window.location.pathname.includes("index.html")) {
+if (window.location.pathname.includes("index.html") || window.location.pathname.includes("professor.html")) {
     if (!localStorage.getItem("logado")) {
-        window.location.href = "login.html";
+        window.location.href = "aluno.html";
     }
 }
 
-// ================= LIVROS =================
+// ================= TEACHER DASHBOARD =================
+const emprestimosMock = [
+    {codigo: 'EMPR-1729...', aluno: 'Maria Silva', serie: '2º Ano', livro: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
+    {codigo: 'EMPR-1729...', aluno: 'João Santos', serie: '3º Ano', livro: 'O Cortiço', dataEmp: '09/10/2024', dataDev: '16/10/2024', status: 'overdue'},
+    {codigo: 'EMPR-1728...', aluno: 'Ana Oliveira', serie: '1º Ano', livro: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'},
+    {codigo: 'EMPR-1728...', aluno: 'Pedro Costa', serie: '2º Ano', livro: 'Dom Casmurro', dataEmp: '07/10/2024', dataDev: '14/10/2024', status: 'active'},
+    {codigo: 'EMPR-1727...', aluno: 'Lucas Pereira', serie: '3º Ano', livro: 'O Cortiço', dataEmp: '05/10/2024', dataDev: '12/10/2024', status: 'overdue'}
+];
+
+function carregarDashboard() {
+    // Stats
+    const totalEmprestimos = emprestimosMock.length;
+    const ativos = emprestimosMock.filter(e => e.status === 'active').length;
+    const atrasados = emprestimosMock.filter(e => e.status === 'overdue').length;
+    const devolucoesHoje = emprestimosMock.filter(e => e.dataDev === '11/10/2024').length; // Mock today
+
+    document.getElementById('total-emp').textContent = totalEmprestimos;
+    document.getElementById('ativos').textContent = ativos;
+    document.getElementById('atrasados').textContent = atrasados;
+    document.getElementById('devolucoes').textContent = devolucoesHoje;
+
+    // Table
+    const tbody = document.querySelector('#emprestimos-table tbody');
+    tbody.innerHTML = '';
+    emprestimosMock.slice(0,8).forEach(emp => {
+        const statusClass = emp.status === 'overdue' ? 'status-overdue' : 'status-active';
+        tbody.innerHTML += `
+            <tr>
+                <td>${emp.codigo}</td>
+                <td>${emp.aluno}</td>
+                <td>${emp.serie}</td>
+                <td>${emp.livro}</td>
+                <td>${emp.dataEmp}</td>
+                <td>${emp.dataDev}</td>
+                <td><span class="${statusClass}">${emp.status.toUpperCase()}</span></td>
+            </tr>
+        `;
+    });
+}
+
+// ================= LIVROS (student pages) =================
 const livros = [
     { titulo: "Dom Casmurro", autor: "Machado de Assis", categoria: "Romance", img: "imagens/domcasmurro.png", pdf: "pdf/domcasmurro.pdf" },
     { titulo: "O Cortiço", autor: "Aluísio Azevedo", categoria: "Realismo", img: "imagens/ocortico.png", pdf: "pdf/cortico.pdf" },
     { titulo: "Capitães da Areia", autor: "Jorge Amado", categoria: "Drama", img: "imagens/capitaesdeareia.png", pdf: "pdf/capitaes.pdf" },
-    { titulo: "Memórias Póstumas", autor: "Machado de Assis", categoria: "Romance", img: "img/memorias.jpg", pdf: "pdf/memorias.pdf" }
+    { titulo: "Memórias Póstumas", autor: "Machado de Assis", categoria: "Romance", img: "imagens/memorias.jpg", pdf: "pdf/memorias.pdf" }
 ];
 
-// ================= HISTÓRICO DE EMPRÉSTIMOS =================
+// Rest of student functions unchanged...
 function getHistorico() {
     return JSON.parse(localStorage.getItem("emprestimos") || "[]");
 }
@@ -37,14 +77,12 @@ function salvarHistorico(historico) {
     localStorage.setItem("emprestimos", JSON.stringify(historico));
 }
 
-// ================= VERIFICAR BLOQUEIO =================
 function estaBloqueado() {
     const bloqueadoAte = localStorage.getItem("bloqueadoAte");
     if (!bloqueadoAte) return false;
     return new Date(bloqueadoAte) > new Date();
 }
 
-// ================= CARREGAR LIVROS =================
 function carregarLivros(lista) {
     const container = document.getElementById("livros");
     if (!container) return;
@@ -68,7 +106,6 @@ function carregarLivros(lista) {
     });
 }
 
-// ================= BUSCA =================
 const searchInput = document.getElementById("search");
 if (searchInput) {
     searchInput.addEventListener("input", e => {
@@ -82,7 +119,6 @@ if (searchInput) {
     });
 }
 
-// ================= FILTRAR POR CATEGORIA =================
 function filtrarCategoria(categoria) {
     if (categoria === "Todos") {
         carregarLivros(livros);
@@ -91,7 +127,6 @@ function filtrarCategoria(categoria) {
     }
 }
 
-// ================= BOTÕES =================
 function verPDF(pdf) {
     window.open(pdf, "_blank");
 }
@@ -100,7 +135,6 @@ function retirarBiblioteca(titulo) {
     alert(`Você pode retirar "${titulo}" na biblioteca.`);
 }
 
-// ================= MODAL DE EMPRÉSTIMO =================
 const modal = document.getElementById("modal");
 const formEmprestimo = document.getElementById("emprestimoForm");
 
@@ -113,7 +147,6 @@ function fecharModal() {
     modal.style.display = "none";
 }
 
-// ================= CONFIRMAR EMPRÉSTIMO =================
 formEmprestimo.addEventListener("submit", e => {
     e.preventDefault();
 
@@ -147,9 +180,9 @@ formEmprestimo.addEventListener("submit", e => {
 
     alert(`Livro "${livro}" emprestado com sucesso!\nAluno: ${nome} (Série: ${serie})\nCódigo: ${codigo}\nDevolução até: ${dataDevolucao.toLocaleDateString()}`);
     fecharModal();
+    carregarLivros(livros); // Refresh
 });
 
-// ================= VERIFICAR ATRASOS =================
 function verificarAtrasos() {
     const historico = getHistorico();
     const hoje = new Date();
@@ -171,12 +204,20 @@ function verificarAtrasos() {
     }
 }
 
-// ================= LOGOUT =================
 function logout() {
     localStorage.removeItem("logado");
-    window.location.href = "login.html";
+    localStorage.removeItem("bloqueadoAte");
+    window.location.href = "aluno.html";
 }
 
-// ================= INICIAR =================
-verificarAtrasos();
-carregarLivros(livros);
+// ================= INIT =================
+document.addEventListener('DOMContentLoaded', function() {
+    verificarAtrasos();
+    
+    if (window.location.pathname.includes('professor.html')) {
+        carregarDashboard();
+        document.querySelector('.sidebar li').classList.add('active'); // Highlight dashboard
+    } else {
+        carregarLivros(livros);
+    }
+});
