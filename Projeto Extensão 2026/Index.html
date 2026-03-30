@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Escolar</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteca Escolar</title>
+<link rel="stylesheet" href="Login.html">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+
+<!-- ================= BIBLIOTECA ================= -->
+<div id="bibliotecaContainer" style="display:none;">
+
 <header>
   <div class="header-left">
-    <img src="imagens/imagem2.png" class="logo">
-
+    <img src="img/logo.png" class="logo">
     <div class="titulo-escola">
       Escola Estadual <br>
       <strong>Professor Gonçalves Couto</strong>
@@ -19,24 +23,37 @@
   </div>
 
   <input type="text" id="search" placeholder="🔍 Buscar livros...">
+  <button onclick="logout()" class="btn-logout">Sair</button>
 </header>
 
 <main>
+  <!-- SIDEBAR DE CATEGORIAS -->
+  <aside class="sidebar">
+    <h3>Categorias</h3>
+    <ul>
+      <li onclick="filtrarCategoria('Todos')">Todos</li>
+      <li onclick="filtrarCategoria('Romance')">Romance</li>
+      <li onclick="filtrarCategoria('Realismo')">Realismo</li>
+      <li onclick="filtrarCategoria('Drama')">Drama</li>
+    </ul>
+  </aside>
 
-  <h2 class="titulo-pagina">📚 Acervo da Biblioteca</h2>
-
-  <!-- CATEGORIAS -->
-  <div class="categorias">
-    <button onclick="filtrarCategoria('Todos')">Todos</button>
-    <button onclick="filtrarCategoria('Romance')">Romance</button>
-    <button onclick="filtrarCategoria('Realismo')">Realismo</button>
-    <button onclick="filtrarCategoria('Drama')">Drama</button>
-  </div>
-
+  <!-- GRID DE LIVROS -->
   <section id="livros" class="grid"></section>
-
 </main>
 
-<script src="script.js"></script>
-</body>
-</html>
+<!-- MODAL DE EMPRÉSTIMO -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal()">&times;</span>
+    <h2>Emprestar Livro</h2>
+    <form id="emprestimoForm">
+      <input type="text" id="nomeAluno" placeholder="Nome do aluno" required>
+      <input type="text" id="serieAluno" placeholder="Série/Ano" required>
+      <input type="hidden" id="livroSelecionado">
+      <button type="submit">Confirmar Empréstimo</button>
+    </form>
+  </div>
+</div>
+
+</div>
