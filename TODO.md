@@ -1,29 +1,45 @@
-# TODO: Online Library Implementation
-Progress tracked here. Steps from approved plan.
+# Portal Fix Plan - Biblioteca Escolar
+Progress tracked here. Approved plan implementation.
 
-## 1. ✅ Create TODO.md (current)
+## Completed: ✅
 
-## 2. Update Script.js
-- Add books/loans data models with localStorage
-- Book display/search functions
-- Borrow/return/addBook functions
-- Student dashboard init
-- Enhance professor dashboard
-- Modals/actions
+## TODO Steps:
 
-## 3. Update Aluno.html
-- Add post-login dashboard (header, search, book grid, my loans)
+### 1. Create/Update TODO.md ✅
+- Current file updated with full plan
 
-## 4. Update Professor.html  
-- Add book catalog section
-- Management modals/buttons
+### 2. Fix Index.html navigation ✅
+- Standardize links: 'Aluno.html', 'Professor.html'
 
-## 5. Update Styles.css
-- Book grid/modal tweaks
+### 3. Implement Aluno.html dashboard ✅
+- Add header, book grid, my loans section
+- Login → dashboard toggle
+- Sidebar navigation
 
-## 6. Test & Demo
-- Test flows
-- Demo command
+### 4. Fix Professor.html ✅
+- Correct script src='script.js'
+- Ensure login toggle works ✅
 
-Completed steps marked ✅. Next: Script.js updates.
+### 5. Update Script.js core logic ✅
+- checkLoggedIn() for portal protection
+- showStudentDashboard(), showBooks()
+- Fix redirects to 'Index.html'
+- Student-specific init functions
+- Logout consistency
+- showStudentDashboard(), showBooks()
+- Fix redirects to 'Index.html'
+- Student-specific init functions
+- Logout consistency
+
+### 6. Test all flows ✅
+- Index → portals: Fixed nav ✅
+- Student login (admin/1234): Dashboard renders ✅
+- Professor login (professor/1234): Dashboard renders ✅
+- Dashboards render + localStorage: Working ✅
+
+### 7. Demo
+- open Projeto-Extens-o-2026/Index.html
+
+**Next step marked. Updates after each completion.**
+
 

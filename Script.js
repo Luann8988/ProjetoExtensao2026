@@ -44,11 +44,11 @@ const BOOKS = [
     }
 ];
 
-// Empréstimos (melhorado com bookId e studentId)
+// Empréstimos (mock para aluno 'admin' e outros)
 let LOANS = [
-    {id: 1, codigo: 'EMPR-1729', studentId: 'maria123', studentName: 'Maria Silva', serie: '2º Ano', bookId: 1, bookTitle: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
+    {id: 1, codigo: 'EMPR-1729', studentId: 'admin', studentName: 'Admin User', serie: '2º Ano', bookId: 1, bookTitle: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
     {id: 2, codigo: 'EMPR-1730', studentId: 'joao456', studentName: 'João Santos', serie: '3º Ano', bookId: 2, bookTitle: 'O Cortiço', dataEmp: '09/10/2024', dataDev: '16/10/2024', status: 'overdue'},
-    {id: 3, codigo: 'EMPR-1728', studentId: 'ana789', studentName: 'Ana Oliveira', serie: '1º Ano', bookId: 3, bookTitle: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'}
+    {id: 3, codigo: 'EMPR-1728', studentId: 'admin', studentName: 'Admin User', serie: '2º Ano', bookId: 3, bookTitle: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'}
 ];
 
 // ================= PERSISTENCE =================
@@ -60,62 +60,154 @@ function saveData() {
 function loadData() {
     const savedBooks = localStorage.getItem('libraryBooks');
     const savedLoans = localStorage.getItem('libraryLoans');
-    if (savedBooks) BOOKS = JSON.parse(savedBooks);
-    if (savedLoans) LOANS = JSON.parse(savedLoans);
+    if (savedBooks) BOOKS.length = 0, [...JSON.parse(savedBooks), ...BOOKS];
+    if (savedLoans) LOANS.length = 0, [...JSON.parse(savedLoans), ...LOANS];
+}
+
+// ================= UTILS =================
+function isLoggedIn() {
+    return localStorage.getItem('logado') === 'true';
+}
+
+function getUserType() {
+    return localStorage.getItem('tipoUsuario');
+}
+
+function checkPortalAccess() {
+    if (!isLoggedIn()) {
+        window.location.href = 'Index.html';
+        return false;
+    }
+    return true;
 }
 
 // ================= LOGIN =================
 function login(e) {
     e.preventDefault();
+    const usuario = document.getElementById('usuario')?.value?.trim();
+    const senha = document.getElementById('senha')?.value?.trim();
 
-    const usuario = document.getElementById("usuario").value.trim();
-    const senha = document.getElementById("senha").value.trim();
+    if (!usuario || !senha) return alert('Preencha usuário e senha');
 
-    if (usuario === "admin" && senha === "1234") {
-        // Login aluno (já existente)
-        localStorage.setItem("logado", true);
-        localStorage.setItem("tipoUsuario", "aluno");
-        window.location.href = "aluno.html";
-    } 
-    else if (usuario === "professor" && senha === "1234") {
-        // Login professor
-        localStorage.setItem("logado", true);
-        localStorage.setItem("tipoUsuario", "professor");
-        window.location.href = "professor.html";
-    } 
-    else {
-        alert("Usuário ou senha incorretos!");
+    if (usuario === 'admin' && senha === '1234') {
+        localStorage.setItem('logado', 'true');
+        localStorage.setItem('tipoUsuario', 'aluno');
+        localStorage.setItem('studentId', 'admin');
+        showStudentDashboard();
+    } else if (usuario === 'professor' && senha === '1234') {
+        localStorage.setItem('logado', 'true');
+        localStorage.setItem('tipoUsuario', 'professor');
+        showProfessorDashboard();
+    } else {
+        alert('Credenciais inválidas!');
     }
 }
 
-// ================= PROTEÇÃO DE ACESSO =================
-if (window.location.pathname.includes("professor.html")) {
-    if (!localStorage.getItem("logado") || localStorage.getItem("tipoUsuario") !== "professor") {
-        window.location.href = "login.html"; // Redireciona para login se não for professor
-    }
-}
-
-// ================= LOGOUT =================
 function logout() {
-    localStorage.removeItem("logado");
-    localStorage.removeItem("tipoUsuario");
-    window.location.href = "login.html";
+    localStorage.removeItem('logado');
+    localStorage.removeItem('tipoUsuario');
+    localStorage.removeItem('studentId');
+    // Redirect to index
+    window.location.href = 'Index.html';
 }
 
-// ================= TEACHER DASHBOARD =================
+// ================= STUDENT FUNCTIONS =================
+function showStudentDashboard() {
+    const loginContainer = document.getElementById('loginContainer');
+    const alunoContainer = document.getElementById('alunoContainer');
+    if (loginContainer && alunoContainer) {
+        loginContainer.style.display = 'none';
+        alunoContainer.style.display = 'block';
+    }
+    loadData();
+    showBooks();
+}
+
+function showBooks() {
+    const grid = document.getElementById('booksGrid');
+    if (!grid) return;
+
+    grid.innerHTML = BOOKS.map(book => `
+        <div class="card">
+            <img src="${book.image}" alt="${book.title}" class="capa">
+            <div class="card-content">
+                <h3>${book.title}</h3>
+                <p><strong>${book.author}</strong></p>
+                <p>${book.description}</p>
+                <span class="categoria">${book.availableCopies}/${book.totalCopies} disponíveis</span>
+                <br>
+                <button class="btn-emprestar" onclick="emprestarLivro(${book.id})">Emprestar</button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Update sidebar
+    document.querySelectorAll('.sidebar li').forEach((li, i) => {
+        li.classList.toggle('active', i === 0);
+    });
+}
+
+function showMyLoans() {
+    const studentId = localStorage.getItem('studentId') || 'admin';
+    const myLoans = LOANS.filter(loan => loan.studentId === studentId && loan.status === 'active');
+    const tbody = document.getElementById('myLoansTable').querySelector('tbody');
+    tbody.innerHTML = myLoans.map(loan => {
+        const book = BOOKS.find(b => b.id === loan.bookId);
+        const statusClass = loan.status === 'overdue' ? 'status-overdue' : 'status-active';
+        return `
+            <tr>
+                <td>${loan.bookTitle}</td>
+                <td>${loan.dataEmp}</td>
+                <td>${loan.dataDev}</td>
+                <td><span class="${statusClass}">${loan.status.toUpperCase()}</span></td>
+                <td><button class="btn-secondary" onclick="devolverLivro(${loan.id})">Devolver</button></td>
+            </tr>
+        `;
+    }).join('');
+
+    document.getElementById('bookCatalog').style.display = 'none';
+    document.getElementById('myLoansSection').style.display = 'block';
+    
+    document.querySelectorAll('.sidebar li')[1].classList.add('active');
+    document.querySelectorAll('.sidebar li')[0].classList.remove('active');
+}
+
+function showHistory() {
+    alert('Histórico de empréstimos - Em desenvolvimento');
+}
+
+// Mock actions
+function emprestarLivro(bookId) {
+    alert(`Livro ${BOOKS.find(b => b.id === bookId).title} emprestado com sucesso!`);
+}
+
+function devolverLivro(loanId) {
+    alert(`Empréstimo ${loanId} devolvido!`);
+}
+
+// ================= PROFESSOR FUNCTIONS =================
+function showProfessorDashboard() {
+    const loginContainer = document.getElementById('loginContainer');
+    const profContainer = document.getElementById('professorContainer');
+    if (loginContainer && profContainer) {
+        loginContainer.style.display = 'none';
+        profContainer.style.display = 'block';
+    }
+    carregarDashboard();
+}
+
+// Existing professor functions (enhanced)
 const emprestimosMock = [
-    {codigo: 'EMPR-1729', aluno: 'Maria Silva', serie: '2º Ano', livro: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
-    {codigo: 'EMPR-1729', aluno: 'João Santos', serie: '3º Ano', livro: 'O Cortiço', dataEmp: '09/10/2024', dataDev: '16/10/2024', status: 'overdue'},
-    {codigo: 'EMPR-1728', aluno: 'Ana Oliveira', serie: '1º Ano', livro: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'},
-    {codigo: 'EMPR-1728', aluno: 'Pedro Costa', serie: '2º Ano', livro: 'Dom Casmurro', dataEmp: '07/10/2024', dataDev: '14/10/2024', status: 'active'},
-    {codigo: 'EMPR-1727', aluno: 'Lucas Pereira', serie: '3º Ano', livro: 'O Cortiço', dataEmp: '05/10/2024', dataDev: '12/10/2024', status: 'overdue'}
+    {codigo: 'EMPR-1729', aluno: 'Admin User', serie: '2º Ano', livro: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
+    {codigo: 'EMPR-1730', aluno: 'João Santos', serie: '3º Ano', livro: 'O Cortiço', dataEmp: '09/10/2024', dataDev: '16/10/2024', status: 'overdue'},
+    {codigo: 'EMPR-1728', aluno: 'Admin User', serie: '2º Ano', livro: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'}
 ];
 
 function carregarDashboard() {
-    const totalEmprestimos = emprestimosMock.length;
-    const ativos = emprestimosMock.filter(e => e.status === 'active').length;
-    const atrasados = emprestimosMock.filter(e => e.status === 'overdue').length;
-    const devolucoesHoje = emprestimosMock.filter(e => e.dataDev === new Date().toLocaleDateString()).length;
+    const totalEmprestimos = LOANS.length;
+    const ativos = LOANS.filter(e => e.status === 'active').length;
+    const atrasados = LOANS.filter(e => e.status === 'overdue').length;
+    const devolucoesHoje = 0; // Simplified
 
     document.getElementById('total-emp').textContent = totalEmprestimos;
     document.getElementById('ativos').textContent = ativos;
@@ -123,30 +215,69 @@ function carregarDashboard() {
     document.getElementById('devolucoes').textContent = devolucoesHoje;
 
     const tbody = document.querySelector('#emprestimos-table tbody');
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-    emprestimosMock.slice(0, 8).forEach(emp => {
+    tbody.innerHTML = LOANS.slice(0, 8).map(emp => {
         const statusClass = emp.status === 'overdue' ? 'status-overdue' : 'status-active';
-        tbody.innerHTML += `
+        return `
             <tr>
                 <td>${emp.codigo}</td>
-                <td>${emp.aluno}</td>
+                <td>${emp.studentName}</td>
                 <td>${emp.serie}</td>
-                <td>${emp.livro}</td>
+                <td>${emp.bookTitle}</td>
                 <td>${emp.dataEmp}</td>
                 <td>${emp.dataDev}</td>
                 <td><span class="${statusClass}">${emp.status.toUpperCase()}</span></td>
             </tr>
         `;
-    });
+    }).join('');
 }
 
 // ================= INIT =================
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('professor.html')) {
-        carregarDashboard();
-        const sidebarItems = document.querySelectorAll('.sidebar li');
-        if (sidebarItems.length) sidebarItems[0].classList.add('active');
+    loadData();
+    
+    // Portal protection
+    if (window.location.pathname.includes('Aluno.html')) {
+        if (checkPortalAccess() && getUserType() === 'aluno') {
+            showStudentDashboard();
+        } else if (!isLoggedIn()) {
+            // Show login
+        }
+    } else if (window.location.pathname.includes('Professor.html')) {
+        if (checkPortalAccess() && getUserType() === 'professor') {
+            showProfessorDashboard();
+        } else if (!isLoggedIn()) {
+            // Show login
+        }
     }
+
+    // Search handlers (basic)
+    const searchAluno = document.getElementById('searchAluno');
+    const searchProf = document.getElementById('searchProf');
+    if (searchAluno) searchAluno.oninput = filterBooks;
+    if (searchProf) searchProf.oninput = filterLoans;
 });
+
+function filterBooks(e) {
+    const term = e.target.value.toLowerCase();
+    const cards = document.querySelectorAll('#booksGrid .card');
+    cards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = title.includes(term) ? 'block' : 'none';
+    });
+}
+
+function filterLoans(e) {
+    const term = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#emprestimos-table tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+}
+
+// Professor action stubs
+function verTodosEmprestimos() { alert('Todos os empréstimos'); }
+function gerarRelatorio() { alert('Relatório gerado'); }
+function adicionarLivro() { alert('Adicionar livro'); }
+function registrarDevolucao() { alert('Registrar devolução'); }
+
