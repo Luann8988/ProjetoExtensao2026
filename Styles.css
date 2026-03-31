@@ -201,7 +201,6 @@ main {
   opacity: 0.85;
 }
 
-/* ================= TEACHER DASHBOARD ================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -314,7 +313,6 @@ main {
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* ================= LOGIN & MODAL (unchanged) ================= */
 .login-container {
   display: flex;
   flex-direction: column;
@@ -339,6 +337,7 @@ main {
   font-weight: 800;
   margin-bottom: 20px;
   background: linear-gradient(90deg, #FFD700, #FFC20E);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
@@ -452,5 +451,208 @@ main {
   
   .stats-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* CORES */
+:root {
+  --azul: #2E3192;
+  --azul-escuro: #1B1464;
+  --amarelo: #FFC20E;
+  --branco: #fff;
+  --cinza: #f5f7ff;
+  --texto: #333;
+}
+
+/* BODY */
+body {
+  background: var(--cinza);
+  color: var(--texto);
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(90deg, var(--azul-escuro), var(--azul));
+  color: white;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* LAYOUT PRINCIPAL */
+main {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: var(--branco);
+  padding: 20px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+.sidebar h3 {
+  color: var(--azul);
+  margin-bottom: 15px;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar li {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sidebar li:hover,
+.sidebar li.active {
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+  font-weight: bold;
+}
+
+/* CONTEÚDO DIREITO */
+.dashboard-content {
+  flex: 1;
+}
+
+/* GRID DE ESTATÍSTICAS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* CARD ESTATÍSTICA */
+.stat-card {
+  background: linear-gradient(135deg, var(--azul), var(--azul-escuro));
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 14px;
+}
+
+/* SEÇÕES */
+.data-section {
+  background: white;
+  margin-top: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* HEADER DA TABELA */
+.data-header {
+  background: var(--azul);
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+}
+
+/* TABELA */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background: #f0f0f0;
+  padding: 10px;
+}
+
+.data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.data-table tr:hover {
+  background: #eef1ff;
+}
+
+/* BOTÕES */
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  flex-wrap: wrap;
+}
+
+.admin-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: var(--azul);
+  color: white;
+}
+
+.btn-secondary {
+  background: var(--amarelo);
+  color: var(--azul-escuro);
+}
+
+/* LOGIN */
+#loginContainer {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul));
+}
+
+#loginContainer form {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 300px;
+}
+
+#loginContainer input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+#loginContainer button {
+  width: 100%;
+  padding: 10px;
+  background: var(--amarelo);
+  border: none;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
   }
 }
