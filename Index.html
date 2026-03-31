@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biblioteca Escolar</title>
-<link rel="stylesheet" href="styles.css"> <!-- Somente CSS -->
+<title>Biblioteca Escolar - Seleção de Portal</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- ================= BIBLIOTECA ================= -->
-<div id="bibliotecaContainer">
+<div class="portal-selector">
 
   <header>
     <div class="header-left">
@@ -19,44 +18,57 @@
         <strong>Professor Gonçalves Couto</strong>
       </div>
     </div>
-
-    <!-- Campo de busca -->
-    <input type="text" id="search" placeholder="🔍 Buscar livros...">
-    <button onclick="logout()" class="btn-logout">Sair</button>
+    <div style="flex: 1;"></div> <!-- Spacer -->
+    <button onclick="window.location.href='aluno.html'" class="btn-logout" style="margin-right: 10px;">👨‍🎓 Portal Aluno</button>
+    <button onclick="window.location.href='professor.html'" class="btn-logout">👨‍🏫 Portal Professor</button>
   </header>
 
-  <main>
-    <!-- SIDEBAR DE CATEGORIAS -->
-    <aside class="sidebar">
-      <h3>Categorias</h3>
-      <ul>
-        <li onclick="filtrarCategoria('Todos')">Todos</li>
-        <li onclick="filtrarCategoria('Romance')">Romance</li>
-        <li onclick="filtrarCategoria('Realismo')">Realismo</li>
-        <li onclick="filtrarCategoria('Drama')">Drama</li>
-      </ul>
-    </aside>
+  <main style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px;">
+    
+    <h1 style="color: #2E3192; font-size: 36px; margin-bottom: 40px; text-align: center;">
+      Bem-vindo à Biblioteca Escolar
+    </h1>
 
-    <!-- GRID DE LIVROS -->
-    <section id="livros" class="grid"></section>
-  </main>
+    <div class="portal-buttons" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+      
+      <!-- PORTAL ALUNO -->
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='aluno.html'">
+        <div style="height: 180px; background: linear-gradient(135deg, #4facfe, #00f2fe); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 64px;">👨‍🎓</span>
+        </div>
+        <div class="card-content">
+          <h3>Portal do Aluno</h3>
+          <p>Visualize livros, faça empréstimos e gerencie seus registros</p>
+          <span class="categoria">Para Estudantes</span>
+          <button class="btn-emprestar" style="margin-top: 10px;">Acessar →</button>
+        </div>
+      </div>
 
-  <!-- MODAL DE EMPRÉSTIMO -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="fecharModal()">&times;</span>
-      <h2>Emprestar Livro</h2>
-      <form id="emprestimoForm">
-        <input type="text" id="nomeAluno" placeholder="Nome do aluno" required>
-        <input type="text" id="serieAluno" placeholder="Série/Ano" required>
-        <input type="hidden" id="livroSelecionado">
-        <button type="submit">Confirmar Empréstimo</button>
-      </form>
+      <!-- PORTAL PROFESSOR -->
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='professor.html'">
+        <div style="height: 180px; background: linear-gradient(135deg, #2E3192, #1B1464); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 64px;">👨‍🏫</span>
+        </div>
+        <div class="card-content">
+          <h3>Portal do Professor</h3>
+          <p>Gerencie empréstimos, visualize estatísticas e controle a biblioteca</p>
+          <span class="categoria">Administração</span>
+          <button class="btn-pdf" style="margin-top: 10px;">Dashboard →</button>
+        </div>
+      </div>
+
     </div>
-  </div>
+
+    <p style="margin-top: 40px; color: #666; text-align: center;">
+      Selecione o portal desejado ou faça login diretamente:
+      <br>
+      <strong>Aluno:</strong> Use suas credenciais | <strong>Professor:</strong> admin / 1234
+    </p>
+
+  </main>
 
 </div>
 
-<script src="script.js"></script> <!-- Script da biblioteca -->
+<script src="script.js"></script>
 </body>
 </html>
