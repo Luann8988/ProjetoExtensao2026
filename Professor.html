@@ -12,7 +12,7 @@
 
   <!-- LOGIN -->
   <div id="loginContainer" class="login-container">
-    <img src="Imagens/imagem1.png" class="logo" alt="Logo Escola">
+    <img src="Imagens/imagem1.png" class="logo" alt="Logo da Escola Estadual Professor Gonçalves Couto" aria-label="Logo">
 
 
 <h2>Portal do Professor</h2>
@@ -32,7 +32,7 @@
 
     <header>
       <div class="header-left">
-        <img src="Imagens/imagem1.png" alt="Logo Escola" class="logo">
+        <img src="Imagens/imagem1.png" alt="Logo da Escola Estadual Professor Gonçalves Couto" class="logo" aria-label="Logo">
 
         <div class="titulo-escola">
           Escola Estadual <br>
@@ -46,12 +46,11 @@
     <main>
       <aside class="sidebar">
         <h3>Dashboard</h3>
-        <ul>
-<li class="active" onclick="carregarDashboard()">📊 Estatísticas</li>
-
-          <li onclick="window.location.href='gerenciar_alunos.html'">👥 Alunos</li>
-          <li onclick="window.location.href='relatorios.html'">📈 Relatórios</li>
-          <li onclick="window.location.href='gerenciar_livros.html'">📚 Livros</li>
+        <ul role="navigation" aria-label="Navegação do Dashboard">
+          <li class="active" onclick="carregarDashboard()" tabindex="0" role="button" aria-current="page">📊 Estatísticas</li>
+          <li onclick="showSection('alunos')" tabindex="0" role="button">👥 Gerenciar Alunos</li>
+          <li onclick="showSection('relatorios')" tabindex="0" role="button">📈 Relatórios</li>
+          <li onclick="showSection('livros')" tabindex="0" role="button">📚 Gerenciar Livros</li>
         </ul>
       </aside>
 
