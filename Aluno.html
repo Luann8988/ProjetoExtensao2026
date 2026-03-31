@@ -2,25 +2,91 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Biblioteca Escolar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal do Aluno - Biblioteca Escolar</title>
   <link rel="stylesheet" href="styles.css">
+
 </head>
 
 <body class="login-body">
 
-  <div class="login-container">
-    <img src="imagens/imagem1.png" class="logo">
+  <!-- LOGIN FORM -->
+  <div id="loginContainer" class="login-container">
+    <img src="imagens/imagem1.png" class="logo" alt="Logo Escola">
 
     <h2>Portal do Aluno</h2>
 
     <form onsubmit="login(event)">
       <input type="text" id="usuario" placeholder="Usuário" required>
       <input type="password" id="senha" placeholder="Senha" required>
-
       <button type="submit">Entrar</button>
     </form>
+  </div>
 
-    
-  <script src="script.js"></script>
+  <!-- DASHBOARD ALUNO -->
+  <div id="alunoContainer" style="display:none;">
+
+    <header>
+      <div class="header-left">
+        <img src="imagens/imagem1.png" alt="Logo Escola" class="logo">
+
+        <div class="titulo-escola">
+          Escola Estadual <br>
+          <strong>Professor Gonçalves Couto</strong>
+        </div>
+      </div>
+      <input type="text" id="searchAluno" placeholder="🔍 Buscar livros...">
+      <button onclick="logout()" class="btn-logout">Sair</button>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <h3>Meu Painel</h3>
+        <ul>
+          <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
+          <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
+          <li onclick="showHistory()">📜 Histórico</li>
+        </ul>
+      </aside>
+
+      <section class="dashboard-content">
+        
+        <!-- CATÁLOGO DE LIVROS -->
+        <div id="bookCatalog">
+          <div class="data-section">
+            <div class="data-header">📚 Catálogo de Livros</div>
+            <div id="booksGrid" class="grid">
+              <!-- Loaded by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- MEUS EMPRÉSTIMOS -->
+        <div id="myLoansSection" style="display:none;">
+          <div class="data-section">
+            <div class="data-header">📋 Meus Empréstimos Ativos</div>
+            <table class="data-table" id="myLoansTable">
+              <thead>
+                <tr>
+                  <th>Livro</th>
+                  <th>Data Empr.</th>
+                  <th>Data Dev.</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+
+  <script src="Script.js"></script>
 </body>
 </html>

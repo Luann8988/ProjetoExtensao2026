@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Biblioteca Escolar - Seleção de Portal</title>
-<link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css">
+
 </head>
 <body>
 
@@ -12,14 +13,14 @@
 
   <header>
     <div class="header-left">
-      <img src="imagens/imagem2.png" class="logo">
+      <img src="Imagens/imagem2.png" class="logo">
       <div class="titulo-escola">
         Escola Estadual <br>
         <strong>Professor Gonçalves Couto</strong>
       </div>
     </div>
     <div style="flex: 1;"></div> <!-- Spacer -->
-    <button onclick="window.location.href='aluno.html'" class="btn-logout" style="margin-right: 10px;">👨‍🎓 Portal Aluno</button>
+    <button onclick="window.location.href='Aluno.html'" class="btn-logout" style="margin-right: 10px;">👨‍🎓 Portal Aluno</button>
     <button onclick="window.location.href='Professor.html'" class="btn-logout">👨‍🏫 Portal Professor</button>
   </header>
 
@@ -32,7 +33,7 @@
     <div class="portal-buttons" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
       
       <!-- PORTAL ALUNO -->
-      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='aluno.html'">
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='Aluno.html'">
         <div style="height: 180px; background: linear-gradient(135deg, #4facfe, #00f2fe); display: flex; align-items: center; justify-content: center;">
           <span style="font-size: 64px;">👨‍🎓</span>
         </div>
@@ -45,7 +46,7 @@
       </div>
 
       <!-- PORTAL PROFESSOR -->
-      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='professor.html'">
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='Professor.html'">
         <div style="height: 180px; background: linear-gradient(135deg, #2E3192, #1B1464); display: flex; align-items: center; justify-content: center;">
           <span style="font-size: 64px;">👨‍🏫</span>
         </div>
@@ -59,16 +60,10 @@
 
     </div>
 
-    <p style="margin-top: 40px; color: #666; text-align: center;">
-      Selecione o portal desejado ou faça login diretamente:
-      <br>
-      <strong>Aluno:</strong> Use suas credenciais | <strong>Professor:</strong> admin / 1234
-    </p>
-
   </main>
 
 </div>
 
-<script src="script.js"></script>
+<script src="Script.js"></script>
 </body>
 </html>

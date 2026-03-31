@@ -75,7 +75,6 @@ function getUserType() {
 
 function checkPortalAccess() {
     if (!isLoggedIn()) {
-        window.location.href = 'Index.html';
         return false;
     }
     return true;
@@ -93,13 +92,23 @@ function login(e) {
         localStorage.setItem('logado', 'true');
         localStorage.setItem('tipoUsuario', 'aluno');
         localStorage.setItem('studentId', 'admin');
-        showStudentDashboard();
+        const alunoContainer = document.getElementById('alunoContainer');
+        if (alunoContainer) {
+            showStudentDashboard();
+        } else {
+            window.location.href = 'Aluno.html';
+        }
     } else if (usuario === 'professor' && senha === '1234') {
         localStorage.setItem('logado', 'true');
         localStorage.setItem('tipoUsuario', 'professor');
-        showProfessorDashboard();
+        const profContainer = document.getElementById('professorContainer');
+        if (profContainer) {
+            showProfessorDashboard();
+        } else {
+            window.location.href = 'Professor.html';
+        }
     } else {
-        alert('Credenciais inválidas!');
+        alert('Credenciais inválidas! Aluno: admin/1234 | Professor: professor/1234');
     }
 }
 
@@ -235,22 +244,14 @@ function carregarDashboard() {
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
     
-    // Portal protection
-    if (window.location.pathname.includes('Aluno.html')) {
-        if (checkPortalAccess() && getUserType() === 'aluno') {
-            showStudentDashboard();
-        } else if (!isLoggedIn()) {
-            // Show login
-        }
-    } else if (window.location.pathname.includes('Professor.html')) {
-        if (checkPortalAccess() && getUserType() === 'professor') {
-            showProfessorDashboard();
-        } else if (!isLoggedIn()) {
-            // Show login
-        }
+    // Auto-show dashboard if already logged in correct portal
+    if (document.getElementById('alunoContainer') && isLoggedIn() && getUserType() === 'aluno') {
+        showStudentDashboard();
+    } else if (document.getElementById('professorContainer') && isLoggedIn() && getUserType() === 'professor') {
+        showProfessorDashboard();
     }
 
-    // Search handlers (basic)
+    // Search handlers
     const searchAluno = document.getElementById('searchAluno');
     const searchProf = document.getElementById('searchProf');
     if (searchAluno) searchAluno.oninput = filterBooks;
