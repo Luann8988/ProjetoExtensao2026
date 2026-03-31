@@ -1,3 +1,69 @@
+// ================= DATA MODELS =================
+
+// Livros da biblioteca com imagens
+const BOOKS = [
+    {
+        id: 1,
+        title: 'Dom Casmurro',
+        author: 'Machado de Assis',
+        image: 'Imagens/domcasmurro.png',
+        description: 'Romance clássico sobre amor e traição.',
+        isbn: '9788570011234',
+        totalCopies: 5,
+        availableCopies: 3
+    },
+    {
+        id: 2,
+        title: 'O Cortiço',
+        author: 'Aluísio Azevedo',
+        image: 'Imagens/ocortico.png', 
+        description: 'Naturalismo brasileiro retratando cortiço.',
+        isbn: '9788570014569',
+        totalCopies: 4,
+        availableCopies: 1
+    },
+    {
+        id: 3,
+        title: 'Capitães da Areia',
+        author: 'Jorge Amado',
+        image: 'Imagens/capitaesdeareia.png',
+        description: 'Aventura dos meninos de rua em Salvador.',
+        isbn: '9788570017898',
+        totalCopies: 6,
+        availableCopies: 4
+    },
+    {
+        id: 4,
+        title: 'Vidas Secas',
+        author: 'Graciliano Ramos',
+        image: 'Imagens/imagem1.png',
+        description: 'Drama da família de retirantes no sertão.',
+        isbn: '9788570012347',
+        totalCopies: 3,
+        availableCopies: 2
+    }
+];
+
+// Empréstimos (melhorado com bookId e studentId)
+let LOANS = [
+    {id: 1, codigo: 'EMPR-1729', studentId: 'maria123', studentName: 'Maria Silva', serie: '2º Ano', bookId: 1, bookTitle: 'Dom Casmurro', dataEmp: '10/10/2024', dataDev: '17/10/2024', status: 'active'},
+    {id: 2, codigo: 'EMPR-1730', studentId: 'joao456', studentName: 'João Santos', serie: '3º Ano', bookId: 2, bookTitle: 'O Cortiço', dataEmp: '09/10/2024', dataDev: '16/10/2024', status: 'overdue'},
+    {id: 3, codigo: 'EMPR-1728', studentId: 'ana789', studentName: 'Ana Oliveira', serie: '1º Ano', bookId: 3, bookTitle: 'Capitães da Areia', dataEmp: '08/10/2024', dataDev: '15/10/2024', status: 'active'}
+];
+
+// ================= PERSISTENCE =================
+function saveData() {
+    localStorage.setItem('libraryBooks', JSON.stringify(BOOKS));
+    localStorage.setItem('libraryLoans', JSON.stringify(LOANS));
+}
+
+function loadData() {
+    const savedBooks = localStorage.getItem('libraryBooks');
+    const savedLoans = localStorage.getItem('libraryLoans');
+    if (savedBooks) BOOKS = JSON.parse(savedBooks);
+    if (savedLoans) LOANS = JSON.parse(savedLoans);
+}
+
 // ================= LOGIN =================
 function login(e) {
     e.preventDefault();
