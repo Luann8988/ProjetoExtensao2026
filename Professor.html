@@ -1,40 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal do Professor - Biblioteca</title>
-<link rel="stylesheet" href="Styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal do Professor - Biblioteca</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
 
-<div id="professorContainer">
+<body class="login-body">
 
-  <header>
-    <div class="header-left">
-      <img src="imagens/imagem1.png" alt="Logo Escola" class="logo">
-      <div class="titulo-escola">
-        Escola Estadual <br>
-        <strong>Professor Gonçalves Couto</strong>
+  <!-- LOGIN -->
+  <div id="loginContainer" class="login-container">
+    <img src="imagens/imagem1.png" class="logo" alt="Logo Escola">
+
+    <h2>Portal do Professor</h2>
+
+    <form onsubmit="login(event)">
+      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+
+  <!-- PORTAL DO PROFESSOR -->
+  <div id="professorContainer" style="display:none;">
+
+    <header>
+      <div class="header-left">
+        <img src="imagens/imagem1.png" alt="Logo Escola" class="logo">
+        <div class="titulo-escola">
+          Escola Estadual <br>
+          <strong>Professor Gonçalves Couto</strong>
+        </div>
       </div>
-    </div>
-    <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
-    <button onclick="logout()" class="btn-logout">Sair</button>
-  </header>
+      <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
+      <button onclick="logout()" class="btn-logout">Sair</button>
+    </header>
 
-  <main>
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <h3>Dashboard</h3>
-      <ul>
-        <li class="active">📊 Estatísticas</li>
-        <li onclick="window.location.href='gerenciar_alunos.html'">👥 Alunos</li>
-        <li onclick="window.location.href='relatorios.html'">📈 Relatórios</li>
-        <li onclick="window.location.href='gerenciar_livros.html'">📚 Livros</li>
-      </ul>
-    </aside>
+    <main>
+      <aside class="sidebar">
+        <h3>Dashboard</h3>
+        <ul>
+          <li class="active">📊 Estatísticas</li>
+          <li onclick="window.location.href='gerenciar_alunos.html'">👥 Alunos</li>
+          <li onclick="window.location.href='relatorios.html'">📈 Relatórios</li>
+          <li onclick="window.location.href='gerenciar_livros.html'">📚 Livros</li>
+        </ul>
+      </aside>
 
-    <!-- DASHBOARD CONTENT -->
+      
+       <!-- DASHBOARD CONTENT -->
     <section class="dashboard-content">
       
       <!-- ESTATÍSTICAS -->
@@ -93,8 +108,5 @@
   </main>
 
 </div>
-
-<script src="Script.js"></script>
-
-</body>
-</html>
+  <!-- SCRIPT DE LOGIN -->
+  <script src="Script.js"
