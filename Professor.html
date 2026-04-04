@@ -38,7 +38,8 @@
         </div>
       </div>
 
-      <input type="text" placeholder="🔍 Buscar...">
+      <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
+
       <button onclick="logout()" class="btn-logout">Sair</button>
     </header>
 
@@ -46,15 +47,20 @@
     <main>
 
       <!-- MENU -->
-      <aside class="sidebar">
-        <h3>Dashboard</h3>
+
+      <aside class="sidebar sidebar-prof">
+        <h3>🏛️ Painel Professor</h3>
         <ul>
-          <li class="active">📊 Estatísticas</li>
-          <li>👥 Alunos</li>
-          <li>📈 Relatórios</li>
-          <li>📚 Livros</li>
+          <li class="active" onclick="carregarDashboard()">📊 Dashboard</li>
+          <li onclick="loadAlunosSection()">👥 Alunos</li>
+          <li onclick="gerarRelatorios()">📈 Relatórios</li>
+          <li onclick="gerenciarLivros()">📚 Gerenciar Livros</li>
+          <li onclick="configuracoes()">⚙️ Configurações</li>
+          <li onclick="ajuda()">❓ Ajuda</li>
+          
         </ul>
       </aside>
+
 
       <!-- CONTEÚDO DIREITO -->
       <section class="dashboard-content">
@@ -64,47 +70,103 @@
           <div class="stat-card">
             <div class="stat-number">0</div>
             <div class="stat-label">Total Empréstimos</div>
+            <div class="stat-change">+0% <span class="change-icon">📈</span></div>
+            <div class="stat-trend">
+              <div class="trend-bar" style="width: 0%;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #e74c3c;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #f1c40f;"></div> 
           </div>
 
           <div class="stat-card">
             <div class="stat-number">0</div>
             <div class="stat-label">Ativos</div>
+
+              <div class="stat-change">+0% <span class="change-icon">📈</span></div>
+              <div class="stat-trend">
+                <div class="trend-bar" style="width: 0%;"></div>
+                <div class="trend-bar" style="width: 0%; background-color: #e74c3c;"></div>
+                <div class="trend-bar" style="width: 0%; background-color: #f1c40f;"></div>
+
           </div>
 
           <div class="stat-card">
             <div class="stat-number">0</div>
             <div class="stat-label">Atrasados</div>
+            <div class="stat-change">+0% <span class="change-icon">📈</span></div>
+            <div class="stat-trend">
+              <div class="trend-bar" style="width: 0%;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #e74c3c;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #f1c40f;"></div>
+
           </div>
 
           <div class="stat-card">
             <div class="stat-number">0</div>
             <div class="stat-label">Devoluções</div>
+            <div class="stat-change">+0% <span class="change-icon">📈</span></div>
+            <div class="stat-trend">
+              <div class="trend-bar" style="width: 0%;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #e74c3c;"></div>
+              <div class="trend-bar" style="width: 0%; background-color: #f1c40f;"></div>
           </div>
         </div>
 
         <!-- TABELA -->
         <div class="data-section">
-          <div class="data-header">📋 Empréstimos Recentes</div>
+          <div class="data-header">📋 Empréstimos Recentes 
+            <div class="admin-actions" style="float: right; display: inline-flex; gap: 10px;">
+              <button class="admin-btn btn-primary" onclick="adicionarLivro()">➕ Novo Livro</button>
+              <button class="admin-btn btn-secondary" onclick="registrarDevolucao()">🔄 Devolução</button>
+              <button class="admin-btn btn-secondary" onclick="exportRelatorio()">📊 Exportar CSV</button>
+              <button class="admin-btn btn-secondary" onclick="gerarRelatorios()">📈 Ver Relatórios</button>
+            </div>
+          </div>
 
-          <table class="data-table">
+          <table class="data-table" id="emprestimos-table">
             <thead>
               <tr>
                 <th>Código</th>
                 <th>Aluno</th>
+                <th>Série</th>
                 <th>Livro</th>
+                <th>Data Emp.</th>
+                <th>Data Dev.</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>001</td>
-                <td>João</td>
-                <td>Matemática</td>
-                <td class="status-active">Ativo</td>
-              </tr>
+              <!-- Loaded by JS -->
             </tbody>
           </table>
         </div>
+
+        <!-- ADD BOOK MODAL -->
+        <div id="modalAddBook" class="modal">
+          <div class="modal-content">
+            <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
+            <h3>📚 Adicionar Novo Livro</h3>
+            <form id="addBookForm">
+              <input type="text" placeholder="Título" id="newTitle" required>
+              <input type="text" placeholder="Autor" id="newAuthor" required>
+              <input type="text" placeholder="Imagem (filename.png)" id="newImage" required>
+              <input type="text" placeholder="Descrição" id="newDesc" required>
+              <input type="text" placeholder="ISBN" id="newIsbn" required>
+              <input type="number" placeholder="Total cópias" id="newCopies" min="1" required>
+              <button type="submit">Adicionar Livro</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- RETURN LOAN MODAL -->
+        <div id="modalDevolucao" class="modal">
+          <div class="modal-content">
+            <button class="close" onclick="hideModal('modalDevolucao')">&times;</button>
+            <h3>🔄 Registrar Devolução</h3>
+            <input type="text" id="searchReturn" placeholder="Buscar por código ou aluno...">
+            <div id="returnLoansList"></div>
+          </div>
+        </div>
+
 
       </section>
     </main>

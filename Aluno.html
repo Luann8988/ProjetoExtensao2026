@@ -62,7 +62,7 @@
         </div>
 
         <!-- MEUS EMPRÉSTIMOS -->
-        <div id="myLoansSection" style="display:none;">
+<div id="myLoansSection" style="display:none;">
           <div class="data-section">
             <div class="data-header">📋 Meus Empréstimos Ativos</div>
             <table class="data-table" id="myLoansTable">
@@ -81,6 +81,72 @@
             </table>
           </div>
         </div>
+
+        <!-- STUDENT PROFILE MODAL -->
+        <div id="modalStudentProfile" class="modal">
+          <div class="modal-content">
+            <button class="close" onclick="hideModal('modalStudentProfile')">&times;</button>
+            <h3>👤 Meu Perfil</h3>
+            <form id="profileForm">
+              <div class="form-group">
+                <label>👤 Escolha seu Avatar</label>
+                <div class="avatar-grid">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1" class="avatar-option" alt="Avatar 1" data-seed="student1" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student2" class="avatar-option" alt="Avatar 2" data-seed="student2" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student3" class="avatar-option" alt="Avatar 3" data-seed="student3" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student4" class="avatar-option" alt="Avatar 4" data-seed="student4" onclick="selectAvatar(this)">
+                </div>
+                <img id="avatarPreview" class="profile-avatar-preview" src="" style="display:none;">
+              </div>
+              <div class="form-group">
+                <label>Nome de Usuário</label>
+                <input type="text" id="profileName" placeholder="@seuusuario" maxlength="20" required>
+              </div>
+              <label>Senha</label>
+              <div class="password-group">
+                <input type="password" id="profilePassword" placeholder="Nova senha" required>
+                <button type="button" class="toggle-password" onclick="togglePassword('profilePassword')">👁️</button>
+              </div>
+              
+              <div class="form-group">
+                <label>Série/Turma</label>
+                <input type="text" id="profileSerie" placeholder="6º Ano" required> 
+                <input type="text" id="profileSerie" placeholder="7º Ano" required>
+                <input type="text" id="profileSerie" placeholder="8º Ano" required>
+                <input type="text" id="profileSerie" placeholder="9º Ano" required>
+                <input type="text" id="profileSerie" placeholder="1º Ano EM" required>
+                <input type="text" id="profileSerie" placeholder="2º Ano EM" required>
+                <input type="text" id="profileSerie" placeholder="3º Ano EM" required>
+              </div>
+              <button type="submit">💾 Salvar Perfil Netflix</button>
+            </form>
+
+            <p id="profileStatus"></p>
+          </div>
+        </div>
+
+        <!-- HISTORY SECTION -->
+        <div id="historySection" style="display:none;">
+          <div class="data-section">
+            <div class="data-header">📜 Histórico Completo</div>
+            <table class="data-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>Livro</th>
+                  <th>Empréstimo</th>
+                  <th>Devolução</th>
+                  <th>Status Final</th>
+                  <th>Avaliação</th>
+                
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loaded by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
 
       </section>
     </main>

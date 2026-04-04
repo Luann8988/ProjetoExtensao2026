@@ -1,5 +1,3 @@
-// Professional Library System - Script.js
-// Modular, with real persistence, loan management, professional UX
 
 // ================= CONSTANTS & CONFIG =================
 const IMAGES_PATH = 'Imagens/';
@@ -191,7 +189,7 @@ function login(e) {
     if (container && loginCont) {
       loginCont.style.display = 'none';
       container.style.display = 'block';
-      if (pageType === 'aluno') showBooks();
+      if (pageType === 'aluno') afterStudentLogin();
       else carregarDashboard();
     }
     showToast('Login realizado com sucesso!');
@@ -200,7 +198,92 @@ function login(e) {
   }
 }
 
+function afterStudentLogin() {
+  setupStudentProfile();
+  showBooks();
+}
+
+function setupStudentProfile() {
+  const profileSaved = localStorage.getItem('studentProfile');
+  if (!profileSaved) {
+    showModal('modalStudentProfile');
+  }
+}
+
+function showHistory() {
+  const studentId = localStorage.getItem('studentId');
+  const history = library.loans.filter(l => l.studentId === studentId && l.status.includes('returned'));
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = history.map(loan => `
+    <tr>
+      <td>${loan.bookTitle}</td>
+      <td>${loan.dataEmp}</td>
+      <td>${loan.dataDevolucao || 'Pendente'}</td>
+      <td>${loan.status.replace('_returned', '')}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('bookCatalog').style.display = 'none';
+  document.getElementById('myLoansSection').style.display = 'none';
+  document.getElementById('historySection').style.display = 'block';
+  updateSidebar(2);
+}
+
+
+
 // ================= STUDENT FUNCTIONS =================
+function setupStudentProfile() {
+  const profileSaved = localStorage.getItem('studentProfile');
+  if (!profileSaved) {
+    showModal('modalStudentProfile');
+  }
+}
+
+function selectAvatar(img) {
+  document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+  img.classList.add('selected');
+  const seed = img.dataset.seed;
+  document.getElementById('avatarPreview').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+  document.getElementById('avatarPreview').style.display = 'block';
+  localStorage.setItem('selectedAvatarSeed', seed); // temp until save
+}
+
+function saveStudentProfile(e) {
+  e.preventDefault();
+  const name = document.getElementById('profileName').value.trim();
+  const serie = document.getElementById('profileSerie').value.trim();
+  const avatarSeed = localStorage.getItem('selectedAvatarSeed') || 'student1';
+  if (name && serie) {
+    const profile = {name, serie, avatarSeed};
+    localStorage.setItem('studentProfile', JSON.stringify(profile));
+    localStorage.setItem('studentName', name);
+    localStorage.setItem('studentSerie', serie);
+    localStorage.setItem('studentAvatar', `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`);
+    hideModal('modalStudentProfile');
+    showToast('Perfil Netflix salvo! 🎉');
+  } else {
+    showToast('Preencha todos os campos!', 'error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const profileForm = document.getElementById('profileForm');
+  if (profileForm) profileForm.addEventListener('submit', saveStudentProfile);
+});
+
+// Get student info (with fallback)
+function getStudentInfo() {
+  const profile = localStorage.getItem('studentProfile');
+  return profile ? JSON.parse(profile) : {name: 'Aluno Não Identificado', serie: 'N/A'};
+}
+
+// Call profile setup after login for student
+function afterStudentLogin() {
+  setupStudentProfile();
+  showBooks();
+}
+
+
 function showBooks() {
   const grid = document.getElementById('booksGrid');
   if (!grid) return;
@@ -221,10 +304,10 @@ function showBooks() {
   updateSidebar(0);
 }
 
+
 function emprestarLivro(bookId) {
   const studentId = localStorage.getItem('studentId');
-  const studentName = 'Admin User';  // Mock, enhance later
-  const serie = '2º Ano';
+  const {name: studentName, serie} = getStudentInfo();
 
   const loan = library.createLoan(studentId, studentName, serie, bookId);
   if (loan) {
@@ -235,6 +318,7 @@ function emprestarLivro(bookId) {
     showToast('Livro indisponível!', 'error');
   }
 }
+
 
 function showMyLoans() {
   const studentId = localStorage.getItem('studentId');
@@ -283,7 +367,7 @@ function carregarDashboard() {
   document.getElementById('devolucoes').textContent = stats.devoluToday;
 
   const tbody = document.querySelector('#emprestimos-table tbody');
-  tbody.innerHTML = library.loans.slice(0, 8).map(loan => {
+  tbody.innerHTML = library.loans.slice(-8).map(loan => {
     const statusClass = library.isOverdue(loan) ? 'status-overdue' : 'status-active';
     return `
       <tr>
@@ -296,10 +380,11 @@ function carregarDashboard() {
         <td><span class="${statusClass}">${loan.status.toUpperCase()}</span></td>
       </tr>
     `;
-  }).join('');
+  }).reverse().join('');
 
   updateSidebarProf(0);
 }
+
 
 function updateSidebarProf(activeIndex) {
   // Update professor sidebar active states
@@ -308,9 +393,107 @@ function updateSidebarProf(activeIndex) {
   });
 }
 
-// Professor actions (now functional modals)
-function adicionarLivro() { showModal('modalAddBook'); }
-function registrarDevolucao() { showModal('modalDevolucao'); }
+// Professor advanced functions
+function adicionarLivro() {
+  showModal('modalAddBook');
+}
+
+function addBookHandler(e) {
+  e.preventDefault();
+  const title = document.getElementById('newTitle').value;
+  const author = document.getElementById('newAuthor').value;
+  const image = document.getElementById('newImage').value;
+  const desc = document.getElementById('newDesc').value;
+  const isbn = document.getElementById('newIsbn').value;
+  const copies = parseInt(document.getElementById('newCopies').value);
+
+  const newId = library.books.length + 1;
+  const newBook = new Book(newId, title, author, image, desc, isbn, copies);
+  library.books.push(newBook);
+  library.saveData();
+  hideModal('modalAddBook');
+  showToast('Livro adicionado com sucesso!');
+  carregarDashboard();
+}
+
+function registrarDevolucao() {
+  showModal('modalDevolucao');
+  loadReturnLoans();
+}
+
+function loadReturnLoans() {
+  const activeLoans = library.loans.filter(l => l.status === 'active');
+  const list = document.getElementById('returnLoansList');
+  const searchReturn = document.getElementById('searchReturn');
+  
+  function filterLoans() {
+    const term = searchReturn.value.toLowerCase();
+    const filtered = activeLoans.filter(loan => 
+      loan.codigo.toLowerCase().includes(term) || 
+      loan.studentName.toLowerCase().includes(term) ||
+      loan.serie.toLowerCase().includes(term) ||
+      loan.bookTitle.toLowerCase().includes(term)
+    );
+    list.innerHTML = filtered.map(loan => `
+      <div class="loan-item">
+        <strong>${loan.codigo}</strong> - ${loan.studentName} (${loan.serie}) - ${loan.bookTitle}
+        <span class="status-${library.isOverdue(loan) ? 'overdue' : 'active'}">${library.isOverdue(loan) ? 'Atrasado' : 'Ativo'}</span>
+        <button onclick="returnLoanProf(${loan.id})" class="btn-secondary">Devolver</button>
+      </div>
+    `).join('') || '<p style="text-align: center; color: var(--text-light);">Nenhum empréstimo ativo encontrado</p>';
+  }
+  
+  searchReturn.oninput = debounce(filterLoans);
+  filterLoans();
+}
+
+function loadAlunosSection() {
+  showToast('Funcionalidade alunos em desenvolvimento', 'info');
+}
+
+function gerarRelatorios() {
+  exportRelatorio();
+  showToast('Relatório exportado!');
+}
+
+function gerenciarLivros() {
+  showToast('Gerenciar livros avançado em desenvolvimento', 'info');
+}
+
+
+function returnLoanProf(loanId) {
+  if (confirm('Confirmar devolução?')) {
+    library.returnLoan(loanId);
+    showToast('Devolução registrada!');
+    hideModal('modalDevolucao');
+    carregarDashboard();
+  }
+}
+
+function exportRelatorio() {
+  const stats = library.getStats();
+  const csv = [
+    ['Relatório Biblioteca', new Date().toLocaleDateString('pt-BR')],
+    [],
+    ['Total Empréstimos', stats.total],
+    ['Ativos', stats.active],
+    ['Atrasados', stats.overdue],
+    ['Devoluções Hoje', stats.devoluToday],
+    [],
+    ...library.loans.map(l => [
+      l.codigo, l.studentName, l.serie, l.bookTitle, l.dataEmp, l.dataDev, l.status
+    ])
+  ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\\n');
+  
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio_biblioteca_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('Relatório exportado!');
+}
+
 
 // ================= SEARCH =================
 function setupSearch() {
@@ -320,9 +503,17 @@ function setupSearch() {
     searchAluno.oninput = (e) => debounce(() => filterBooks(e.target.value));
   }
   if (searchProf) {
-    searchProf.oninput = (e) => debounce(() => filterLoans(e.target.value));
+    searchProf.oninput = (e) => debounce(() => filterLoansProf(e.target.value));
   }
 }
+
+function filterLoansProf(term) {
+  term = term.toLowerCase();
+  document.querySelectorAll('#emprestimos-table tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
 
 function filterBooks(term) {
   term = term.toLowerCase();
@@ -339,33 +530,60 @@ function filterLoans(term) {
   });
 }
 
+// Sidebar universal handler
+function initSidebar() {
+  document.querySelectorAll('.sidebar li').forEach(li => {
+    li.addEventListener('click', function() {
+      const index = Array.from(this.parentNode.children).indexOf(this);
+      if (getCurrentPageType() === 'professor') {
+        // Professor specific
+        document.querySelectorAll('.sidebar li').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      } else {
+        updateSidebar(index);
+        if (index === 0) showBooks();
+        else if (index === 1) showMyLoans();
+        else if (index === 2) showHistory();
+      }
+    });
+  });
+}
+
 // ================= INIT =================
 document.addEventListener('DOMContentLoaded', function() {
   library.loadData();
+
+  // Setup forms
+  const addBookForm = document.getElementById('addBookForm');
+  if (addBookForm) addBookForm.addEventListener('submit', addBookHandler);
+  const profileForm = document.getElementById('profileForm');
+  if (profileForm) profileForm.addEventListener('submit', saveStudentProfile);
+
+  initSidebar();
+  setupSearch();
 
   const pageType = getCurrentPageType();
   const isLogged = localStorage.getItem('logado') === 'true';
   const userType = localStorage.getItem('tipoUsuario');
 
   if (isLogged && userType === pageType) {
-    // Valid session for this page
     const container = document.getElementById(pageType + 'Container');
     const loginCont = document.getElementById('loginContainer');
     if (container && loginCont) {
       loginCont.style.display = 'none';
       container.style.display = 'block';
-      if (pageType === 'aluno') showBooks();
+      if (pageType === 'aluno') afterStudentLogin();
       else carregarDashboard();
     }
   } else if (isLogged) {
-    // Mismatch - logout
     logout();
   }
 
-  setupSearch();
-
-  // Close modals on outside click (add if modals exist)
+  // Close modals
   document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) hideModal(e.target.id);
   });
 });
+
+
+
