@@ -3,117 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal do Professor - Biblioteca</title>
+  <title>Portal do Professor</title>
   <link rel="stylesheet" href="styles.css">
-
 </head>
 
 <body class="login-body">
 
   <!-- LOGIN -->
   <div id="loginContainer" class="login-container">
-    <img src="Imagens/imagem1.png" class="logo" alt="Logo da Escola Estadual Professor Gonçalves Couto" aria-label="Logo">
 
+    <img src="Imagens/imagem3.png" class="logo" alt="Logo">
+    <h2>Portal do Professor</h2>
 
-<h2>Portal do Professor</h2>
-
-
-
-
+    <!-- FORM -->
     <form onsubmit="login(event)">
       <input type="text" id="usuario" placeholder="Usuário" required>
       <input type="password" id="senha" placeholder="Senha" required>
       <button type="submit">Entrar</button>
     </form>
+
   </div>
 
-  <!-- PORTAL DO PROFESSOR -->
+  <!-- PORTAL -->
   <div id="professorContainer" style="display:none;">
 
+    <!-- HEADER -->
     <header>
       <div class="header-left">
-        <img src="Imagens/imagem1.png" alt="Logo da Escola Estadual Professor Gonçalves Couto" class="logo" aria-label="Logo">
+        <img src="Imagens/imagem3.png" class="logo">
 
         <div class="titulo-escola">
           Escola Estadual <br>
           <strong>Professor Gonçalves Couto</strong>
         </div>
       </div>
-      <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
+
+      <input type="text" placeholder="🔍 Buscar...">
       <button onclick="logout()" class="btn-logout">Sair</button>
     </header>
 
+    <!-- CONTEÚDO -->
     <main>
+
+      <!-- MENU -->
       <aside class="sidebar">
         <h3>Dashboard</h3>
-        <ul role="navigation" aria-label="Navegação do Dashboard">
-          <li class="active" onclick="carregarDashboard()" tabindex="0" role="button" aria-current="page">📊 Estatísticas</li>
-          <li onclick="showSection('alunos')" tabindex="0" role="button">👥 Gerenciar Alunos</li>
-          <li onclick="showSection('relatorios')" tabindex="0" role="button">📈 Relatórios</li>
-          <li onclick="showSection('livros')" tabindex="0" role="button">📚 Gerenciar Livros</li>
+        <ul>
+          <li class="active">📊 Estatísticas</li>
+          <li>👥 Alunos</li>
+          <li>📈 Relatórios</li>
+          <li>📚 Livros</li>
         </ul>
       </aside>
 
-      
-       <!-- DASHBOARD CONTENT -->
-    <section class="dashboard-content">
-      
-      <!-- ESTATÍSTICAS -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="total-emp">0</div>
-          <div class="stat-label">Total Empréstimos</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="ativos">0</div>
-          <div class="stat-label">Ativos</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="atrasados">0</div>
-          <div class="stat-label">Atrasados</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="devolucoes">0</div>
-          <div class="stat-label">Devoluções Hoje</div>
-        </div>
-      </div>
+      <!-- CONTEÚDO DIREITO -->
+      <section class="dashboard-content">
 
-      <!-- RECENTES EMPRÉSTIMOS -->
-      <div class="data-section">
-        <div class="data-header">📋 Empréstimos Recentes</div>
-        <table class="data-table" id="emprestimos-table">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Aluno</th>
-              <th>Série</th>
-              <th>Livro</th>
-              <th>Data Emp.</th>
-              <th>Data Dev.</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Loaded by JS -->
-          </tbody>
-        </table>
-      </div>
+        <!-- ESTATÍSTICAS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Total Empréstimos</div>
+          </div>
 
-      <!-- AÇÕES RÁPIDAS -->
-      <div class="data-section">
-        <div class="data-header">⚡ Ações Rápidas</div>
-        <div class="admin-actions">
-          <a href="#" class="admin-btn btn-primary" onclick="verTodosEmprestimos()">Ver Todos Empréstimos</a>
-          <a href="#" class="admin-btn btn-secondary" onclick="gerarRelatorio()">Gerar Relatório</a>
-          <a href="#" class="admin-btn btn-primary" onclick="adicionarLivro()">Adicionar Livro</a>
-          <a href="#" class="admin-btn btn-secondary" onclick="registrarDevolucao()">Registrar Devolução</a>
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Ativos</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Atrasados</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Devoluções</div>
+          </div>
         </div>
-      </div>
 
-    </section>
-  </main>
+        <!-- TABELA -->
+        <div class="data-section">
+          <div class="data-header">📋 Empréstimos Recentes</div>
 
-</div>
-  <!-- SCRIPT DE LOGIN -->
-<script src="Script.js"></script>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Aluno</th>
+                <th>Livro</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>001</td>
+                <td>João</td>
+                <td>Matemática</td>
+                <td class="status-active">Ativo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
+      </section>
+    </main>
+
+  </div>
+
+  <script src="Script.js"></script>
+</body>
+</html>
