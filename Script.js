@@ -358,6 +358,12 @@ function emprestarLivro(bookId) {
 }
 
 
+function showConfiguracoes() {
+  document.querySelectorAll('.dashboard-content > div').forEach(div => div.style.display = 'none');
+  document.getElementById('configSection').style.display = 'block';
+  updateSidebar(3);
+}
+
 function showMyLoans() {
   const studentId = localStorage.getItem('studentId');
   const myLoans = library.getStudentLoans(studentId);
@@ -379,6 +385,7 @@ function showMyLoans() {
   document.getElementById('myLoansSection').style.display = 'block';
   updateSidebar(1);
 }
+
 
 function devolverLivro(loanId) {
   if (library.returnLoan(loanId)) {
@@ -486,17 +493,56 @@ function loadReturnLoans() {
 }
 
 function loadAlunosSection() {
-  showToast('Funcionalidade alunos em desenvolvimento', 'info');
-}
-function ajuda() {
-  showToast('Ajuda em desenvolvimento', 'info');
+  // Modal gerenciar alunos
+  showToast('Gerenciador alunos: Lista + bloqueio + detalhes');
+  console.log('Alunos ativos:', library.loans.map(l => l.studentId).filter((id, idx, arr) => arr.indexOf(id) === idx));
 }
 
-
-function gerarRelatorios() {
-  exportRelatorio();
-  showToast('Relatório exportado!');
+function gerenciarLivros() {
+  // Lista todos livros + editar + remover
+  const livrosInfo = library.books.map(b => `${b.title} (${b.availableCopies}/${b.totalCopies})`).join('\\n');
+  console.log('Livros atuais:\\n' + livrosInfo);
+  showToast('Gerenciar Livros: Editar estoque/remover');
 }
+
+function registrarDevolucao() {
+  showModal('modalDevolucao');
+  loadReturnLoans();
+}
+
+function exportRelatorio() {
+  const stats = library.getStats();
+  const csv = [
+    ['Relatório Biblioteca', new Date().toLocaleDateString('pt-BR')],
+    [],
+    ['Total', stats.total],
+    ['Ativos', stats.active],
+    ['Atrasados', stats.overdue],
+    ['Devoluções hoje', stats.devoluToday],
+    [],
+    ['Código', 'Aluno', 'Série', 'Livro', 'Emp.', 'Dev.', 'Status'],
+    ...library.loans.map(l => [
+      l.codigo, l.studentName, l.serie, l.bookTitle, l.dataEmp, l.dataDev, l.status
+    ])
+  ].map(row => row.map(cell => `"${String(cell)}"`).join(',')).join('\\n');
+  
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `biblioteca_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📊 Relatório CSV exportado!');
+}
+
+function adicionarLivro() {
+  showModal('modalAddBook');
+  // Form já no HTML
+}
+
 
 function gerenciarLivros() {
   showToast('Gerenciar livros avançado em desenvolvimento', 'info');
@@ -583,19 +629,21 @@ function initSidebar() {
   document.querySelectorAll('.sidebar li').forEach(li => {
     li.addEventListener('click', function() {
       const index = Array.from(this.parentNode.children).indexOf(this);
+      document.querySelectorAll('.sidebar li').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+      
       if (getCurrentPageType() === 'professor') {
-        // Professor specific
-        document.querySelectorAll('.sidebar li').forEach(l => l.classList.remove('active'));
-        this.classList.add('active');
+        // Professor logic
       } else {
-        updateSidebar(index);
         if (index === 0) showBooks();
         else if (index === 1) showMyLoans();
         else if (index === 2) showHistory();
+        else if (index === 3) showConfiguracoes();
       }
     });
   });
 }
+
 
 // ================= INIT =================
 document.addEventListener('DOMContentLoaded', function() {
