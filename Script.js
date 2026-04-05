@@ -50,7 +50,21 @@ class LoanManager {
       new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
       new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
       new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'imagem1.png', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2)
+      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'imagem1.png', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
+      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'brasCubas.png', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
+      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'moreninha.png', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
+      new Book(7, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'basilio.png', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
+      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'isaura.png', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
+      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
+      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
+      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
+      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
+      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
+      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
+      new Book(15, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'basilio.png', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
+      new Book(16, 'A Escrava Isaura', 'Bernardo Guimarães', 'isaura.png', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
+      new Book(17, 'Senhora', 'José de Alencar', 'senhora.png', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
+      new Book(18, 'O Guarani', 'José de Alencar', 'guarani.png', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5)
     ];
   }
 
@@ -199,9 +213,33 @@ function login(e) {
 }
 
 function afterStudentLogin() {
+  const profile = localStorage.getItem('studentProfile');
+  if (profile) {
+    const {name, serie, avatarSeed} = JSON.parse(profile);
+    document.getElementById('headerUserName').textContent = `Olá, ${name}!`;
+    document.getElementById('headerUserSerie').textContent = serie;
+    document.getElementById('headerAvatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+    document.getElementById('headerAvatar').style.display = 'block';
+  }
   setupStudentProfile();
   showBooks();
 }
+
+function loadProfileHeader() {
+  const profile = localStorage.getItem('studentProfile');
+  if (profile) {
+    const {name, serie, avatarSeed} = JSON.parse(profile);
+    document.getElementById('headerUserName').textContent = `Olá, ${name}!`;
+    document.getElementById('headerUserSerie').textContent = serie;
+    document.getElementById('headerAvatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
+    document.getElementById('headerAvatar').style.display = 'block';
+  }
+}
+
+function showProfile() {
+  showModal('modalStudentProfile');
+}
+
 
 function setupStudentProfile() {
   const profileSaved = localStorage.getItem('studentProfile');
@@ -450,6 +488,10 @@ function loadReturnLoans() {
 function loadAlunosSection() {
   showToast('Funcionalidade alunos em desenvolvimento', 'info');
 }
+function ajuda() {
+  showToast('Ajuda em desenvolvimento', 'info');
+}
+
 
 function gerarRelatorios() {
   exportRelatorio();
@@ -458,7 +500,13 @@ function gerarRelatorios() {
 
 function gerenciarLivros() {
   showToast('Gerenciar livros avançado em desenvolvimento', 'info');
+
+  function configuracoes() {
+    showToast('Configurações em desenvolvimento', 'info');
+  }
 }
+
+
 
 
 function returnLoanProf(loanId) {

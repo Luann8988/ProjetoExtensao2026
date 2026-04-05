@@ -46,12 +46,30 @@
           <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
           <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
           <li onclick="showHistory()">📜 Histórico</li>
+          <li onclick="showProfile()">👤 Meu Perfil</li>
+          <li onclick="configuracoes()">⚙️ Configurações</li>
+          <li onclick="ajuda()">❓ Ajuda</li>
+          <li onclick="sugestoes()">💡 Sugestões</li>
+          <li onclick="feedback()">📝 Feedback</li>
+          
         </ul>
       </aside>
 
+
       <section class="dashboard-content">
         
+        <!-- PERFIL NETFLIX HEADER -->
+        <div class="netflix-profile-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
+          <img id="headerAvatar" src="" class="profile-avatar-preview" alt="Seu avatar" style="display: none;">
+          <div>
+            <h2 id="headerUserName">Bem-vindo, Aluno!</h2>
+            <p id="headerUserSerie">Complete seu perfil</p>
+          </div>
+          <button class="btn-secondary" onclick="showModal('modalStudentProfile')" style="margin-left: auto;">⚙️ Configurações</button>
+        </div>
+        
         <!-- CATÁLOGO DE LIVROS -->
+
         <div id="bookCatalog">
           <div class="data-section">
             <div class="data-header">📚 Catálogo de Livros</div>
@@ -72,7 +90,7 @@
                   <th>Data Empr.</th>
                   <th>Data Dev.</th>
                   <th>Status</th>
-                  <th>Ação</th>
+                  <th>Ação</th></th>
                 </tr>
               </thead>
               <tbody>
@@ -95,6 +113,14 @@
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student2" class="avatar-option" alt="Avatar 2" data-seed="student2" onclick="selectAvatar(this)">
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student3" class="avatar-option" alt="Avatar 3" data-seed="student3" onclick="selectAvatar(this)">
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student4" class="avatar-option" alt="Avatar 4" data-seed="student4" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student5" class="avatar-option" alt="Avatar 5" data-seed="student5" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student6" class="avatar-option" alt="Avatar 6" data-seed="student6" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student7" class="avatar-option" alt="Avatar 7" data-seed="student7" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student8" class="avatar-option" alt="Avatar 8" data-seed="student8" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student9" class="avatar-option" alt="Avatar 9" data-seed="student9" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student10" class="avatar-option" alt="Avatar 10" data-seed="student10" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student11" class="avatar-option" alt="Avatar 11" data-seed="student11" onclick="selectAvatar(this)">
+                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student12" class="avatar-option" alt="Avatar 12" data-seed="student12" onclick="selectAvatar(this)">
                 </div>
                 <img id="avatarPreview" class="profile-avatar-preview" src="" style="display:none;">
               </div>
@@ -137,13 +163,44 @@
                   <th>Devolução</th>
                   <th>Status Final</th>
                   <th>Avaliação</th>
-                
+                  <th>Comentário</th>
+                  <th>Recomendações</th>
                 </tr>
               </thead>
               <tbody>
                 <!-- Loaded by JS -->
               </tbody>
             </table>
+          </div>
+        </div>
+
+        <div id="configSection" style="display:none;">
+          <div class="data-section">
+            <div class="data-header">⚙️ Configurações</div>
+            <p>Configurações em desenvolvimento...</p>
+          </div>
+
+          <div class="data-section">
+            <div class="data-header">❓ Ajuda</div>
+            <p>Ajuda em desenvolvimento...</p>
+          </div>
+
+          <div class="data-section">
+            <div class="data-header">💡 Sugestões</div>
+            <p>Sugestões em desenvolvimento...</p>
+          </div>
+
+          <div class="data-section">
+            <div class="data-header">📝 Feedback</div>
+            <p>Feedback em desenvolvimento...</p>
+          </div>
+
+          <div class="data-section">
+            <div class="data-header">👤 Meu Perfil</div>
+            <p>Perfil em desenvolvimento...</p>
+            <button class="btn-primary" onclick="showProfile()">Editar Perfil</button>
+            
+            
           </div>
         </div>
 
