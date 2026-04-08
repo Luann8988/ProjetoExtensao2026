@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal do Aluno | Biblioteca Escolar - Prof. Gonçalves Couto</title>
+  <title>Portal do Aluno | Biblioteca Escolar - Prof. Gonçalves Couto</title>
   <link rel="stylesheet" href="styles.css">
-
 </head>
 
 <body class="login-body">
@@ -13,7 +12,6 @@
   <!-- LOGIN FORM -->
   <div id="loginContainer" class="login-container">
     <img src="Imagens/imagem1.png" class="logo" alt="Logo da Escola Estadual Professor Gonçalves Couto" aria-label="Logo">
-
     <h2>Portal do Aluno</h2>
 
     <form onsubmit="login(event)">
@@ -26,10 +24,10 @@
   <!-- DASHBOARD ALUNO -->
   <div id="alunoContainer" style="display:none;">
 
+    <!-- HEADER -->
     <header>
       <div class="header-left">
         <img src="Imagens/imagem1.png" alt="Logo da Escola Estadual Professor Gonçalves Couto" class="logo" aria-label="Logo">
-
         <div class="titulo-escola">
           Escola Estadual <br>
           <strong>Professor Gonçalves Couto</strong>
@@ -39,23 +37,20 @@
       <button onclick="logout()" class="btn-logout">Sair</button>
     </header>
 
+    <!-- MAIN CONTENT -->
     <main>
+      <!-- SIDEBAR -->
       <aside class="sidebar">
         <h3>Meu Painel</h3>
         <ul>
           <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
           <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
           <li onclick="showHistory()">📜 Histórico</li>
-        <li onclick="showBooks()">📚 Catálogo</li>
-          <li onclick="showMyLoans()">📋 Empréstimos</li>
-          <li onclick="showHistory()">📜 Histórico</li>
           <li onclick="showConfiguracoes()">⚙️ Configurações</li>
-
-          
         </ul>
       </aside>
 
-
+      <!-- DASHBOARD CONTENT -->
       <section class="dashboard-content">
         
         <!-- PERFIL NETFLIX HEADER -->
@@ -67,20 +62,19 @@
           </div>
           <button class="btn-secondary" onclick="showModal('modalStudentProfile')" style="margin-left: auto;">⚙️ Configurações</button>
         </div>
-        
-        <!-- CATÁLOGO DE LIVROS -->
 
+        <!-- CATÁLOGO DE LIVROS -->
         <div id="bookCatalog">
           <div class="data-section">
             <div class="data-header">📚 Catálogo de Livros</div>
             <div id="booksGrid" class="grid">
-              <!-- Loaded by JS -->
+              <!-- Conteúdo carregado via JS -->
             </div>
           </div>
         </div>
 
         <!-- MEUS EMPRÉSTIMOS -->
-<div id="myLoansSection" style="display:none;">
+        <div id="myLoansSection" style="display:none;">
           <div class="data-section">
             <div class="data-header">📋 Meus Empréstimos Ativos</div>
             <table class="data-table" id="myLoansTable">
@@ -90,25 +84,27 @@
                   <th>Data Empr.</th>
                   <th>Data Dev.</th>
                   <th>Status</th>
-                  <th>Ação</th></th>
+                  <th>Ação</th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Loaded by JS -->
+                <!-- Conteúdo carregado via JS -->
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- STUDENT PROFILE MODAL -->
+        <!-- MODAL PERFIL -->
         <div id="modalStudentProfile" class="modal">
           <div class="modal-content">
             <button class="close" onclick="hideModal('modalStudentProfile')">&times;</button>
             <h3>👤 Meu Perfil</h3>
             <form id="profileForm">
+              <!-- Avatar -->
               <div class="form-group">
                 <label>👤 Escolha seu Avatar</label>
                 <div class="avatar-grid">
+                  <!-- 12 opções de avatar -->
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1" class="avatar-option" alt="Avatar 1" data-seed="student1" onclick="selectAvatar(this)">
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student2" class="avatar-option" alt="Avatar 2" data-seed="student2" onclick="selectAvatar(this)">
                   <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student3" class="avatar-option" alt="Avatar 3" data-seed="student3" onclick="selectAvatar(this)">
@@ -124,34 +120,91 @@
                 </div>
                 <img id="avatarPreview" class="profile-avatar-preview" src="" style="display:none;">
               </div>
+
+              <!-- Nome de usuário -->
               <div class="form-group">
                 <label>Nome de Usuário</label>
                 <input type="text" id="profileName" placeholder="@seuusuario" maxlength="20" required>
               </div>
-              <label>Senha</label>
-              <div class="password-group">
-                <input type="password" id="profilePassword" placeholder="Nova senha" required>
-                <button type="button" class="toggle-password" onclick="togglePassword('profilePassword')">👁️</button>
-              </div>
-              
+
+              <!-- Senha -->
               <div class="form-group">
-                <label>Série/Turma</label>
-                <input type="text" id="profileSerie" placeholder="6º Ano" required> 
-                <input type="text" id="profileSerie" placeholder="7º Ano" required>
-                <input type="text" id="profileSerie" placeholder="8º Ano" required>
-                <input type="text" id="profileSerie" placeholder="9º Ano" required>
-                <input type="text" id="profileSerie" placeholder="1º Ano EM" required>
-                <input type="text" id="profileSerie" placeholder="2º Ano EM" required>
-                <input type="text" id="profileSerie" placeholder="3º Ano EM" required>
+                <label>Senha</label>
+                <div class="password-group">
+                  <input type="password" id="profilePassword" placeholder="Nova senha" required>
+                  <button type="button" class="toggle-password" onclick="togglePassword('profilePassword')">👁️</button>
+                </div>
               </div>
+
+              <!-- Série -->
+              <div class="form-group">
+                <label for="profileSerie">Série/Turma</label>
+                <select id="profileSerie" required>
+                  <option value="" disabled selected>Escolha sua série</option>
+                  <!-- Opções de série/ano -->
+                  <optgroup label="6º Ano">
+                    <option value="6.1">6.1</option>
+                    <option value="6.2">6.2</option>
+                    <option value="6.3">6.3</option>
+                    <option value="6.4">6.4</option>
+                  </optgroup>
+                  <optgroup label="7º Ano">
+                    <option value="7.1">7.1</option>
+                    <option value="7.2">7.2</option>
+                    <option value="7.3">7.3</option>
+                    <option value="7.4">7.4</option>
+                  </optgroup>
+                  <optgroup label="8º Ano">
+                    <option value="8.1">8.1</option>
+                    <option value="8.2">8.2</option>
+                    <option value="8.3">8.3</option>
+                    <option value="8.4">8.4</option>
+                  </optgroup>
+                  <optgroup label="9º Ano">
+                    <option value="9.1">9.1</option>
+                    <option value="9.2">9.2</option>
+                    <option value="9.3">9.3</option>
+                    <option value="9.4">9.4</option>
+                  </optgroup>
+                  <optgroup label="1º Ano EM">
+                    <option value="1.1">1.1</option>
+                    <option value="1.2">1.2</option>
+                    <option value="1.3">1.3</option>
+                    <option value="1.4">1.4</option>
+                    <option value="1.5">1.5</option>
+                    <option value="1.6">1.6 (Noturno)</option>
+                  </optgroup>
+                  <optgroup label="2º Ano EM">
+                    <option value="2.1">2.1</option>
+                    <option value="2.2">2.2</option>
+                    <option value="2.3">2.3</option>
+                    <option value="2.4">2.4</option>
+                    <option value="2.5">2.5</option>
+                    <option value="2.6">2.6 (Noturno)</option>
+                  </optgroup>
+                  <optgroup label="3º Ano EM">
+                    <option value="3.1">3.1</option>
+                    <option value="3.2">3.2</option>
+                    <option value="3.3">3.3</option>
+                    <option value="3.4">3.4</option>
+                    <option value="3.5">3.5</option>
+                    <option value="3.6">3.6 (Noturno)</option>
+                  </optgroup>
+                  <optgroup label="EJA">
+                    <option value="EJA.1">EJA.1</option>
+                    <option value="EJA.2">EJA.2</option>
+                    <option value="EJA.3">EJA.3</option>
+                    <option value="EJA.4">EJA.4</option>
+                  </optgroup>
+                </select>
+              </div>
+
               <button type="submit">💾 Salvar Perfil Netflix</button>
             </form>
-
-            <p id="profileStatus"></p>
           </div>
         </div>
 
-        <!-- HISTORY SECTION -->
+        <!-- HISTÓRICO -->
         <div id="historySection" style="display:none;">
           <div class="data-section">
             <div class="data-header">📜 Histórico Completo</div>
@@ -168,51 +221,47 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- Loaded by JS -->
+                <!-- Conteúdo carregado via JS -->
               </tbody>
             </table>
           </div>
         </div>
 
+        <!-- CONFIGURAÇÕES -->
         <div id="configSection" style="display:none;">
           <div class="data-section">
             <div class="data-header">⚙️ Configurações</div>
             <p>Configurações em desenvolvimento...</p>
+            <button onclick="toggleDarkMode()">Ativar/Desativar Modo Escuro</button>
           </div>
-
           <div class="data-section">
             <div class="data-header">❓ Ajuda</div>
-            <p>Ajuda em desenvolvimento...</p>
+            <p>Precisa de ajuda? Clique abaixo:</p>
+            <button onclick="openHelp()">Abrir Ajuda</button>
           </div>
-
           <div class="data-section">
             <div class="data-header">💡 Sugestões</div>
-            <p>Sugestões em desenvolvimento...</p>
+            <p>Envie sua sugestão:</p>
+            <input type="text" id="suggestionInput" placeholder="Digite sua sugestão">
+            <button onclick="submitSuggestion()">Enviar</button>
           </div>
-
           <div class="data-section">
             <div class="data-header">📝 Feedback</div>
-            <p>Feedback em desenvolvimento...</p>
+            <p>Deixe seu feedback:</p>
+            <textarea id="feedbackInput" placeholder="Digite seu feedback"></textarea>
+            <button onclick="submitFeedback()">Enviar</button>
           </div>
-
           <div class="data-section">
             <div class="data-header">👤 Meu Perfil</div>
-            <p>Perfil em desenvolvimento...</p>
+            <p>Editar informações do perfil:</p>
             <button class="btn-primary" onclick="showProfile()">Editar Perfil</button>
-            
-            
           </div>
         </div>
 
-
       </section>
     </main>
-
   </div>
 
-<script src="Script.js"></script>
-
-<!-- Comentários PT-BR adicionados -->
-<!-- Melhorias: Cards livros agora com botão PDF, grid mais compacto responsivo -->
+  <script src="Script.js"></script>
 </body>
 </html>
