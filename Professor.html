@@ -142,6 +142,40 @@
           </table>
         </div>
 
+        <!-- SEÇÃO PROFESSORES - Nova seção com cards de professores -->
+        <!-- Seção melhorada: Lista professores com foto, matéria, contatos -->
+        <div id="teachersSection" class="data-section" style="display: none;">
+          <div class="data-header">
+            👨‍🏫 Professores
+            <button class="btn-secondary" onclick="loadTeachers()">Carregar Professores</button>
+          </div>
+          <div id="teachersGrid" class="grid">
+            <!-- Cards professores carregados por JS -->
+          </div>
+        </div>
+
+        <!-- SEÇÃO LIVROS PROFESSOR - Grid livros como aluno, mas admin -->
+        <div id="profBooksSection" class="data-section" style="display: none;">
+          <div class="data-header">
+            📚 Todos os Livros (Admin)
+            <input type="text" id="searchBooksProf" placeholder="🔍 Buscar livros..." style="margin-left: auto; width: 200px;">
+          </div>
+          <div id="profBooksGrid" class="grid">
+            <!-- Livros admin carregados por showBooks('profBooksGrid') -->
+          </div>
+        </div>
+
+        <!-- SEÇÃO ALUNOS MELHORADA - Cards top alunos -->
+        <div id="alunosSection" class="data-section" style="display: none;">
+          <div class="data-header">
+            👥 Alunos (Top Empréstimos)
+            <button class="btn-primary" onclick="loadAlunosSection()">Atualizar</button>
+          </div>
+          <div id="alunosGrid" class="grid">
+            <!-- Cards alunos carregados por JS -->
+          </div>
+        </div>
+
         <!-- ADD BOOK MODAL -->
         <div id="modalAddBook" class="modal">
           <div class="modal-content">

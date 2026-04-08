@@ -134,12 +134,74 @@ main {
   font-weight: bold;
 }
 
+/* Grid para cards de livros - otimizado para lado a lado melhor */
 .grid {
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
+  padding: 20px 0;
 }
+
+/* Book cover improvements */
+/* Imagem capa dos livros - menor para cards compactos */
+.capa {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Book categories */
+.categoria {
+  display: inline-block;
+  margin: 8px 0;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive book grid */
+/* Responsivo mobile - cards menores lado a lado */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  
+  .capa {
+    height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    overflow-x: auto;
+  }
+  
+  .capa {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .capa {
+    height: 260px;
+  }
+}
+
 
 /* CARDS */
 .card {
@@ -198,7 +260,16 @@ main {
   transition: var(--transition);
 }
 
-.btn-pdf { background: #2E3192; color: #fff; }
+/* Botão PDF - destaque para livros */
+.btn-pdf { 
+  background: linear-gradient(135deg, #667eea, #764ba2); 
+  color: white; 
+  margin: 5px 0;
+  font-size: 14px;
+}
+.btn-pdf:hover { 
+  background: linear-gradient(135deg, #5a67d8, #6b46c1); 
+}
 .btn-biblioteca { background: #888; color: #fff; }
 .btn-emprestar { background: #FFC20E; color: #1B1464; }
 
@@ -590,7 +661,6 @@ button:focus-visible, input:focus-visible {
   outline-offset: 2px;
 }
 
-/* PORTAL CARDS (project-specific) */
 .portal-card {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;

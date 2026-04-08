@@ -1,17 +1,16 @@
 
-// ================= CONSTANTS & CONFIG =================
 const IMAGES_PATH = 'Imagens/';
-const STORAGE_VERSION = '1.0';
+const STORAGE_VERSION = '1.1'; /* v1.1: PDF + professores */
 const OVERDUE_DAYS = 7;
 
-// ================= DATA MODELS (Classes) =================
 class Book {
-  constructor(id, title, author, image, description, isbn, totalCopies, availableCopies = totalCopies) {
+constructor(id, title, author, image, pdfUrl, description, isbn, totalCopies, availableCopies = totalCopies) {
     this.id = id;
     this.title = title;
     this.author = author;
-    this.image = IMAGES_PATH + image;
-    this.description = description;
+  this.image = IMAGES_PATH + image;
+  this.pdfUrl = pdfUrl ? IMAGES_PATH + pdfUrl : null;
+  /* Campo PDF pronto para uso */
     this.isbn = isbn;
     this.totalCopies = totalCopies;
     this.availableCopies = availableCopies;
@@ -36,6 +35,11 @@ class Book {
     }
     return false;
   }
+
+  /* Verifica se livro tem PDF disponível */
+  hasPdf() {
+    return !!this.pdfUrl;
+  }
 }
 
 class LoanManager {
@@ -47,13 +51,13 @@ class LoanManager {
 
   initBooks() {
     this.books = [
-      new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
-      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
+      new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3), /* PDF adicionado */
+      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1), /* PDF adicionado */
       new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'imagem1.png', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
-      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'brasCubas.png', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
-      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'moreninha.png', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
-      new Book(7, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'basilio.png', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
+      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'Vidas Secas.jpg', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
+      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
+      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
+      new Book(7, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'Primo basílio.jpg', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
       new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'isaura.png', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
       new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
       new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
@@ -143,10 +147,8 @@ class LoanManager {
   }
 }
 
-// ================= GLOBAL INSTANCE =================
 const library = new LoanManager();
 
-// ================= UTILS =================
 let timeout;
 function debounce(fn, delay = 300) {
   clearTimeout(timeout);
@@ -309,13 +311,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (profileForm) profileForm.addEventListener('submit', saveStudentProfile);
 });
 
-// Get student info (with fallback)
 function getStudentInfo() {
   const profile = localStorage.getItem('studentProfile');
   return profile ? JSON.parse(profile) : {name: 'Aluno Não Identificado', serie: 'N/A'};
 }
 
-// Call profile setup after login for student
 function afterStudentLogin() {
   setupStudentProfile();
   showBooks();
@@ -403,7 +403,6 @@ function updateSidebar(activeIndex) {
   });
 }
 
-// ================= PROFESSOR FUNCTIONS =================
 function carregarDashboard() {
   const stats = library.getStats();
   document.getElementById('total-emp').textContent = stats.total;
@@ -438,7 +437,6 @@ function updateSidebarProf(activeIndex) {
   });
 }
 
-// Professor advanced functions
 function adicionarLivro() {
   showModal('modalAddBook');
 }
@@ -540,7 +538,6 @@ function exportRelatorio() {
 
 function adicionarLivro() {
   showModal('modalAddBook');
-  // Form já no HTML
 }
 
 
@@ -645,11 +642,9 @@ function initSidebar() {
 }
 
 
-// ================= INIT =================
 document.addEventListener('DOMContentLoaded', function() {
   library.loadData();
 
-  // Setup forms
   const addBookForm = document.getElementById('addBookForm');
   if (addBookForm) addBookForm.addEventListener('submit', addBookHandler);
   const profileForm = document.getElementById('profileForm');
@@ -675,7 +670,6 @@ document.addEventListener('DOMContentLoaded', function() {
     logout();
   }
 
-  // Close modals
   document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) hideModal(e.target.id);
   });

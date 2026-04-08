@@ -1,33 +1,19 @@
-# Library System Improvement Plan - Approved Steps
+# TODO - Melhoria Portal Biblioteca
 
-## Current Status: Plan Approved ✅
+Status: Em andamento
 
-### Breakdown of Tasks:
-# Biblioteca System - COMPLETADO ✅
+## Plano Aprovado:
+1. [ ] Criar TODO.md (feito)
+2. [x] Atualizar Script.js: PDF básico + hasPdf() adicionado
+3. [x] Atualizar Styles.css: Cards livros compactos lado a lado, PDFs melhorados
+4. [ ] Professor.html melhorias (progresso)
+5. [ ] Aluno.html: PDF nos livros
+6. [ ] Index.html: Seletor fundo
+7. [ ] Comentários PT-BR
+8. [ ] Testar
+5. [ ] Atualizar Aluno.html: Polish + botão PDF nos livros
+6. [ ] Atualizar Index.html: Seletor fundo portal + JS
+7. [ ] Adicionar comentários PT-BR em todos arquivos
+8. [ ] Testar responsivo/PDFs + completar
 
-**Todas as melhorias implementadas com sucesso:**
-
-✅ Student profile modal with dynamic data
-✅ History tab for students
-✅ Professor dashboard with full table columns
-✅ Professor modals: add book, loan return
-✅ CSV report export
-✅ Professional UI: persistence, overdue detection, toasts, search
-✅ Responsive, accessible, modern design
-
-**Sistema completo e profissional. Teste os portais:**
-
-- **Aluno**: admin/1234 → Emprestimos, histórico, perfil
-- **Professor**: professor/1234 → Dashboard, gerenciar livros/devoluções
-
-Abra `Index.html` para demo completa.
-
-
-**Next Action**: Fix professor dashboard table and add modals (Step 3-4)
-
-
-**Next Action**: Implement professor modals (Step 2)
-
-
-**Next Action**: Implement student profile modal (Step 1)
-
+Próximo: Script.js
