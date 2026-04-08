@@ -701,3 +701,28 @@ button:focus-visible, input:focus-visible {
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 10px 25px rgba(46,49,146,0.4);
 }
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+.data-section {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.data-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
