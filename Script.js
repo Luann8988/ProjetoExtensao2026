@@ -674,6 +674,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target.classList.contains('modal')) hideModal(e.target.id);
   });
 });
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    alert('Modo escuro alternado!');
+}
+
+function openHelp() {
+    alert('Aqui você encontrará informações de ajuda.');
+}
+
+function submitSuggestion() {
+    const suggestion = document.getElementById('suggestionInput').value;
+    if(suggestion.trim() === "") {
+        alert("Digite uma sugestão antes de enviar!");
+        return;
+    }
+    alert("Sugestão enviada: " + suggestion);
+    document.getElementById('suggestionInput').value = "";
+}
+
+function submitFeedback() {
+    const feedback = document.getElementById('feedbackInput').value;
+    if(feedback.trim() === "") {
+        alert("Digite um feedback antes de enviar!");
+        return;
+    }
+    alert("Feedback enviado: " + feedback);
+    document.getElementById('feedbackInput').value = "";
+}
+
+function showProfile() {
+    alert("Funcionalidade de edição de perfil em desenvolvimento!");
+}
 
 
 
