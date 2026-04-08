@@ -1,3 +1,4 @@
+
 * {
   margin: 0;
   padding: 0;
@@ -138,6 +139,12 @@ main {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
   padding: 20px 10px;
+  max-width: 100%;
+  width: 100%;
+}
+
+#bookCatalog .grid {
+  padding: 20px 40px;
 }
 
 .card {
@@ -336,6 +343,22 @@ main {
   margin-bottom: 20px;
 }
 
+#bookCatalog .data-section {
+  width: 1200%;              
+  max-width: 1200px;       
+  margin: 0 auto;          
+  padding: 0 20px;          
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Layout dos livros */
+#bookCatalog .data-section .books {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
 .data-header {
   background: #2E3192;
   color: white;
@@ -405,7 +428,6 @@ main {
   margin: 10px 0;
 }
 
-/* NETFLIX-STYLE AVATARS */
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
@@ -438,7 +460,6 @@ main {
   object-fit: cover;
 }
 
-/* FORM ENHANCEMENTS */
 .form-group {
   margin-bottom: 15px;
 }
