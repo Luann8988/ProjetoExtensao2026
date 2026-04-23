@@ -149,6 +149,7 @@ main {
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.3s ease;
+  
 }
 
 .card:hover {
@@ -220,7 +221,6 @@ main {
   }
 }
 
-/* CARDS */
 .card {
   background: #fff;
   border-radius: 15px;
@@ -369,7 +369,6 @@ main {
 .status-overdue { color: #ef4444; font-weight: bold; }
 .status-active { color: #10b981; font-weight: bold; }
 
-/* ADMIN BUTTONS */
 .admin-actions {
   display: flex;
   gap: 10px;
@@ -405,7 +404,6 @@ main {
   margin: 10px 0;
 }
 
-/* NETFLIX-STYLE AVATARS */
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
@@ -700,4 +698,231 @@ button:focus-visible, input:focus-visible {
 .portal-card:hover {
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 10px 25px rgba(46,49,146,0.4);
+}
+
+/* NETFLIX BOOK CATALOG - LARGER SPACE & ROWS */
+#bookCatalog {
+  padding: 0;
+  margin: 0 -20px;
+  max-width: none;
+  background: linear-gradient(to bottom, var(--bg-light), #f0f4f8);
+}
+
+.book-row {
+  padding: 40px 20px;
+  margin-bottom: 20px;
+  background: #141414; /* Dark Netflix bg for immersion */
+  color: white;
+  overflow: hidden;
+}
+
+.row-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 20px 20px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.row-count {
+  font-size: 16px;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+.row-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) rgba(255,255,255,0.2);
+}
+
+.row-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.row-grid::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+}
+
+.row-grid::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.book-card {
+  flex: 0 0 280px;
+  height: 420px;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+  background: #000;
+  box-shadow: var(--shadow-md);
+}
+
+.book-card:hover {
+  transform: scale(1.05);
+  z-index: 10;
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(255,194,14,0.3);
+}
+
+.book-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.book-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent 60%);
+  opacity: 0;
+  transition: var(--transition);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.book-card:hover .book-overlay {
+  opacity: 1;
+}
+
+.overlay-info {
+  width: 100%;
+}
+
+.overlay-info h4 {
+  font-size: 20px;
+  margin: 0 0 8px;
+  color: white;
+}
+
+.overlay-info p {
+  margin: 0 0 10px;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.rating-bar {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.overlay-desc {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0 0 15px;
+  opacity: 0.85;
+  max-height: 3em;
+  overflow: hidden;
+}
+
+.pdf-btn, .netflix-cta {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.pdf-btn {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.pdf-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.netflix-cta {
+  background: var(--accent);
+  color: var(--primary-dark);
+  flex: 1;
+}
+
+.netflix-cta:hover:not(.disabled) {
+  background: #e6ac00;
+  transform: translateY(-1px);
+}
+
+.netflix-cta.disabled {
+  background: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE FOR BOOKS */
+@media (max-width: 768px) {
+  .book-card {
+    flex: 0 0 220px;
+    height: 330px;
+  }
+  
+  .row-grid {
+    gap: 12px;
+  }
+  
+  .book-row {
+    padding: 30px 10px;
+  }
+  
+  .row-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-card {
+    flex: 0 0 160px;
+    height: 240px;
+  }
+  
+  .overlay-info h4 {
+    font-size: 16px;
+  }
+  
+  .pdf-btn, .netflix-cta {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+.data-section {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.data-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
 }
