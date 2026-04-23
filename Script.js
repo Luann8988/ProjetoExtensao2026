@@ -50,27 +50,36 @@ class LoanManager {
   }
 
   initBooks() {
-    this.books = [
-      new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3), /* PDF adicionado */
-      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1), /* PDF adicionado */
-      new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'Vidas Secas.jpg', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
-      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
-      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
-      new Book(7, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'Primo basílio.jpg', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
-      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'isaura.png', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
-      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
-      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
-      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
-      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
-      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
-      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
-      new Book(15, 'O Primo Basílio', 'José Maria de Eça de Queirós', 'basilio.png', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
-      new Book(16, 'A Escrava Isaura', 'Bernardo Guimarães', 'isaura.png', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
-      new Book(17, 'Senhora', 'José de Alencar', 'senhora.png', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
-      new Book(18, 'O Guarani', 'José de Alencar', 'guarani.png', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5)
-    ];
-  }
+  this.books = [
+    new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
+
+    new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
+
+    new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'capitaesdeareia.pdf', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
+
+    new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
+
+    new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'memorias.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
+
+    new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'moreninha.pdf', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
+
+    new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.jpg', 'primobasilio.pdf', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
+
+    new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
+
+    new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
+
+    new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
+
+    new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
+
+    new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
+
+    new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
+
+    new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
+  ];
+}
 
   isOverdue(loan) {
     const devDate = new Date(loan.dataDev.split('/').reverse().join('-'));
