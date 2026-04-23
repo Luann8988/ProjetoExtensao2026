@@ -706,9 +706,6 @@ function submitFeedback() {
 function showProfile() {
     alert("Funcionalidade de edição de perfil em desenvolvimento!");
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> afdc6210b376cff5c8a7bfbd125d18c347533fa5
 
 
