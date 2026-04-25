@@ -50,24 +50,23 @@ class LoanManager {
   }
 
   initBooks() {
-    this.books = [
-      new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
-      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
-      new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'capitaesdeareia.pdf', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
-      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'memorias.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
-      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'moreninha.pdf', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
-      new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.jpg', 'primobasilio.pdf', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
-      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
-      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
-      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
-      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
-      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
-      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
-      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
-    ];
-  }
-
+  this.books = [
+    new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/machado-de-assis/dom-casmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
+    new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/aluisio-azevedo/ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
+    new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/jorge-amado/capitaesdaareia.pdf', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
+    new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/graciliano-ramos/vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
+    new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/machado-de-assis/memoriaspostumasdebrascubas.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
+    new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/joaquim-manuel-de-macedo/amoreninha.pdf', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
+    new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.jpg', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/eca-de-queiros/primobasilio.pdf', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
+    new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/bernardo-guimaraes/escravaisaura.pdf', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
+    new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/jose-de-alencar/senhora.pdf', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
+    new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/jose-de-alencar/guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
+    new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/jose-de-alencar/iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
+    new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/aluisio-azevedo/mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
+    new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/machado-de-assis/luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
+    new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'https://www.curso-objetivo.br/vestibular/assets/download/obras-literarias/bernardo-guimaraes/seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2)
+  ];
+}
   isOverdue(loan) {
     const devDate = new Date(loan.dataDev.split('/').reverse().join('-'));
     const today = new Date();
