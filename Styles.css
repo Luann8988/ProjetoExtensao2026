@@ -747,18 +747,338 @@ button:focus-visible, input:focus-visible {
 .btn-primary:hover {
     background-color: #0056b3;
 }
-.pdf-btn {
-  background-color: #2c3e50;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 5px;
+/* Container Principal do Catálogo */
+#booksGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 20px;
+}
+
+/* Card do Livro */
+.book-item {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Capa e Botão PDF */
+.book-cover-wrapper {
+    position: relative;
+    height: 300px;
+    background: #f0f0f0;
+}
+
+.book-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-read-pdf {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(231, 76, 60, 0.9); /* Vermelho PDF */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: 0.3s;
+}
+
+.btn-read-pdf:hover {
+    background: #c0392b;
+    width: 90%;
+}
+
+/* Informações do Livro */
+.book-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.book-title {
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-author {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+.book-description {
+    font-size: 0.85rem;
+    color: #34495e;
+    line-height: 1.4;
+    height: 60px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    margin-bottom: 15px;
+}
+
+/* Rodapé do Card */
+.book-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.book-stock {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #27ae60;
+}
+
+.btn-loan {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-loan:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+#professorContainer {
+  background: #0b1220;
+  min-height: 100vh;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* HEADER */
+#professorContainer header {
+  background: linear-gradient(135deg, #2E3192, #1B1464);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid #FFC20E;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* SIDEBAR */
+#professorContainer .sidebar-prof {
+  width: 230px;
+  background: #0f172a;
+  height: 100vh;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  padding: 20px;
+  border-right: 1px solid #1e293b;
+}
+
+#professorContainer .sidebar-prof ul {
+  list-style: none;
+  padding: 0;
+}
+
+#professorContainer .sidebar-prof li {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #cbd5e1;
   transition: 0.3s;
 }
 
-.pdf-btn:hover {
-  background-color: #3498db;
+#professorContainer .sidebar-prof li:hover {
+  background: #1e293b;
+  color: #fff;
 }
+
+#professorContainer .sidebar-prof li.active {
+  background: #FFC20E;
+  color: #1B1464;
+  font-weight: bold;
+}
+
+/* CONTEÚDO */
+#professorContainer .dashboard-content {
+  margin-left: 250px;
+  padding: 25px;
+}
+
+/* SEÇÕES (IMPORTANTE PARA O JS FUNCIONAR BEM) */
+#professorContainer .section {
+  display: none;
+  animation: fade 0.25s ease-in-out;
+}
+
+#professorContainer .section.active {
+  display: block;
+}
+
+/* ANIMAÇÃO */
+@keyframes fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* STATS GRID */
+#professorContainer .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+#professorContainer .stat-card {
+  background: #111827;
+  padding: 18px;
+  border-radius: 12px;
+  border-left: 4px solid #FFC20E;
+  transition: 0.3s;
+}
+
+#professorContainer .stat-card:hover {
+  transform: translateY(-5px);
+  background: #1f2937;
+}
+
+#professorContainer .stat-number {
+  font-size: 28px;
+  color: #FFC20E;
+  font-weight: bold;
+}
+
+/* TABLE */
+#professorContainer .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#professorContainer .data-table th {
+  background: #2E3192;
+  padding: 10px;
+}
+
+#professorContainer .data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #1e293b;
+}
+
+#professorContainer .data-table tr:hover {
+  background: #1e293b;
+}
+
+/* GRID */
+#professorContainer .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+/* CARD */
+#professorContainer .card {
+  background: #111827;
+  padding: 15px;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+#professorContainer .card:hover {
+  transform: scale(1.03);
+  background: #1f2937;
+}
+
+/* BOTÕES */
+#professorContainer button {
+  cursor: pointer;
+}
+
+#professorContainer .btn-primary {
+  background: #2E3192;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+#professorContainer .btn-secondary {
+  background: #FFC20E;
+  color: #1B1464;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  #professorContainer .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #professorContainer .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #professorContainer .dashboard-content {
+    margin-left: 0;
+  }
+
+  #professorContainer .sidebar-prof {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+}
+/*foto do professor e informações */
+.professor-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.professor-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1B1464;
+}
+.professor-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFC20E;
+}
+.professor-role {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
 

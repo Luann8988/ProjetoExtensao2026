@@ -1,6 +1,6 @@
 
 const IMAGES_PATH = 'Imagens/';
-const STORAGE_VERSION = '1.1'; /* v1.1: PDF + professores */
+const STORAGE_VERSION = '1.1'; 
 const OVERDUE_DAYS = 7;
 
 class Book {
@@ -8,9 +8,8 @@ constructor(id, title, author, image, pdfUrl, description, isbn, totalCopies, av
     this.id = id;
     this.title = title;
     this.author = author;
-  this.image = IMAGES_PATH + image;
-  this.pdfUrl = pdfUrl ? IMAGES_PATH + pdfUrl : null;
-  /* Campo PDF pronto para uso */
+    this.image = IMAGES_PATH + image;
+    this.pdfUrl = pdfUrl ? IMAGES_PATH + pdfUrl : null;
     this.isbn = isbn;
     this.totalCopies = totalCopies;
     this.availableCopies = availableCopies;
@@ -78,9 +77,9 @@ class LoanManager {
     new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
 
     new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
-  ];
-}
-
+    ];
+    
+  }
   isOverdue(loan) {
     const devDate = new Date(loan.dataDev.split('/').reverse().join('-'));
     const today = new Date();
@@ -184,7 +183,6 @@ function logout() {
   window.location.href = 'Index.html';
 }
 
-// ================= MODALS =================
 function showModal(id) {
   document.getElementById(id).style.display = 'flex';
 }
@@ -278,9 +276,6 @@ function showHistory() {
   updateSidebar(2);
 }
 
-
-
-// ================= STUDENT FUNCTIONS =================
 function setupStudentProfile() {
   const profileSaved = localStorage.getItem('studentProfile');
   if (!profileSaved) {
@@ -359,7 +354,7 @@ function emprestarLivro(bookId) {
   const loan = library.createLoan(studentId, studentName, serie, bookId);
   if (loan) {
     showToast(`Emprestado: ${loan.bookTitle}`);
-    showBooks();  // Refresh
+    showBooks();  
     showMyLoans();
   } else {
     showToast('Livro indisponível!', 'error');
@@ -438,9 +433,7 @@ function carregarDashboard() {
   updateSidebarProf(0);
 }
 
-
 function updateSidebarProf(activeIndex) {
-  // Update professor sidebar active states
   document.querySelectorAll('.sidebar li').forEach((li, i) => {
     li.classList.toggle('active', i === activeIndex);
   });
@@ -500,13 +493,11 @@ function loadReturnLoans() {
 }
 
 function loadAlunosSection() {
-  // Modal gerenciar alunos
   showToast('Gerenciador alunos: Lista + bloqueio + detalhes');
   console.log('Alunos ativos:', library.loans.map(l => l.studentId).filter((id, idx, arr) => arr.indexOf(id) === idx));
 }
 
 function gerenciarLivros() {
-  // Lista todos livros + editar + remover
   const livrosInfo = library.books.map(b => `${b.title} (${b.availableCopies}/${b.totalCopies})`).join('\\n');
   console.log('Livros atuais:\\n' + livrosInfo);
   showToast('Gerenciar Livros: Editar estoque/remover');
@@ -558,9 +549,6 @@ function gerenciarLivros() {
   }
 }
 
-
-
-
 function returnLoanProf(loanId) {
   if (confirm('Confirmar devolução?')) {
     library.returnLoan(loanId);
@@ -595,7 +583,6 @@ function exportRelatorio() {
 }
 
 
-// ================= SEARCH =================
 function setupSearch() {
   const searchAluno = document.getElementById('searchAluno');
   const searchProf = document.getElementById('searchProf');
@@ -716,5 +703,228 @@ function showProfile() {
     alert("Funcionalidade de edição de perfil em desenvolvimento!");
 }
 
+function showSection(sectionId, portalType) {
+    const allSections = [
+        'dashboardSection', 'alunosSection', 'relatoriosSection', 
+        'livrosSection', 'devolucoesSection', 'configSection',
+        'bookCatalog', 'myLoansSection', 'historySection'
+  ];
+  function showSection(sectionId, element) {
+
+  // 1. esconder todas as seções
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(sec => {
+    sec.style.display = 'none';
+    sec.classList.remove('active');
+  });
+
+  // 2. mostrar a selecionada
+  const target = document.getElementById(sectionId);
+  if (target) {
+    target.style.display = 'block';
+    target.classList.add('active');
+  }
+
+  // 3. remover active de todos os menus
+  const items = document.querySelectorAll('.menu-item');
+  items.forEach(item => item.classList.remove('active'));
+
+  // 4. ativar o clicado
+  if (element) {
+    element.classList.add('active');
+  }
+
+  // 5. scroll top (fica mais sistema real)
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+    
+    allSections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    const target = document.getElementById(sectionId);
+    if (target) target.style.display = 'block';
+
+    const sidebarItems = document.querySelectorAll(portalType === 'professor' ? '.sidebar-prof li' : '.sidebar-aluno li');
+    sidebarItems.forEach(li => li.classList.remove('active'));
+}
+
+function adicionarNovoLivro(event) {
+    event.preventDefault();
+    
+    const titulo = document.getElementById('newTitle').value;
+    const pdf = document.getElementById('newPdf').value; // Nome do arquivo.pdf
+    
+    const novoLivro = new Book(
+        Date.now(), 
+        titulo,
+        document.getElementById('newAuthor').value,
+        "capa-padrao.png", // Imagem
+        pdf, 
+        document.getElementById('newDesc').value,
+        "000-000",
+        5, 5 
+    );
+
+    library.books.push(novoLivro);
+    library.saveData(); 
+    alert("Livro adicionado com sucesso!");
+    navegarProfessor('dashboardSection'); // Volta para o início
+    carregarDashboard(); // Atualiza a tabela do prof
+}
+
+function showBooks() {
+    showSection('bookCatalog');
+    const grid = document.getElementById('booksGrid');
+    if (!grid) return;
+
+    grid.innerHTML = library.books.map(book => `
+        <div class="card">
+            <img src="${book.image}" alt="${book.title}" class="capa">
+            <div class="card-content">
+                <h3>${book.title}</h3>
+                <p><strong>${book.author}</strong></p>
+                <div class="actions">
+                    <button class="btn-emprestar" ${!book.canLoan() ? 'disabled' : ''} onclick="emprestarLivro(${book.id})">
+                        ${book.canLoan() ? 'Emprestar' : 'Esgotado'}
+                    </button>
+                    ${book.pdfUrl ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+    updateSidebar(0);
+}
 
 
+function showMyLoans() {
+    showSection('myLoansSection');
+    const studentId = localStorage.getItem('studentId');
+    const myLoans = library.loans.filter(l => l.studentId === studentId && l.status === 'active');
+    const tbody = document.querySelector('#myLoansTable tbody');
+    
+    tbody.innerHTML = myLoans.map(loan => `
+        <tr>
+            <td>${loan.bookTitle}</td>
+            <td>${loan.dataEmp}</td>
+            <td>${loan.dataDev}</td>
+            <td><button class="btn-secondary" onclick="devolverLivro(${loan.id})">Devolver</button></td>
+        </tr>
+    `).join('');
+    updateSidebar(1);
+}
+
+function updateSidebar(activeIndex) {
+    const navItems = document.querySelectorAll('.sidebar li');
+    navItems.forEach((li, i) => {
+        li.classList.toggle('active', i === activeIndex);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    library.loadData();
+    const type = localStorage.getItem('tipoUsuario');
+    if (type === 'aluno') showBooks();
+});
+function switchProfTab(tabId) {
+    const sections = [
+        'dashboardSection',
+        'alunosSection',
+        'relatoriosSection',
+        'livrosSection',
+        'devolucoesSection'
+    ];
+
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+
+    const active = document.getElementById(tabId);
+    if (active) active.style.display = 'block';
+
+    document.querySelectorAll('.sidebar-prof li').forEach(li => {
+        li.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+
+    if (tabId === 'dashboardSection') carregarDashboard();
+    if (tabId === 'devolucoesSection') loadReturnLoans();
+}
+
+document.querySelectorAll('.sidebar-prof li').forEach((li, index) => {
+    li.addEventListener('click', function() {
+        document.querySelectorAll('.sidebar-prof li').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+
+        if (index === 0) switchProfTab('dashboardSection');
+        if (index === 1) switchProfTab('alunosSection');
+    });
+});
+function addBookHandler(e) {
+    e.preventDefault();
+    
+    const newBook = new Book(Date.now(), title, author, image, "caminho_pdf.pdf", desc, isbn, copies, copies);
+    library.books.push(newBook);
+    library.saveData(); // <--- ESSENCIAL: Salva no localStorage para o aluno ver
+    
+    hideModal('modalAddBook');
+    showToast('Livro disponível para os alunos!');
+    switchProfTab('dashboardSection');
+}
+function navegarProfessor(sectionId, el) {
+
+  const sections = [
+    "dashboardSection",
+    "alunosSection",
+    "relatoriosSection",
+    "livrosSection",
+    "devolucoesSection"
+  ];
+
+  // esconder tudo
+  sections.forEach(id => {
+    const sec = document.getElementById(id);
+    if (sec) sec.style.display = "none";
+  });
+
+  // mostrar atual
+  const target = document.getElementById(sectionId);
+  if (target) target.style.display = "block";
+
+  // menu ativo
+  document.querySelectorAll(".sidebar-prof li")
+    .forEach(li => li.classList.remove("active"));
+
+  if (el) el.classList.add("active");
+}
+function carregarDashboard() {
+
+  const stats = library.getStats();
+
+  document.getElementById("totalEmprestimos").textContent = stats.total;
+  document.getElementById("emprestimosAtivos").textContent = stats.active;
+  document.getElementById("emprestimosAtrasados").textContent = stats.overdue;
+  document.getElementById("devolvidosHoje").textContent = stats.devoluToday;
+
+  // tabela últimos empréstimos
+  const tbody = document.getElementById("dashboardTable");
+
+  tbody.innerHTML = library.loans.slice(-5).map(l => `
+    <tr>
+      <td>${l.studentName}</td>
+      <td>${l.bookTitle}</td>
+      <td>${l.dataEmp}</td>
+      <td>${l.status}</td>
+    </tr>
+  `).join("");
+
+  // gráfico fake animado
+  document.getElementById("b1").style.width = "60%";
+  document.getElementById("b2").style.width = "40%";
+  document.getElementById("b3").style.width = "70%";
+  document.getElementById("b4").style.width = "30%";
+  document.getElementById("b5").style.width = "80%";
+}

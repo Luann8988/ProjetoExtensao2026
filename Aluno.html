@@ -9,7 +9,6 @@
 
 <body class="login-body">
 
-  <!-- LOGIN FORM -->
   <div id="loginContainer" class="login-container">
     <img src="Imagens/imagem1.png" class="logo" alt="Logo da Escola Estadual Professor Gonçalves Couto" aria-label="Logo">
     <h2>Portal do Aluno</h2>
@@ -21,10 +20,8 @@
     </form>
   </div>
 
-  <!-- DASHBOARD ALUNO -->
   <div id="alunoContainer" style="display:none;">
 
-    <!-- HEADER -->
     <header>
       <div class="header-left">
         <img src="Imagens/imagem1.png" alt="Logo da Escola Estadual Professor Gonçalves Couto" class="logo" aria-label="Logo">
@@ -37,9 +34,7 @@
       <button onclick="logout()" class="btn-logout">Sair</button>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main>
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <h3>Meu Painel</h3>
         <ul>
@@ -50,7 +45,6 @@
         </ul>
       </aside>
 
-      <!-- DASHBOARD CONTENT -->
       <section class="dashboard-content">
     
         <div class="netflix-profile-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
@@ -67,12 +61,10 @@
           <div class="data-section">
             <div class="data-header">📚 Catálogo de Livros</div>
             <div id="booksGrid" class="grid">
-              <!-- Conteúdo carregado via JS -->
             </div>
           </div>
         </div>
 
-        <!-- MEUS EMPRÉSTIMOS -->
         <div id="myLoansSection" style="display:none;">
           <div class="data-section">
             <div class="data-header">📋 Meus Empréstimos Ativos</div>
@@ -87,13 +79,11 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- Conteúdo carregado via JS -->
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- MODAL PERFIL -->
         <div id="modalStudentProfile" class="modal">
           <div class="modal-content">
             <button class="close" onclick="hideModal('modalStudentProfile')">&times;</button>
@@ -120,13 +110,11 @@
                 <img id="avatarPreview" class="profile-avatar-preview" src="" style="display:none;">
               </div>
 
-              <!-- Nome de usuário -->
               <div class="form-group">
                 <label>Nome de Usuário</label>
                 <input type="text" id="profileName" placeholder="@seuusuario" maxlength="20" required>
               </div>
 
-              <!-- Senha -->
               <div class="form-group">
                 <label>Senha</label>
                 <div class="password-group">
@@ -135,7 +123,6 @@
                 </div>
               </div>
 
-              <!-- Série -->
               <div class="form-group">
                 <label for="profileSerie">Série/Turma</label>
                 <select id="profileSerie" required>
@@ -220,7 +207,6 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- Conteúdo carregado via JS -->
               </tbody>
             </table>
           </div>
