@@ -1,6 +1,6 @@
 const IMAGES_PATH = 'Imagens/';
 const PDF_PATH = 'PDF/'; // Pasta dos PDFs locais
-const STORAGE_VERSION = '1.1';
+const STORAGE_VERSION = '1.2';
 const OVERDUE_DAYS = 7;
 const MAX_LOANS_PER_STUDENT = 3;
 
@@ -9,7 +9,7 @@ class Book {
     this.id = id;
     this.title = title;
     this.author = author;
-    this.image = IMAGES_PATH + image;
+    this.image = image.startsWith('http') ? image : IMAGES_PATH + image; // Allow external images
     this.category = category;
     this.rating = Math.floor(Math.random() * 2) + 4; // Simula rating inicial 4-5
 
@@ -62,34 +62,38 @@ class LoanManager {
     // Mantendo estático por enquanto, mas sugerindo a mudança:
     this.books = [
       new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
-      // ... resto dos livros
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
-
-      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'memoriaspostumasdebrascubas.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
-
-      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'amoreninha.pdf', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
-
-      new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.jpg', 'primobasilio.pdf', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
-
-      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
-
-      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
-
-      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
-
-      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
-
-      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
-
-      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
-      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
-      new Book(15, 'Quincas Borba', 'Machado de Assis', 'quincasborba.jpg', 'quincasborba.pdf', 'A filosofia do Humanitismo e a loucura.', '9788570015671', 5, 5),
-      new Book(16, 'A Hora da Estrela', 'Clarice Lispector', 'horadaestrela.jpg', 'horadaestrela.pdf', 'A vida de Macabéa no Rio de Janeiro.', '9788570015672', 4, 4),
-      new Book(17, 'Sagarana', 'João Guimarães Rosa', 'sagarana.jpg', 'sagarana.pdf', 'Contos regionalistas de Minas Gerais.', '9788570015673', 3, 3),
-      new Book(18, 'Os Sertões', 'Euclides da Cunha', 'sertoes.jpg', 'sertoes.pdf', 'Relato da Guerra de Canudos.', '9788570015674', 2, 2),
-      new Book(19, 'Auto da Compadecida', 'Ariano Suassuna', 'autocompadecida.jpg', 'autocompadecida.pdf', 'As aventuras de João Grilo e Chicó.', '9788570015675', 6, 6),
-      new Book(20, 'Morte e Vida Severina', 'João Cabral de Melo Neto', 'severina.jpg', 'severina.pdf', 'Poema dramático sobre o retirante.', '9788570015676', 5, 5)
+      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Romance naturalista que retrata a vida em um cortiço carioca.', '9788570011235', 4, 1, 'Clássicos'),
+      new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdaareia.png', 'capitaesdaareia.pdf', 'A vida de um grupo de meninos de rua em Salvador.', '9788570011236', 6, 6, 'Aventura'),
+      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.png', 'vidassecas.pdf', 'Drama da família de retirantes no sertão nordestino.', '9788570012347', 3, 2, 'Drama'),
+      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.png', 'memoriaspostumasdebrascubas.pdf', 'Narrativa inovadora do defunto-autor, com crítica social e humor.', '9788570015678', 5, 5, 'Clássicos'),
+      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.png', 'amoreninha.pdf', 'Romance romântico ambientado no Rio de Janeiro do século XIX.', '9788570018901', 4, 2, 'Romance'),
+      new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.png', 'primobasilio.pdf', 'Crítica social e adultério na sociedade burguesa de Lisboa.', '9788570013458', 5, 3, 'Drama'),
+      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista que narra a luta de Isaura pela liberdade.', '9788570016789', 4, 1, 'Drama'),
+      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor, dinheiro e convenções sociais.', '9788570019012', 6, 4, 'Romance'),
+      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial, com aventura e romance.', '9788570010123', 5, 5, 'Aventura'),
+      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará e o amor entre Iracema e Martim.', '9788570012345', 4, 2, 'Romance'),
+      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Romance naturalista que aborda racismo e preconceito na sociedade maranhense.', '9788570016780', 3, 1, 'Drama'),
+      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre a percepção da realidade e a ilusão.', '9788570018900', 5, 4, 'Clássicos'),
+      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos de um jovem seminarista.', '9788570015670', 4, 2, 'Drama'),
+      new Book(15, 'Quincas Borba', 'Machado de Assis', 'quincasborba.jpg', 'quincasborba.pdf', 'A filosofia do Humanitismo e a loucura, com crítica à sociedade da época.', '9788570015671', 5, 5, 'Clássicos'),
+      new Book(16, 'A Hora da Estrela', 'Clarice Lispector', 'horadaestrela.jpg', 'horadaestrela.pdf', 'A vida de Macabéa, uma datilógrafa nordestina no Rio de Janeiro.', '9788570015672', 4, 4, 'Drama'),
+      new Book(17, 'Sagarana', 'João Guimarães Rosa', 'sagarana.jpg', 'sagarana.pdf', 'Contos regionalistas de Minas Gerais, com linguagem inovadora.', '9788570015673', 3, 3, 'Aventura'),
+      new Book(18, 'Os Sertões', 'Euclides da Cunha', 'sertoes.jpg', 'sertoes.pdf', 'Relato da Guerra de Canudos, com análise histórica, geográfica e sociológica.', '9788570015674', 2, 2, 'História'),
+      new Book(19, 'Auto da Compadecida', 'Ariano Suassuna', 'autocompadecida.jpg', 'autocompadecida.pdf', 'Peça teatral que mistura elementos do folclore nordestino e da religiosidade popular.', '9788570015675', 6, 6, 'Comédia'),
+      new Book(20, 'Morte e Vida Severina', 'João Cabral de Melo Neto', 'severina.jpg', 'severina.pdf', 'Poema dramático sobre a vida e a morte do retirante nordestino.', '9788570015676', 5, 5, 'Drama')
     ];
+
+    // Populate categories for the filter dropdown
+    const uniqueCategories = [...new Set(this.books.map(book => book.category))];
+    const filterCategorySelect = document.getElementById('filterCategory');
+    if (filterCategorySelect) {
+      uniqueCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        filterCategorySelect.appendChild(option);
+      });
+    }
   }
 
   isOverdue(loan) {
@@ -261,7 +265,12 @@ function getCurrentPageType() {
 }
 
 function logout() {
-  localStorage.clear();
+  // Remove apenas os dados da sessão atual para pedir login novamente
+  localStorage.removeItem('logado');
+  localStorage.removeItem('tipoUsuario');
+  localStorage.removeItem('studentId');
+  localStorage.removeItem('studentName');
+  localStorage.removeItem('professorId');
   window.location.href = 'Index.html';
 }
 
@@ -284,21 +293,46 @@ function login(e) {
   const pageType = getCurrentPageType();
 
   // Aqui você deve fazer um fetch para um arquivo PHP que valide o login
-  // Exemplo simplificado mantendo a estrutura para fins educacionais:
-  if (usuario !== "" && senha !== "") {
+  // Exemplo simplificado com credenciais hardcoded para fins educacionais:
+  let isAuthenticated = false;
+  let userId = '';
+  let userName = '';
+
+  if (pageType === 'aluno') {
+    if (usuario === 'aluno' && senha === '123') { // Exemplo de credenciais para aluno
+      isAuthenticated = true;
+      userId = 'aluno123'; // ID único para o aluno
+      userName = 'Aluno Teste';
+    }
+  } else if (pageType === 'professor') {
+    if (usuario === 'prof' && senha === '123') { // Exemplo de credenciais para professor
+      isAuthenticated = true;
+      userId = 'prof456'; // ID único para o professor
+      userName = 'Prof. Bibliotecário';
+    }
+  }
+
+  if (isAuthenticated) {
     localStorage.setItem('logado', 'true');
     localStorage.setItem('tipoUsuario', pageType);
-    // O ideal é que o servidor retorne esses dados
-    localStorage.setItem('studentName', usuario);
+    if (pageType === 'aluno') {
+      localStorage.setItem('studentId', userId);
+      localStorage.setItem('studentName', userName);
+      // Inicializa o perfil do aluno se não existir
+      let profile = JSON.parse(localStorage.getItem('studentProfile'));
+      if (!profile) {
+        profile = { name: userName, serie: 'Aluno Regular', avatarSeed: userId };
+        localStorage.setItem('studentProfile', JSON.stringify(profile));
+      }
+    } else if (pageType === 'professor') {
+      localStorage.setItem('professorId', userId);
+      localStorage.setItem('professorName', userName);
+    }
 
     library.loadData();
-    const container = document.getElementById(
-      pageType + 'Container'
-    );
 
-    const loginCont = document.getElementById(
-      'loginContainer'
-    );
+    const container = document.getElementById(pageType + 'Container');
+    const loginCont = document.getElementById('loginContainer');
 
     if (container && loginCont) {
       loginCont.style.display = 'none';
@@ -307,16 +341,15 @@ function login(e) {
       if (pageType === 'aluno') {
         afterStudentLogin();
       } else {
+        // Para professor, garantir que a seção correta seja exibida inicialmente
         carregarDashboard();
+        navegarProfessor('dashboard', document.querySelector('.sidebar-prof li.menu-item'));
+        renderGenreChart(); // Renderiza o gráfico para o dashboard do professor
       }
     }
-
     showToast('Login realizado com sucesso!');
   } else {
-    showToast(
-      'Credenciais inválidas para este portal!',
-      'error'
-    );
+    showToast('Credenciais inválidas!', 'error');
   }
 }
 
@@ -329,10 +362,19 @@ function getReaderLevel(count) {
 
 function afterStudentLogin() {
   // Tenta pegar do window (vindo do PHP) ou do localStorage (estático)
-  const studentName = window.studentName || localStorage.getItem('studentName') || 'Estudante';
-  const studentId = localStorage.getItem('studentId') || '000';
+  let studentName = localStorage.getItem('studentName') || 'Estudante';
+  let studentId = localStorage.getItem('studentId') || '000';
+
+  // Se o studentId não estiver definido (ex: primeira vez logando com credenciais hardcoded)
+  if (studentId === '000' && localStorage.getItem('logado') === 'true' && localStorage.getItem('tipoUsuario') === 'aluno') {
+    studentId = 'aluno123'; // Define um ID padrão
+    studentName = 'Aluno Teste'; // Define um nome padrão
+    localStorage.setItem('studentId', studentId);
+    localStorage.setItem('studentName', studentName);
+  }
   
   // Cria o perfil automaticamente se não existir
+  // Usa o studentId como avatarSeed padrão se não houver um perfil salvo
   let profile = JSON.parse(localStorage.getItem('studentProfile')) || 
                 { name: studentName, serie: 'Aluno Regular', avatarSeed: studentId };
   
@@ -340,7 +382,7 @@ function afterStudentLogin() {
   
   loadProfileHeader(profile);
   showBooks();
-}
+ }
 
 function loadProfileHeader(profileData) {
   const profile = profileData || JSON.parse(localStorage.getItem('studentProfile'));
@@ -526,9 +568,8 @@ function renderGenreChart() {
 }
 function showBooks() {
   showSection('bookCatalog');
-  const grid = document.getElementById('booksGrid');
-  if (!grid) return;
-  grid.innerHTML = library.books.map(book => renderBookCard(book)).join('');
+  // Chama filterBooks para garantir que os filtros ativos sejam aplicados
+  filterBooks();
   updateSidebar(0);
 }
 
@@ -879,27 +920,28 @@ function setupSearch() {
   const searchAluno = document.getElementById('searchAluno');
 
   if (searchAluno) {
-    searchAluno.oninput = (e) =>
-      debounce(() => {
-        const term = e.target.value.toLowerCase();
+    searchAluno.oninput = () => debounce(filterBooks); // Chama filterBooks para aplicar todos os filtros
+  }
 
-        document
-          .querySelectorAll('#booksGrid .card')
-          .forEach(card => {
-            card.style.display =
-              card.textContent
-                .toLowerCase()
-                .includes(term)
-                ? 'block'
-                : 'none';
-          });
-      });
+  // Preenche as categorias no filtro ao carregar
+  const filterCategorySelect = document.getElementById('filterCategory');
+  if (filterCategorySelect && filterCategorySelect.options.length <= 1) { // Evita duplicar se já houver opções
+    const uniqueCategories = [...new Set(library.books.map(book => book.category))];
+    uniqueCategories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      filterCategorySelect.appendChild(option);
+    });
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   library.loadData();
 
+  // Inicializa o preenchimento das categorias e o setup da busca
+  // Isso precisa ser feito antes de `afterStudentLogin` ou `carregarDashboard`
+  // para que os filtros estejam prontos.
   setupSearch();
 
   const profileForm = document.getElementById('profileForm');
@@ -921,30 +963,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const pageType = getCurrentPageType();
-
-  const isLogged =
-    localStorage.getItem('logado') === 'true';
-
-  if (isLogged) {
-    const container = document.getElementById(
-      pageType + 'Container'
-    );
-
-    const loginCont = document.getElementById(
-      'loginContainer'
-    );
-
-    if (container && loginCont) {
-      loginCont.style.display = 'none';
-      container.style.display = 'block';
-
-      if (pageType === 'aluno') {
-        afterStudentLogin();
-      } else {
-        carregarDashboard();
-      }
-    }
-  }
 
   document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {

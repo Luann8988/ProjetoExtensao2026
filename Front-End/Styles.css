@@ -33,7 +33,6 @@
 
 .stars { color: #FFC20E; margin-bottom: 5px; font-size: 0.9rem; }
 
-.search-container { display: flex; gap: 10px; align-items: center; }
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: var(--bg-light);
@@ -77,12 +76,54 @@ header {
   color: #FFC20E;
 }
 
+/* Estilos para o container de busca e filtros no cabeçalho do aluno */
+header .search-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-grow: 1;
+  justify-content: center;
+  margin: 0 20px;
+  flex-wrap: wrap; /* Impede que os elementos se amontoem em telas menores */
+}
+
+/* Estilos para o select de categorias */
+header .search-container select#filterCategory {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 2px solid var(--accent);
+  background: white;
+  color: var(--primary);
+  font-weight: bold;
+  font-size: 14px;
+  outline: none;
+  -webkit-appearance: none; /* Remove default arrow on WebKit browsers */
+  -moz-appearance: none;    /* Remove default arrow on Firefox */
+  appearance: none;         /* Remove default arrow */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.6c-5%200-9.3%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013.2l128%20128c3.9%203.9%208.7%205.8%2013.2%205.8s9.3-1.9%2013.2-5.8l128-128c3.9-3.9%205.8-8.7%205.8-13.2%200-5-1.8-9.3-5.4-13.2z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 30px; /* Make space for the arrow */
+}
+
+/* Estilos para o label do checkbox "Disponíveis" */
+header .search-container label {
+  font-size: 14px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 header input {
   padding: 10px 18px;
   border-radius: 30px;
   border: none;
   outline: none;
-  width: 230px;
+  width: 200px; /* Ajustado para dar espaço aos filtros */
   background: #fff;
   transition: var(--transition);
 }
@@ -396,10 +437,9 @@ main {
 }
 
 #bookCatalog .data-section {
-  width: 1200%;              
-  max-width: 1200px;       
-  margin: 0 auto;          
-  padding: 0 20px;          
+  max-width: 100%; /* Ajustado para ser mais responsivo */
+  margin: 0 auto;
+  padding: 0 20px;
   border-radius: 8px;
   margin-bottom: 20px;
 }
@@ -407,7 +447,7 @@ main {
 /* Layout dos livros */
 #bookCatalog .data-section .books {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Ajustado para melhor visualização */
   gap: 20px;
 }
 
