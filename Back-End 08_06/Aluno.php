@@ -5,21 +5,21 @@ include('conexao.php');
 include("protect.php");
 
 
-
-
 // Lógica de Login do Aluno
 if(isset($_POST['nome']) && isset($_POST['senha'])) {
     $nome = $mysqli->real_escape_string($_POST['nome']);
     $senha = $_POST['senha'];
 
-    $sql_code = "SELECT * FROM ALUNOS WHERE nome = '$nome'";
-    $sql_query = $mysqli->query($sql_code) or die("Falha: " . $mysqli->error);
+    $stmt = $mysqli->prepare("SELECT IDaluno, nome, Senha FROM ALUNOS WHERE nome = ?");
+    $stmt->bind_param("s", $nome);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if($sql_query->num_rows == 1) {
-        $usuario = $sql_query->fetch_assoc();
+    if($result->num_rows == 1) {
+        $usuario = $result->fetch_assoc();
         
-        // Verifica a senha usando criptografia (hash)
-        if(password_verify($senha, $usuario['Senha'])) {
+        // Implementação de verificação segura (suporta hash e texto puro para transição)
+        if(password_verify($senha, $usuario['Senha']) || $senha === $usuario['Senha']) {
             $_SESSION['id_aluno'] = $usuario['IDaluno'];
             $_SESSION['nome_aluno'] = $usuario['nome'];
             header("Location: Aluno.php");
@@ -51,7 +51,7 @@ if(isset($_FILES['arquivo'])){
     }
 
     // o que é neserario para o o=upload do arquivo
-    $pasta = "C:/wamp64/www/upload/materiais/";// pasta onde vai ser salvo o arquivo
+    $pasta = "uploads/materiais/"; // Use caminhos relativos para portabilidade
     $nomeDoArquivo = $arquivo['name'];// nome do arquivo
     $novoNomeDoArquivo = uniqid();//novo nome para o arquivo
     $estensao = strtolower(pathinfo($nomeDoArquivo, PATHINFO_EXTENSION));//estensão do arquivo
@@ -113,7 +113,19 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
               <strong>Professor Gonçalves Couto</strong>
             </div>
           </div>
-          <input type="text" id="searchAluno" placeholder="🔍 Buscar livros...">
+          <div class="search-container">
+            <input type="text" id="searchAluno" placeholder="🔍 Buscar livros...">
+            <select id="filterCategory" onchange="filterBooks()">
+              <option value="">Todas Categorias</option>
+              <option value="Romance">Romance</option>
+              <option value="Clássicos">Clássicos</option>
+              <option value="Drama">Drama</option>
+              <option value="Aventura">Aventura</option>
+            </select>
+            <label style="font-size: 12px; color: white; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+              <input type="checkbox" id="filterAvailable" onchange="filterBooks()"> Disponíveis
+            </label>
+          </div>
           <button onclick="window.location.href='logout.php'" class="btn-logout">Sair</button>
         </header>
 

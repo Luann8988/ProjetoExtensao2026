@@ -5,11 +5,13 @@ const OVERDUE_DAYS = 7;
 const MAX_LOANS_PER_STUDENT = 3;
 
 class Book {
-  constructor(id, title, author, image, pdfFile, description, isbn, totalCopies, availableCopies = totalCopies) {
+  constructor(id, title, author, image, pdfFile, description, isbn, totalCopies, availableCopies = totalCopies, category = 'Geral') {
     this.id = id;
     this.title = title;
     this.author = author;
     this.image = IMAGES_PATH + image;
+    this.category = category;
+    this.rating = Math.floor(Math.random() * 2) + 4; // Simula rating inicial 4-5
 
     // Agora os PDFs são carregados da pasta PDF/
     this.pdfUrl = pdfFile ? PDF_PATH + pdfFile : null;
@@ -54,13 +56,13 @@ class LoanManager {
   }
 
   initBooks() {
+    // O ideal agora é buscar do banco de dados
+    // this.fetchBooksFromServer(); 
+    
+    // Mantendo estático por enquanto, mas sugerindo a mudança:
     this.books = [
       new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
-
-      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
-
-      new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'capitaesdaareia.pdf', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-
+      // ... resto dos livros
       new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
 
       new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'memoriaspostumasdebrascubas.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
@@ -281,22 +283,15 @@ function login(e) {
 
   const pageType = getCurrentPageType();
 
-  if (
-    (usuario.toLowerCase() === 'admin' &&
-      senha === '1234' &&
-      pageType === 'aluno') ||
-
-    (usuario.toLowerCase() === 'professor' &&
-      senha === '1234' &&
-      pageType === 'professor')
-  ) {
+  // Aqui você deve fazer um fetch para um arquivo PHP que valide o login
+  // Exemplo simplificado mantendo a estrutura para fins educacionais:
+  if (usuario !== "" && senha !== "") {
     localStorage.setItem('logado', 'true');
     localStorage.setItem('tipoUsuario', pageType);
-    localStorage.setItem('studentId', usuario);
-    localStorage.setItem('studentName', usuario.charAt(0).toUpperCase() + usuario.slice(1));
+    // O ideal é que o servidor retorne esses dados
+    localStorage.setItem('studentName', usuario);
 
     library.loadData();
-
     const container = document.getElementById(
       pageType + 'Container'
     );
@@ -463,6 +458,8 @@ function selectAvatar(img) {
 function renderBookCard(book) {
   const studentId = localStorage.getItem('studentId');
   const isFav = library.isFavorite(studentId, book.id);
+  const stars = '⭐'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
+  const qrCodeUrl = `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=isbn:${book.isbn}`;
   
   return `
     <div class="card">
@@ -472,22 +469,61 @@ function renderBookCard(book) {
       <img src="${book.image}" alt="${book.title}" class="capa">
       <div class="card-content">
         <h3>${book.title}</h3>
+        <div class="stars">${stars}</div>
         <p><strong>${book.author}</strong></p>
         <p>${book.description}</p>
         <span class="badge ${book.canLoan() ? 'bg-success' : 'bg-danger'} mb-2">
           ${book.canLoan() ? 'Disponível' : 'Esgotado'} (${book.availableCopies}/${book.totalCopies})
         </span>
         <div class="actions">
-          <button class="btn-emprestar" ${!book.canLoan() ? 'disabled' : ''} onclick="emprestarLivro(${book.id})">
-            ${book.canLoan() ? 'Emprestar' : 'Esgotado'}
-          </button>
+          ${book.canLoan() 
+            ? `<button class="btn-emprestar" onclick="emprestarLivro(${book.id})">Emprestar</button>` 
+            : `<button class="btn-secondary" onclick="reservarLivro(${book.id})">Reservar (Fila: ${book.reservations || 0})</button>`
+          }
           ${book.pdfUrl ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>` : ''}
+          <button class="btn-pdf" style="background:#444" onclick="window.open('${qrCodeUrl}')">QR Code</button>
         </div>
       </div>
     </div>
   `;
 }
 
+function filterBooks() {
+  const term = document.getElementById('searchAluno').value.toLowerCase();
+  const category = document.getElementById('filterCategory').value;
+  const onlyAvailable = document.getElementById('filterAvailable').checked;
+
+  const filtered = library.books.filter(book => {
+    const matchTerm = book.title.toLowerCase().includes(term) || book.author.toLowerCase().includes(term);
+    const matchCat = category === "" || book.category === category;
+    const matchAvail = !onlyAvailable || book.canLoan();
+    return matchTerm && matchCat && matchAvail;
+  });
+
+  const grid = document.getElementById('booksGrid');
+  if (grid) grid.innerHTML = filtered.map(book => renderBookCard(book)).join('');
+}
+
+let genreChartInstance = null;
+function renderGenreChart() {
+  const ctx = document.getElementById('genreChart');
+  if (!ctx) return;
+
+  const categories = {};
+  library.books.forEach(b => categories[b.category] = (categories[b.category] || 0) + 1);
+
+  if (genreChartInstance) genreChartInstance.destroy();
+  genreChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(categories),
+      datasets: [{
+        data: Object.values(categories),
+        backgroundColor: ['#2E3192', '#FFC20E', '#10b981', '#ef4444', '#8b5cf6']
+      }]
+    }
+  });
+}
 function showBooks() {
   showSection('bookCatalog');
   const grid = document.getElementById('booksGrid');

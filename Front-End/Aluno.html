@@ -33,6 +33,20 @@
       </div>
       <input type="text" id="searchAluno" placeholder="🔍 Buscar livros...">
       <button onclick="logout()" class="btn-logout">Sair</button>
+      <div class="search-container">
+        <input type="text" id="searchAluno" placeholder="🔍 Buscar livros...">
+        <select id="filterCategory" onchange="filterBooks()">
+          <option value="">Todas Categorias</option>
+          <option value="Romance">Romance</option>
+          <option value="Clássicos">Clássicos</option>
+          <option value="Drama">Drama</option>
+          <option value="Aventura">Aventura</option>
+        </select>
+        <label style="font-size: 12px; color: white; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="checkbox" id="filterAvailable" onchange="filterBooks()"> Disponíveis
+        </label>
+      </div>
+      <button onclick="window.location.href='logout.php'" class="btn-logout">Sair</button>
     </header>
 
     <main>

@@ -31,9 +31,9 @@ DROP TABLE IF EXISTS `alunos`;
 CREATE TABLE IF NOT EXISTS `alunos` (
   `IDaluno` int NOT NULL,
   `nome` varchar(140) NOT NULL,
-  `Senha` varchar(16) NOT NULL,
+  `Senha` varchar(255) NOT NULL, -- Aumentado para suportar hashes de senha
   PRIMARY KEY (`IDaluno`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `alunos`
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `cadastro_livros` (
   `FK_IDprofessor` int NOT NULL,
   PRIMARY KEY (`FK_IDlivro`,`FK_IDprofessor`),
   KEY `fk_professor` (`FK_IDprofessor`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `emprestimos` (
   `atrasado` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`FK_IDaluno`,`FK_IDlivro`),
   KEY `fk_emprestimo_livro` (`FK_IDlivro`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -87,8 +87,30 @@ CREATE TABLE IF NOT EXISTS `livros` (
   `Descricao` varchar(140) DEFAULT NULL,
   `ISBN` varchar(13) DEFAULT NULL,
   `Quantidade` int NOT NULL,
+  `Categoria` varchar(50) DEFAULT 'Geral',
   PRIMARY KEY (`IDlivro`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Tabela de Reservas (Fila de espera)
+CREATE TABLE IF NOT EXISTS `reservas` (
+  `IDreserva` int NOT NULL AUTO_INCREMENT,
+  `FK_IDaluno` int NOT NULL,
+  `FK_IDlivro` int NOT NULL,
+  `data_reserva` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('pendente', 'notificado', 'cancelado') DEFAULT 'pendente',
+  PRIMARY KEY (`IDreserva`),
+  CONSTRAINT `fk_reserva_aluno` FOREIGN KEY (`FK_IDaluno`) REFERENCES `alunos` (`IDaluno`),
+  CONSTRAINT `fk_reserva_livro` FOREIGN KEY (`FK_IDlivro`) REFERENCES `livros` (`IDlivro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Nova tabela para persistir favoritos sem depender do navegador
+CREATE TABLE IF NOT EXISTS `favoritos` (
+  `FK_IDaluno` int NOT NULL,
+  `FK_IDlivro` int NOT NULL,
+  PRIMARY KEY (`FK_IDaluno`, `FK_IDlivro`),
+  FOREIGN KEY (`FK_IDaluno`) REFERENCES `alunos`(`IDaluno`),
+  FOREIGN KEY (`FK_IDlivro`) REFERENCES `livros`(`IDlivro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 

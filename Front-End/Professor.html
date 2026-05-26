@@ -6,6 +6,7 @@
   <title>Portal do Professor</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="login-body">
@@ -96,6 +97,14 @@
 
     </div>
 
+    <!-- GRÁFICOS -->
+    <div class="data-section" style="padding: 20px;">
+      <h3 style="color: var(--primary);">📊 Estatísticas de Gêneros</h3>
+      <div style="max-width: 400px; margin: 0 auto;">
+        <canvas id="genreChart"></canvas>
+      </div>
+    </div>
+
     <!-- TABELA -->
     <div class="data-section">
       <div class="data-header">📋 Empréstimos Recentes</div>
@@ -162,6 +171,7 @@
     <div class="data-section">
       <div class="data-header">📚 Livros</div>
       <button class="btn-secondary" onclick="showModal('modalAddBook')">Adicionar Novo Livro</button>
+      <div id="profBooksGrid" class="grid" style="margin-top: 20px;"></div>
     </div>
   </div>
 
@@ -171,6 +181,13 @@
       <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
       <h3>Novo Livro</h3>
       <form id="addBookForm">
+        <div class="form-group">
+          <label>ISBN (Busca Automática)</label>
+          <div style="display: flex; gap: 5px;">
+            <input type="text" id="newIsbn" placeholder="Ex: 9788535914849">
+            <button type="button" class="btn-primary" onclick="buscarDadosGoogleBooks()">🔍 Buscar</button>
+          </div>
+        </div>
         <div class="form-group">
           <label>Título</label>
           <input type="text" id="newTitle" required>
