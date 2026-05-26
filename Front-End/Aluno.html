@@ -40,9 +40,10 @@
         <h3>Meu Painel</h3>
         <ul>
           <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
+          <li onclick="showFavorites()">⭐ Favoritos</li>
           <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
           <li onclick="showHistory()">📜 Histórico</li>
-          <li onclick="showConfiguracoes()">⚙️ Configurações</li>
+          <li onclick="showSection('configSection')">⚙️ Configurações</li>
         </ul>
       </aside>
 
@@ -53,8 +54,15 @@
           <div>
             <h2 id="headerUserName">Bem-vindo, Aluno!</h2>
             <p id="headerUserSerie">Complete seu perfil</p>
+            <span id="readerLevelBadge" class="level-badge" style="display:none;"></span>
           </div>
-          <button class="btn-secondary" onclick="showModal('modalStudentProfile')" style="margin-left: auto;">⚙️ Configurações</button>
+        <div class="stats-mini" style="margin-left: auto; text-align: right; min-width: 160px;">
+          <div style="font-size: 14px; margin-bottom: 5px; font-weight: 500;">Livros Ativos: <b id="statCount">0</b>/3</div>
+          <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            <div id="loanProgressBar" style="width: 0%; height: 100%; background: #FFC20E; transition: width 0.4s ease-out;"></div>
+          </div>
+        </div>
+
         </div>
 
         <!-- CATÁLOGO DE LIVROS -->
@@ -63,6 +71,14 @@
             <div class="data-header">📚 Catálogo de Livros</div>
             <div id="booksGrid" class="grid">
             </div>
+          </div>
+        </div>
+
+        <!-- FAVORITOS -->
+        <div id="favoritesSection" style="display:none;">
+          <div class="data-section">
+            <div class="data-header">⭐ Meus Favoritos</div>
+            <div id="favoritesGrid" class="grid"></div>
           </div>
         </div>
 
@@ -85,111 +101,7 @@
           </div>
         </div>
 
-        <div id="modalStudentProfile" class="modal">
-          <div class="modal-content">
-            <button class="close" onclick="hideModal('modalStudentProfile')">&times;</button>
-            <h3>👤 Meu Perfil</h3>
-            <form id="profileForm">
-              <!-- Avatar -->
-              <div class="form-group">
-                <label>👤 Escolha seu Avatar</label>
-                <div class="avatar-grid">
-                  <!-- 12 opções de avatar -->
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student1" class="avatar-option" alt="Avatar 1" data-seed="student1" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student2" class="avatar-option" alt="Avatar 2" data-seed="student2" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student3" class="avatar-option" alt="Avatar 3" data-seed="student3" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student4" class="avatar-option" alt="Avatar 4" data-seed="student4" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student5" class="avatar-option" alt="Avatar 5" data-seed="student5" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student6" class="avatar-option" alt="Avatar 6" data-seed="student6" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student7" class="avatar-option" alt="Avatar 7" data-seed="student7" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student8" class="avatar-option" alt="Avatar 8" data-seed="student8" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student9" class="avatar-option" alt="Avatar 9" data-seed="student9" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student10" class="avatar-option" alt="Avatar 10" data-seed="student10" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student11" class="avatar-option" alt="Avatar 11" data-seed="student11" onclick="selectAvatar(this)">
-                  <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=student12" class="avatar-option" alt="Avatar 12" data-seed="student12" onclick="selectAvatar(this)">
-                </div>
-                <img id="avatarPreview" class="profile-avatar-preview" src="" style="display:none;">
-              </div>
 
-              <div class="form-group">
-                <label>Nome de Usuário</label>
-                <input type="text" id="profileName" placeholder="@seuusuario" maxlength="20" required>
-              </div>
-
-              <div class="form-group">
-                <label>Senha</label>
-                <div class="password-group">
-                  <input type="password" id="profilePassword" placeholder="Nova senha" required>
-                  <button type="button" class="toggle-password" onclick="togglePassword('profilePassword')">👁️</button>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="profileSerie">Série/Turma</label>
-                <select id="profileSerie" required>
-                  <option value="" disabled selected>Escolha sua série</option>
-                  <!-- Opções de série/ano -->
-                  <optgroup label="6º Ano">
-                    <option value="6.1">6.1</option>
-                    <option value="6.2">6.2</option>
-                    <option value="6.3">6.3</option>
-                    <option value="6.4">6.4</option>
-                  </optgroup>
-                  <optgroup label="7º Ano">
-                    <option value="7.1">7.1</option>
-                    <option value="7.2">7.2</option>
-                    <option value="7.3">7.3</option>
-                    <option value="7.4">7.4</option>
-                  </optgroup>
-                  <optgroup label="8º Ano">
-                    <option value="8.1">8.1</option>
-                    <option value="8.2">8.2</option>
-                    <option value="8.3">8.3</option>
-                    <option value="8.4">8.4</option>
-                  </optgroup>
-                  <optgroup label="9º Ano">
-                    <option value="9.1">9.1</option>
-                    <option value="9.2">9.2</option>
-                    <option value="9.3">9.3</option>
-                    <option value="9.4">9.4</option>
-                  </optgroup>
-                  <optgroup label="1º Ano EM">
-                    <option value="1.1">1.1</option>
-                    <option value="1.2">1.2</option>
-                    <option value="1.3">1.3</option>
-                    <option value="1.4">1.4</option>
-                    <option value="1.5">1.5</option>
-                    <option value="1.6">1.6 (Noturno)</option>
-                  </optgroup>
-                  <optgroup label="2º Ano EM">
-                    <option value="2.1">2.1</option>
-                    <option value="2.2">2.2</option>
-                    <option value="2.3">2.3</option>
-                    <option value="2.4">2.4</option>
-                    <option value="2.5">2.5</option>
-                    <option value="2.6">2.6 (Noturno)</option>
-                  </optgroup>
-                  <optgroup label="3º Ano EM">
-                    <option value="3.1">3.1</option>
-                    <option value="3.2">3.2</option>
-                    <option value="3.3">3.3</option>
-                    <option value="3.4">3.4</option>
-                    <option value="3.5">3.5</option>
-                    <option value="3.6">3.6 (Noturno)</option>
-                  </optgroup>
-                  <optgroup label="EJA">
-                    <option value="EJA.1">EJA.1</option>
-                    <option value="EJA.2">EJA.2</option>
-                    <option value="EJA.3">EJA.3</option>
-                    <option value="EJA.4">EJA.4</option>
-                  </optgroup>
-                </select>
-              </div>
-
-              <button type="submit">💾 Salvar Perfil Netflix</button>
-            </form>
-          </div>
-        </div>
 
         <!-- HISTÓRICO -->
         <div id="historySection" style="display:none;">
@@ -216,31 +128,48 @@
         <!-- CONFIGURAÇÕES -->
         <div id="configSection" style="display:none;">
           <div class="data-section">
-            <div class="data-header">⚙️ Configurações</div>
-            <p>Configurações em desenvolvimento...</p>
-            <button onclick="toggleDarkMode()">Ativar/Desativar Modo Escuro</button>
+            <div class="data-header">📈 Seu Nível de Leitura</div>
+            <div style="padding: 20px;">
+              <p id="levelStatsInfo" style="margin: 0; font-size: 15px;">Calculando estatísticas...</p>
+            </div>
           </div>
+
           <div class="data-section">
-            <div class="data-header">❓ Ajuda</div>
-            <p>Precisa de ajuda? Clique abaixo:</p>
-            <button onclick="openHelp()">Abrir Ajuda</button>
+            <div class="data-header">👤 Editar Perfil</div>
+            <form id="profileSettingsForm" onsubmit="saveStudentProfile(event)" style="padding: 20px;">
+              <div class="form-group">
+                <label>Seu Nome</label>
+                <input type="text" id="profileName" required>
+              </div>
+              <div class="form-group">
+                <label>Sua Série/Turma</label>
+                <input type="text" id="profileSerie" required>
+              </div>
+              <div class="form-group">
+                <label>Estilo do Avatar ( Seed )</label>
+                <input type="text" id="avatarSeedInput" placeholder="Ex: Felix, Daisy, etc">
+                <small style="color: var(--text-light)">Dica: Mude o texto para gerar um avatar novo!</small>
+              </div>
+              <button type="submit" class="btn-emprestar">Salvar Alterações</button>
+            </form>
           </div>
-          <div class="data-section">
-            <div class="data-header">💡 Sugestões</div>
-            <p>Envie sua sugestão:</p>
-            <input type="text" id="suggestionInput" placeholder="Digite sua sugestão">
-            <button onclick="submitSuggestion()">Enviar</button>
+
+        <div class="data-section">
+          <div class="data-header">🎨 Preferências e Dados</div>
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+            <button class="btn-secondary w-100" onclick="toggleDarkMode()">🌓 Alternar Modo Escuro/Claro</button>
+            <button class="btn-pdf w-100" onclick="showToast('Notificações ativadas!', 'info')">🔔 Ativar Notificações</button>
+            <hr>
+            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 5px;">Área Restrita:</p>
+            <button class="btn-biblioteca w-100" style="background: var(--error);" onclick="resetLibraryData()">🗑️ Limpar Meus Dados e Histórico</button>
           </div>
+        </div>
+
           <div class="data-section">
-            <div class="data-header">📝 Feedback</div>
-            <p>Deixe seu feedback:</p>
-            <textarea id="feedbackInput" placeholder="Digite seu feedback"></textarea>
-            <button onclick="submitFeedback()">Enviar</button>
-          </div>
-          <div class="data-section">
-            <div class="data-header">👤 Meu Perfil</div>
-            <p>Editar informações do perfil:</p>
-            <button class="btn-primary" onclick="showProfile()">Editar Perfil</button>
+            <div class="data-header">❓ Suporte</div>
+            <div style="padding: 20px;">
+              <p>Dúvidas sobre o funcionamento da biblioteca? <a href="mailto:suporte@escola.com">Contate o bibliotecário</a></p>
+            </div>
           </div>
         </div>
 

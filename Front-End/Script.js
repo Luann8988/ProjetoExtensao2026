@@ -2,6 +2,7 @@ const IMAGES_PATH = 'Imagens/';
 const PDF_PATH = 'PDF/'; // Pasta dos PDFs locais
 const STORAGE_VERSION = '1.1';
 const OVERDUE_DAYS = 7;
+const MAX_LOANS_PER_STUDENT = 3;
 
 class Book {
   constructor(id, title, author, image, pdfFile, description, isbn, totalCopies, availableCopies = totalCopies) {
@@ -48,6 +49,7 @@ class LoanManager {
   constructor() {
     this.loans = [];
     this.books = [];
+    this.favorites = [];
     this.initBooks();
   }
 
@@ -78,8 +80,13 @@ class LoanManager {
       new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
 
       new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
-
-      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2)
+      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
+      new Book(15, 'Quincas Borba', 'Machado de Assis', 'quincasborba.jpg', 'quincasborba.pdf', 'A filosofia do Humanitismo e a loucura.', '9788570015671', 5, 5),
+      new Book(16, 'A Hora da Estrela', 'Clarice Lispector', 'horadaestrela.jpg', 'horadaestrela.pdf', 'A vida de Macabéa no Rio de Janeiro.', '9788570015672', 4, 4),
+      new Book(17, 'Sagarana', 'João Guimarães Rosa', 'sagarana.jpg', 'sagarana.pdf', 'Contos regionalistas de Minas Gerais.', '9788570015673', 3, 3),
+      new Book(18, 'Os Sertões', 'Euclides da Cunha', 'sertoes.jpg', 'sertoes.pdf', 'Relato da Guerra de Canudos.', '9788570015674', 2, 2),
+      new Book(19, 'Auto da Compadecida', 'Ariano Suassuna', 'autocompadecida.jpg', 'autocompadecida.pdf', 'As aventuras de João Grilo e Chicó.', '9788570015675', 6, 6),
+      new Book(20, 'Morte e Vida Severina', 'João Cabral de Melo Neto', 'severina.jpg', 'severina.pdf', 'Poema dramático sobre o retirante.', '9788570015676', 5, 5)
     ];
   }
 
@@ -90,6 +97,12 @@ class LoanManager {
   }
 
   createLoan(studentId, studentName, serie, bookId) {
+    const activeLoans = this.loans.filter(l => l.studentId === studentId && l.status === 'active').length;
+    if (activeLoans >= MAX_LOANS_PER_STUDENT) {
+      showToast(`Limite atingido! Máximo ${MAX_LOANS_PER_STUDENT} livros.`, 'error');
+      return null;
+    }
+
     const book = this.books.find(b => b.id === bookId);
 
     if (!book || !book.canLoan()) return null;
@@ -172,7 +185,8 @@ class LoanManager {
       'libraryData_v' + STORAGE_VERSION,
       JSON.stringify({
         books: this.books,
-        loans: this.loans
+        loans: this.loans,
+        favorites: this.favorites
       })
     );
   }
@@ -192,9 +206,26 @@ class LoanManager {
       });
 
       this.loans = parsed.loans || [];
+      this.favorites = parsed.favorites || [];
     } else {
       this.saveData();
     }
+  }
+
+  toggleFavorite(studentId, bookId) {
+    const index = this.favorites.findIndex(f => f.studentId === studentId && f.bookId === bookId);
+    if (index > -1) {
+      this.favorites.splice(index, 1);
+      showToast('Removido dos favoritos', 'info');
+    } else {
+      this.favorites.push({ studentId, bookId });
+      showToast('Adicionado aos favoritos', 'success');
+    }
+    this.saveData();
+  }
+
+  isFavorite(studentId, bookId) {
+    return this.favorites.some(f => f.studentId === studentId && f.bookId === bookId);
   }
 }
 
@@ -251,17 +282,18 @@ function login(e) {
   const pageType = getCurrentPageType();
 
   if (
-    (usuario === 'admin' &&
+    (usuario.toLowerCase() === 'admin' &&
       senha === '1234' &&
       pageType === 'aluno') ||
 
-    (usuario === 'professor' &&
+    (usuario.toLowerCase() === 'professor' &&
       senha === '1234' &&
       pageType === 'professor')
   ) {
     localStorage.setItem('logado', 'true');
     localStorage.setItem('tipoUsuario', pageType);
     localStorage.setItem('studentId', usuario);
+    localStorage.setItem('studentName', usuario.charAt(0).toUpperCase() + usuario.slice(1));
 
     library.loadData();
 
@@ -293,21 +325,39 @@ function login(e) {
   }
 }
 
+function getReaderLevel(count) {
+  if (count >= 15) return { name: 'Mestre da Sabedoria 🧙‍♂️', color: '#8b5cf6', next: null };
+  if (count >= 10) return { name: 'Devorador de Livros 📚', color: '#ec4899', next: 15 };
+  if (count >= 5) return { name: 'Leitor Frequente 📖', color: '#3b82f6', next: 10 };
+  return { name: 'Leitor Iniciante 🌱', color: '#10b981', next: 5 };
+}
+
 function afterStudentLogin() {
-  setupStudentProfile();
-  loadProfileHeader();
+  // Tenta pegar do window (vindo do PHP) ou do localStorage (estático)
+  const studentName = window.studentName || localStorage.getItem('studentName') || 'Estudante';
+  const studentId = localStorage.getItem('studentId') || '000';
+  
+  // Cria o perfil automaticamente se não existir
+  let profile = JSON.parse(localStorage.getItem('studentProfile')) || 
+                { name: studentName, serie: 'Aluno Regular', avatarSeed: studentId };
+  
+  localStorage.setItem('studentProfile', JSON.stringify(profile));
+  
+  loadProfileHeader(profile);
   showBooks();
 }
 
-function loadProfileHeader() {
-  const profile = localStorage.getItem('studentProfile');
+function loadProfileHeader(profileData) {
+  const profile = profileData || JSON.parse(localStorage.getItem('studentProfile'));
+  const studentId = localStorage.getItem('studentId');
 
   if (profile) {
-    const { name, serie, avatarSeed } = JSON.parse(profile);
+    const { name, serie, avatarSeed } = profile;
 
     const nameEl = document.getElementById('headerUserName');
     const serieEl = document.getElementById('headerUserSerie');
     const avatarEl = document.getElementById('headerAvatar');
+    const levelEl = document.getElementById('readerLevelBadge');
 
     if (nameEl) {
       nameEl.textContent = `Olá, ${name}!`;
@@ -323,26 +373,38 @@ function loadProfileHeader() {
 
       avatarEl.style.display = 'block';
     }
+
+    if (studentId && levelEl) {
+      const returnedCount = library.loans.filter(l => l.studentId === studentId && l.status.includes('returned')).length;
+      const level = getReaderLevel(returnedCount);
+      levelEl.textContent = level.name;
+      levelEl.style.backgroundColor = level.color;
+      levelEl.style.display = 'inline-block';
+    }
+
+    // Atualiza o contador de livros e a barra de progresso
+    const statCount = document.getElementById('statCount');
+    const progressBar = document.getElementById('loanProgressBar');
+    if (studentId) {
+      const activeLoans = library.loans.filter(l => l.studentId === studentId && l.status === 'active').length;
+      if (statCount) statCount.textContent = activeLoans;
+      if (progressBar) {
+        progressBar.style.width = (activeLoans / MAX_LOANS_PER_STUDENT * 100) + '%';
+      }
+    }
   }
 }
 
 function setupStudentProfile() {
-  const profileSaved = localStorage.getItem('studentProfile');
-
-  if (!profileSaved) {
-    showModal('modalStudentProfile');
-  }
+  // Perfil removido do fluxo: não abrir modal.
 }
 
 function saveStudentProfile(e) {
+
   e.preventDefault();
-
   const name = document.getElementById('profileName').value.trim();
-
   const serie = document.getElementById('profileSerie').value.trim();
-
-  const avatarSeed =
-    localStorage.getItem('selectedAvatarSeed') || 'student1';
+  const avatarSeed = document.getElementById('avatarSeedInput').value.trim() || 'student1';
 
   if (name && serie) {
     const profile = {
@@ -357,12 +419,21 @@ function saveStudentProfile(e) {
     );
 
     hideModal('modalStudentProfile');
-
-    loadProfileHeader();
+    loadProfileHeader(profile);
 
     showToast('Perfil salvo! 🎉');
   } else {
     showToast('Preencha todos os campos!', 'error');
+  }
+}
+
+function resetLibraryData() {
+  if (confirm('Tem certeza que deseja limpar todos os seus dados e histórico? Isso não pode ser desfeito.')) {
+    const studentId = localStorage.getItem('studentId');
+    library.loans = library.loans.filter(l => l.studentId !== studentId);
+    library.favorites = library.favorites.filter(f => f.studentId !== studentId);
+    library.saveData();
+    location.reload();
   }
 }
 
@@ -389,44 +460,85 @@ function selectAvatar(img) {
 
 // ================= LIVROS E EMPRÉSTIMOS =================
 
-function showBooks() {
-  showSection('bookCatalog');
-
-  const grid = document.getElementById('booksGrid');
-
-  if (!grid) return;
-
-  grid.innerHTML = library.books.map(book => `
+function renderBookCard(book) {
+  const studentId = localStorage.getItem('studentId');
+  const isFav = library.isFavorite(studentId, book.id);
+  
+  return `
     <div class="card">
+      <div class="favorite-badge ${isFav ? 'active' : ''}" onclick="toggleFav(${book.id}, event)">
+        ${isFav ? '❤️' : '🤍'}
+      </div>
       <img src="${book.image}" alt="${book.title}" class="capa">
-
       <div class="card-content">
         <h3>${book.title}</h3>
-
         <p><strong>${book.author}</strong></p>
-
         <p>${book.description}</p>
-
+        <span class="badge ${book.canLoan() ? 'bg-success' : 'bg-danger'} mb-2">
+          ${book.canLoan() ? 'Disponível' : 'Esgotado'} (${book.availableCopies}/${book.totalCopies})
+        </span>
         <div class="actions">
-          <button
-            class="btn-emprestar"
-            ${!book.canLoan() ? 'disabled' : ''}
-            onclick="emprestarLivro(${book.id})"
-          >
+          <button class="btn-emprestar" ${!book.canLoan() ? 'disabled' : ''} onclick="emprestarLivro(${book.id})">
             ${book.canLoan() ? 'Emprestar' : 'Esgotado'}
           </button>
-
-          ${
-            book.pdfUrl
-              ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>`
-              : ''
-          }
+          ${book.pdfUrl ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>` : ''}
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+}
 
+function showBooks() {
+  showSection('bookCatalog');
+  const grid = document.getElementById('booksGrid');
+  if (!grid) return;
+  grid.innerHTML = library.books.map(book => renderBookCard(book)).join('');
   updateSidebar(0);
+}
+
+function toggleFav(bookId, event) {
+  const studentId = localStorage.getItem('studentId');
+  const wasFav = library.isFavorite(studentId, bookId);
+
+  library.toggleFavorite(studentId, bookId);
+  
+  // Dispara a animação apenas se estiver adicionando aos favoritos
+  if (!wasFav && event) {
+    createFloatingHeart(event.clientX, event.clientY);
+  }
+
+  // Atualiza a view atual
+  if (document.getElementById('bookCatalog').style.display !== 'none') showBooks();
+  else if (document.getElementById('favoritesSection').style.display !== 'none') showFavorites();
+}
+
+function createFloatingHeart(x, y) {
+  const heart = document.createElement('div');
+  heart.className = 'floating-heart';
+  heart.innerHTML = '❤️';
+  heart.style.left = `${x}px`;
+  heart.style.top = `${y}px`;
+  document.body.appendChild(heart);
+
+  // Remove o elemento após a animação (1s)
+  setTimeout(() => heart.remove(), 1000);
+}
+
+function showFavorites() {
+  showSection('favoritesSection');
+  const studentId = localStorage.getItem('studentId');
+  const favGrid = document.getElementById('favoritesGrid');
+  
+  const favoriteBooks = library.books.filter(book => 
+    library.favorites.some(f => f.studentId === studentId && f.bookId === book.id)
+  );
+
+  if (favoriteBooks.length === 0) {
+    favGrid.innerHTML = '<p class="text-center w-100">Você ainda não tem livros favoritos.</p>';
+  } else {
+    favGrid.innerHTML = favoriteBooks.map(book => renderBookCard(book)).join('');
+  }
+  updateSidebar(1);
 }
 
 function openPdf(url) {
@@ -455,6 +567,7 @@ function emprestarLivro(bookId) {
   if (loan) {
     showToast(`Emprestado: ${loan.bookTitle}`);
     showBooks();
+    loadProfileHeader(); // Atualiza o banner imediatamente
   } else {
     showToast('Livro indisponível!', 'error');
   }
@@ -494,13 +607,14 @@ function showMyLoans() {
     </tr>
   `).join('');
 
-  updateSidebar(1);
+  updateSidebar(2);
 }
 
 function devolverLivro(loanId) {
   if (library.returnLoan(loanId)) {
     showToast('Livro devolvido!');
     showMyLoans();
+    loadProfileHeader(); // Atualiza o banner imediatamente
   }
 }
 
@@ -530,7 +644,7 @@ function showHistory() {
     </tr>
   `).join('');
 
-  updateSidebar(2);
+  updateSidebar(3);
 }
 
 // ================= PROFESSOR / DASHBOARD =================
@@ -567,14 +681,7 @@ function carregarDashboard() {
 }
 
 function navegarProfessor(sectionId, el) {
-  const sections = [
-    'dashboardSection',
-    'alunosSection',
-    'relatoriosSection',
-    'livrosSection',
-    'devolucoesSection',
-    'configSection'
-  ];
+  const sections = ['dashboard', 'alunos', 'relatorios', 'livros', 'devolucoes'];
 
   sections.forEach(id => {
     const sec = document.getElementById(id);
@@ -592,11 +699,11 @@ function navegarProfessor(sectionId, el) {
 
   if (el) el.classList.add('active');
 
-  if (sectionId === 'dashboardSection') {
+  if (sectionId === 'dashboard') {
     carregarDashboard();
   }
 
-  if (sectionId === 'devolucoesSection') {
+  if (sectionId === 'devolucoes') {
     loadReturnLoans();
   }
 }
@@ -683,6 +790,7 @@ function adicionarNovoLivro(event) {
 function showSection(sectionId) {
   const sections = [
     'bookCatalog',
+    'favoritesSection',
     'myLoansSection',
     'historySection',
     'configSection'
@@ -697,6 +805,30 @@ function showSection(sectionId) {
   const target = document.getElementById(sectionId);
 
   if (target) target.style.display = 'block';
+
+  if (sectionId === 'configSection') {
+    syncSettingsUI();
+  }
+}
+
+function syncSettingsUI() {
+  const studentId = localStorage.getItem('studentId');
+  const returnedCount = library.loans.filter(l => l.studentId === studentId && l.status.includes('returned')).length;
+  const level = getReaderLevel(returnedCount);
+  const statsInfo = document.getElementById('levelStatsInfo');
+  
+  if (statsInfo) {
+    statsInfo.innerHTML = `Você já devolveu <strong>${returnedCount}</strong> livros.<br>` + 
+      (level.next ? `Faltam <strong>${level.next - returnedCount}</strong> livros para o nível "${getReaderLevel(level.next).name}"!` : "Você atingiu o nível máximo de leitura! Parabéns! 🎉");
+  }
+
+  // Sincroniza campos do formulário
+  const profile = JSON.parse(localStorage.getItem('studentProfile'));
+  if (profile) {
+    document.getElementById('profileName').value = profile.name;
+    document.getElementById('profileSerie').value = profile.serie;
+    document.getElementById('avatarSeedInput').value = profile.avatarSeed || '';
+  }
 }
 
 function updateSidebar(activeIndex) {

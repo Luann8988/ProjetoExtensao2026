@@ -10,20 +10,25 @@ include("protect.php");
 // Lógica de Login do Aluno
 if(isset($_POST['nome']) && isset($_POST['senha'])) {
     $nome = $mysqli->real_escape_string($_POST['nome']);
-    $senha = $mysqli->real_escape_string($_POST['senha']);
+    $senha = $_POST['senha'];
 
-    $sql_code = "SELECT * FROM ALUNOS WHERE nome = '$nome' AND Senha = '$senha'";
+    $sql_code = "SELECT * FROM ALUNOS WHERE nome = '$nome'";
     $sql_query = $mysqli->query($sql_code) or die("Falha: " . $mysqli->error);
 
     if($sql_query->num_rows == 1) {
         $usuario = $sql_query->fetch_assoc();
-        $_SESSION['id_aluno'] = $usuario['IDaluno'];
-        $_SESSION['nome_aluno'] = $usuario['nome'];
-        // Redireciona para evitar reenvio do POST ao recarregar
-        header("Location: Aluno.php");
-        exit;
+        
+        // Verifica a senha usando criptografia (hash)
+        if(password_verify($senha, $usuario['Senha'])) {
+            $_SESSION['id_aluno'] = $usuario['IDaluno'];
+            $_SESSION['nome_aluno'] = $usuario['nome'];
+            header("Location: Aluno.php");
+            exit;
+        } else {
+            $erro = "Senha incorreta!";
+        }
     } else {
-        $erro = "Nome ou senha incorretos!";
+        $erro = "Usuário não encontrado!";
     }
 }
 
@@ -119,7 +124,7 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
               <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
               <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
               <li onclick="showHistory()">📜 Histórico</li>
-              <li onclick="showConfiguracoes()">⚙️ Configurações</li>
+              <li onclick="showSection('configSection')">⚙️ Configurações</li>
             </ul>
           </aside>
 
@@ -129,8 +134,14 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
               <div>
                 <h2 id="headerUserName">Bem-vindo, Aluno!</h2>
                 <p id="headerUserSerie">Complete seu perfil</p>
+                <span id="readerLevelBadge" class="level-badge" style="display:none;"></span>
               </div>
-              <button class="btn-secondary" onclick="showModal('modalStudentProfile')" style="margin-left: auto;">⚙️ Configurações</button>
+            <div class="stats-mini" style="margin-left: auto; text-align: right; min-width: 160px;">
+              <div style="font-size: 14px; margin-bottom: 5px; font-weight: 500;">Livros Ativos: <b id="statCount">0</b>/3</div>
+              <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+                <div id="loanProgressBar" style="width: 0%; height: 100%; background: #FFC20E; transition: width 0.4s ease-out;"></div>
+              </div>
+            </div>
             </div>
 
             <!-- Catálogo -->
@@ -192,7 +203,45 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
             </div>
 
             <!-- Configurações (resumido) -->
-            <div id="configSection" style="display:none;"> ... </div>
+            <div id="configSection" style="display:none;">
+                <div class="data-section">
+                    <div class="data-header">📈 Seu Nível de Leitura</div>
+                    <div style="padding: 20px;">
+                        <p id="levelStatsInfo" style="margin: 0; font-size: 15px; color: var(--text-dark);">Calculando estatísticas...</p>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="data-header">👤 Editar Perfil</div>
+                    <form id="profileSettingsForm" onsubmit="saveStudentProfile(event)" style="padding: 20px;">
+                        <div class="form-group">
+                            <label>Seu Nome</label>
+                            <input type="text" id="profileName" value="<?php echo $_SESSION['nome_aluno']; ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sua Série/Turma</label>
+                            <input type="text" id="profileSerie" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Estilo do Avatar ( Seed )</label>
+                            <input type="text" id="avatarSeedInput" placeholder="Ex: Felix, Daisy, etc">
+                        </div>
+                        <button type="submit" class="btn-emprestar">Salvar Alterações</button>
+                    </form>
+                </div>
+
+                <div class="data-section">
+                    <div class="data-header">🎨 Aparência e Sistema</div>
+                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn-secondary" onclick="toggleDarkMode()">🌓 Alternar Modo Escuro/Claro</button>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <div class="data-header">🔐 Segurança</div>
+                    <div style="padding: 20px;"><p>As senhas são protegidas por criptografia MD5/Hash.</p></div>
+                </div>
+            </div>
           </section>
         </main>
     </div>
