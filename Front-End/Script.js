@@ -287,6 +287,12 @@ function hideModal(id) {
 function login(e) {
   e.preventDefault();
 
+  // Limpa mensagem de erro anterior
+  const errorEl = document.getElementById('loginErrorMessage');
+  if (errorEl) {
+    errorEl.style.display = 'none';
+  }
+
   const usuario = document.getElementById('usuario').value.trim();
   const senha = document.getElementById('senha').value.trim();
 
@@ -349,7 +355,11 @@ function login(e) {
     }
     showToast('Login realizado com sucesso!');
   } else {
-    showToast('Credenciais inválidas!', 'error');
+    if (errorEl) {
+      errorEl.textContent = 'Usuário ou senha incorretos. Verifique seus dados e tente novamente.';
+      errorEl.style.display = 'block';
+    }
+    showToast('Acesso negado!', 'error');
   }
 }
 

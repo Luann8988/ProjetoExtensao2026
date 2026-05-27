@@ -25,10 +25,10 @@ if(isset($_POST['nome']) && isset($_POST['senha'])) {
             header("Location: Aluno.php");
             exit;
         } else {
-            $erro = "Senha incorreta!";
+            $erro = "Usuário ou senha incorretos. Verifique seus dados e tente novamente.";
         }
     } else {
-        $erro = "Usuário não encontrado!";
+        $erro = "Usuário ou senha incorretos. Verifique seus dados e tente novamente.";
     }
 }
 
@@ -84,17 +84,13 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal do Aluno | Biblioteca Escolar - Prof. Gonçalves Couto</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Esconde a div de erro se não houver erro */
-    .error-message { color: red; text-align: center; margin-top: 10px; }
-  </style>
 </head>
 <body class="login-body">
 
 <?php if(!isset($_SESSION['id_aluno'])): ?>
     <!-- TELA DE LOGIN -->
     <div id="loginContainer" class="login-container">
-        <?php if(isset($erro)) echo "<p class='error-message'>$erro</p>"; ?>
+        <?php if(isset($erro)) echo "<div class='error-message' style='display:block;'>$erro</div>"; ?>
         <form action="" method="POST">
             <input type="text" name="nome" placeholder="Nome do Aluno" required>
             <input type="password" name="senha" placeholder="Senha" required>
