@@ -4,13 +4,23 @@ include('conexao.php');
 
 include("protect.php");
 
+// ENDPOINT API: Retorna livros em formato JSON para o Front-End
+if(isset($_GET['api']) && $_GET['api'] == 'livros') {
+    $termo = isset($_GET['q']) ? $mysqli->real_escape_string($_GET['q']) : '';
+    $result = $mysqli->query("SELECT * FROM livros WHERE Titulo LIKE '%$termo%' OR Autor LIKE '%$termo%'");
+    $livros = [];
+    while($row = $result->fetch_assoc()) { $livros[] = $row; }
+    header('Content-Type: application/json');
+    echo json_encode($livros);
+    exit;
+}
 
 // Lógica de Login do Aluno
 if(isset($_POST['nome']) && isset($_POST['senha'])) {
     $nome = $mysqli->real_escape_string($_POST['nome']);
     $senha = $_POST['senha'];
 
-    $stmt = $mysqli->prepare("SELECT IDaluno, nome, Senha FROM ALUNOS WHERE nome = ?");
+    $stmt = $mysqli->prepare("SELECT IDaluno, nome, turma, Senha FROM ALUNOS WHERE nome = ?");
     $stmt->bind_param("s", $nome);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -22,6 +32,7 @@ if(isset($_POST['nome']) && isset($_POST['senha'])) {
         if(password_verify($senha, $usuario['Senha']) || $senha === $usuario['Senha']) {
             $_SESSION['id_aluno'] = $usuario['IDaluno'];
             $_SESSION['nome_aluno'] = $usuario['nome'];
+            $_SESSION['turma_aluno'] = $usuario['turma'];
             header("Location: Aluno.php");
             exit;
         } else {
@@ -130,6 +141,7 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
             <h3>Meu Painel</h3>
             <ul>
               <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
+              <li onclick="showSection('materialsSection')">📁 Materiais de Estudo</li>
               <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
               <li onclick="showHistory()">📜 Histórico</li>
               <li onclick="showSection('configSection')">⚙️ Configurações</li>
@@ -141,7 +153,7 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
               <img id="headerAvatar" src="" class="profile-avatar-preview" alt="Seu avatar" style="display: none;">
               <div>
                 <h2 id="headerUserName">Bem-vindo, Aluno!</h2>
-                <p id="headerUserSerie">Complete seu perfil</p>
+                <p id="headerUserSerie"><?php echo $_SESSION['turma_aluno'] ?? 'Série não informada'; ?></p>
                 <span id="readerLevelBadge" class="level-badge" style="display:none;"></span>
               </div>
             <div class="stats-mini" style="margin-left: auto; text-align: right; min-width: 160px;">
@@ -152,37 +164,34 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
             </div>
             </div>
 
-            <!-- Catálogo -->
+            <!-- Catálogo de Livros -->
             <div id="bookCatalog">
               <div class="data-section">
                 <div class="data-header">📚 Catálogo de Livros</div>
-                    <form method='post' enctype="multipart/form-data" action="" >
-        <p>
-            <label for="">Selecione um arquivo:</label>
-            <input type="file" name="arquivo" id="arquivo">
-        </p>
-        <button name="upload" type="submit">Enviar</button>
-    </form>
-
-
-    <table border="1" cellspacing="0" cellpadding="15">
-        <thead>
-            <th>arquivo</th>
-            <th>data de envio</th>
-        </thead>
-        <tbody>
-        <?php
-        while($material = $sql_query->fetch_assoc()){
-        ?>
-        <tr>
-            <td><a target="_blank" href="<?php echo $material['path']; ?>"><?php echo $material['nome']; ?></a></td>
-            <td><?php echo $material['date_upload']; ?></td>
-        <?php
-        }
-        ?>
-        </tbody>
-    </table>
                 <div id="booksGrid" class="grid"></div>
+              </div>
+            </div>
+
+            <!-- Materiais de Estudo (PHP Integration) -->
+            <div id="materialsSection" style="display:none;">
+              <div class="data-section">
+                <div class="data-header">📁 Materiais e Documentos</div>
+                <div style="padding: 20px;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Nome do Arquivo</th><th>Data de Envio</th><th>Ação</th></tr>
+                    </thead>
+                    <tbody>
+                      <?php while($material = $sql_query->fetch_assoc()): ?>
+                      <tr>
+                        <td><?php echo $material['nome']; ?></td>
+                        <td><?php echo date('d/m/Y', strtotime($material['date_upload'])); ?></td>
+                        <td><a href="<?php echo $material['path']; ?>" target="_blank" class="btn-pdf" style="text-decoration:none; padding: 5px 10px;">Baixar</a></td>
+                      </tr>
+                      <?php endwhile; ?>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 

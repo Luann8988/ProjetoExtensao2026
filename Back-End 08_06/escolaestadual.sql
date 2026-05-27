@@ -29,8 +29,9 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `alunos`;
 CREATE TABLE IF NOT EXISTS `alunos` (
-  `IDaluno` int NOT NULL,
+  `IDaluno` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(140) NOT NULL,
+  `turma` varchar(50) DEFAULT NULL,
   `Senha` varchar(255) NOT NULL, -- Aumentado para suportar hashes de senha
   PRIMARY KEY (`IDaluno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -39,8 +40,8 @@ CREATE TABLE IF NOT EXISTS `alunos` (
 -- Despejando dados para a tabela `alunos`
 --
 
-INSERT INTO `alunos` (`IDaluno`, `nome`, `Senha`) VALUES
-(1, 'teste', 'teste123');
+INSERT INTO `alunos` (`IDaluno`, `nome`, `turma`, `Senha`) VALUES
+(1, 'teste', '7º Ano A', 'teste123');
 
 -- --------------------------------------------------------
 
@@ -130,6 +131,21 @@ CREATE TABLE IF NOT EXISTS `materiais` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `mensagens_chat`
+--
+
+CREATE TABLE IF NOT EXISTS `mensagens_chat` (
+  `IDmensagem` int NOT NULL AUTO_INCREMENT,
+  `remetente_tipo` enum('aluno', 'professor') NOT NULL,
+  `nome` varchar(140) NOT NULL,
+  `turma` varchar(50) DEFAULT NULL,
+  `texto` text NOT NULL,
+  `data_envio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`IDmensagem`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Estrutura para tabela `professores`
@@ -137,7 +153,8 @@ CREATE TABLE IF NOT EXISTS `materiais` (
 
 DROP TABLE IF EXISTS `professores`;
 CREATE TABLE IF NOT EXISTS `professores` (
-  `IDprofessor` int NOT NULL,
+  `IDprofessor` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(140) NOT NULL,
   `Email` varchar(140) NOT NULL,
   `Senha` varchar(16) NOT NULL,
   PRIMARY KEY (`IDprofessor`)
@@ -147,8 +164,8 @@ CREATE TABLE IF NOT EXISTS `professores` (
 -- Despejando dados para a tabela `professores`
 --
 
-INSERT INTO `professores` (`IDprofessor`, `Email`, `Senha`) VALUES
-(1, 'teste@teste.com', 'teste123');
+INSERT INTO `professores` (`IDprofessor`, `nome`, `Email`, `Senha`) VALUES
+(1, 'Prof. Silva', 'teste@teste.com', 'teste123');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

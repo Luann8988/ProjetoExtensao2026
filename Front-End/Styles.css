@@ -493,6 +493,11 @@ main {
   background: #f5f7ff;
 }
 
+.data-table td.overdue {
+  color: var(--error);
+  font-weight: bold;
+}
+
 .status-overdue { color: #ef4444; font-weight: bold; }
 .status-active { color: #10b981; font-weight: bold; }
 
@@ -1228,32 +1233,6 @@ button:focus-visible, input:focus-visible {
   color: #cbd5e1;
   margin-bottom: 10px;
   list-style: none;
-}
-
-.social-links {
-  display: flex;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.social-links a {
-  color: white;
-  background: rgba(255, 255, 255, 0.1);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: var(--transition);
-  font-size: 1.1rem;
-  text-decoration: none;
-}
-
-.social-links a:hover {
-  background: var(--accent);
-  color: var(--primary-dark);
-  transform: translateY(-3px);
 }
 
 .footer-section a:hover {

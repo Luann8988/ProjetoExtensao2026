@@ -52,6 +52,7 @@ class LoanManager {
     this.loans = [];
     this.books = [];
     this.favorites = [];
+    this.reservas = [];
     this.initBooks();
   }
 
@@ -192,7 +193,8 @@ class LoanManager {
       JSON.stringify({
         books: this.books,
         loans: this.loans,
-        favorites: this.favorites
+        favorites: this.favorites,
+        reservas: this.reservas
       })
     );
   }
@@ -213,6 +215,7 @@ class LoanManager {
 
       this.loans = parsed.loans || [];
       this.favorites = parsed.favorites || [];
+      this.reservas = parsed.reservas || [];
     } else {
       this.saveData();
     }
@@ -553,7 +556,12 @@ function filterBooks() {
   });
 
   const grid = document.getElementById('booksGrid');
-  if (grid) grid.innerHTML = filtered.map(book => renderBookCard(book)).join('');
+  if (grid) {
+    grid.innerHTML = filtered.length > 0 
+      ? filtered.map(book => renderBookCard(book)).join('')
+      : `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-light);">
+          <i class="fas fa-search" style="font-size: 30px; margin-bottom: 10px;"></i><br>Nenhum livro encontrado com esses filtros.</div>`;
+  }
 }
 
 let genreChartInstance = null;
@@ -768,7 +776,7 @@ function carregarDashboard() {
 }
 
 function navegarProfessor(sectionId, el) {
-  const sections = ['dashboard', 'alunos', 'relatorios', 'livros', 'devolucoes'];
+  const sections = ['dashboard', 'alunos', 'relatorios', 'livros', 'devolucoes', 'chatSection', 'notificacoes', 'turmas', 'reservas'];
 
   sections.forEach(id => {
     const sec = document.getElementById(id);
@@ -793,6 +801,135 @@ function navegarProfessor(sectionId, el) {
   if (sectionId === 'devolucoes') {
     loadReturnLoans();
   }
+
+  if (sectionId === 'chatSection') {
+    chat.renderChat();
+  }
+
+  if (sectionId === 'notificacoes') {
+    // Opcional: renderizar uma prévia ou estatísticas aqui
+  }
+
+  if (sectionId === 'turmas') {
+    renderTurmas();
+  }
+
+  if (sectionId === 'reservas') {
+    renderReservas();
+  }
+}
+
+function exportarRelatorio(formato) {
+  if (library.loans.length === 0) {
+    showToast('Não há dados para exportar!', 'error');
+    return;
+  }
+
+  const data = library.loans.map(l => ({
+    'Código': l.codigo || l.id,
+    'Aluno': l.studentName,
+    'Livro': l.bookTitle,
+    'Empréstimo': l.dataEmp,
+    'Devolução Prevista': l.dataDev,
+    'Status': l.status
+  }));
+
+  if (formato === 'csv' || formato === 'excel') {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Emprestimos");
+    
+    const filename = `relatorio_biblioteca_${new Date().getTime()}`;
+    if (formato === 'excel') {
+      XLSX.writeFile(workbook, `${filename}.xlsx`);
+    } else {
+      XLSX.writeFile(workbook, `${filename}.csv`, { bookType: 'csv' });
+    }
+  } else if (formato === 'pdf') {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.text("Relatório de Empréstimos - Biblioteca", 14, 15);
+    
+    const headers = [Object.keys(data[0])];
+    const rows = data.map(item => Object.values(item));
+
+    doc.autoTable({
+      startY: 20,
+      head: headers,
+      body: rows,
+      theme: 'striped'
+    });
+
+    doc.save(`relatorio_biblioteca_${new Date().getTime()}.pdf`);
+  }
+  showToast(`Relatório ${formato.toUpperCase()} gerado com sucesso!`);
+}
+
+function renderNotificacoes() {
+  const overdueLoans = library.loans.filter(l => l.status === 'active' && library.isOverdue(l));
+  const container = document.getElementById('notificacoesList');
+  if (!container) return;
+  
+  if (overdueLoans.length === 0) {
+    container.innerHTML = '<p>Não há notificações pendentes.</p>';
+    return;
+  }
+
+  container.innerHTML = overdueLoans.map(l => `
+    <div class="loan-item" style="border-left-color: var(--error)">
+      <div>
+        <strong>⚠️ Atraso:</strong> ${l.studentName} está com o livro "${l.bookTitle}" em atraso.
+      </div>
+      <button class="btn-primary" onclick="showToast('Aviso enviado ao aluno!', 'info')">Notificar Aluno</button>
+    </div>
+  `).join('');
+}
+
+function renderTurmas() {
+  const turmas = {};
+  library.loans.forEach(l => {
+    if (l.serie) {
+      turmas[l.serie] = (turmas[l.serie] || 0) + 1;
+    }
+  });
+  
+  const container = document.getElementById('turmasGrid');
+  if (!container) return;
+
+  const entries = Object.entries(turmas);
+  if (entries.length === 0) {
+    container.innerHTML = '<p>Nenhuma turma registrada nos empréstimos.</p>';
+    return;
+  }
+
+  container.innerHTML = entries.map(([nome, total]) => `
+    <div class="card" style="text-align: center; padding: 20px;">
+      <div class="stat-number" style="font-size: 24px; color: var(--accent);">${nome}</div>
+      <p style="margin: 0; color: #cbd5e1;">${total} Empréstimos</p>
+    </div>
+  `).join('');
+}
+
+function renderReservas() {
+  const container = document.getElementById('reservasList');
+  if (!container) return;
+  
+  const reservas = library.reservas || [];
+  
+  if (reservas.length === 0) {
+    container.innerHTML = '<p>Não há reservas pendentes.</p>';
+    return;
+  }
+
+  container.innerHTML = reservas.map(r => `
+    <div class="loan-item">
+      <div>
+        <strong>${r.studentName}</strong> reservou "${r.bookTitle}" em ${r.data || new Date().toLocaleDateString()}
+      </div>
+      <span class="badge bg-warning">${r.status || 'pendente'}</span>
+    </div>
+  `).join('');
 }
 
 function loadReturnLoans() {
@@ -872,6 +1009,64 @@ function adicionarNovoLivro(event) {
   navegarProfessor('dashboardSection');
 }
 
+// ================= CHAT SYSTEM =================
+
+class ChatManager {
+  constructor() {
+    this.messages = JSON.parse(localStorage.getItem('chat_messages') || '[]');
+  }
+
+  sendMessage(text, type) {
+    const profile = JSON.parse(localStorage.getItem('studentProfile')) || { name: 'Visitante', serie: 'N/A' };
+    const newMessage = {
+      id: Date.now(),
+      text,
+      type, // 'aluno' ou 'professor'
+      nome: type === 'aluno' ? profile.name : 'Prof. Bibliotecário',
+      turma: type === 'aluno' ? profile.serie : '',
+      time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    };
+
+    this.messages.push(newMessage);
+    localStorage.setItem('chat_messages', JSON.stringify(this.messages));
+    this.renderChat();
+  }
+
+  renderChat() {
+    const chatBox = document.getElementById('chatMessages');
+    if (!chatBox) return;
+
+    chatBox.innerHTML = this.messages.map(m => `
+      <div class="message ${m.type}">
+        <div class="message-info">
+          <span class="sender-name">${m.nome} ${m.turma ? `(${m.turma})` : ''}</span>
+          <span class="message-time">${m.time}</span>
+        </div>
+        <div class="message-text">${m.text}</div>
+      </div>
+    `).join('');
+    
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+}
+
+const chat = new ChatManager();
+
+function handleChatSubmit(e, type) {
+  e.preventDefault();
+  const input = e.target.querySelector('input');
+  if (input.value.trim()) {
+    chat.sendMessage(input.value, type);
+    input.value = '';
+  }
+}
+
+function showChat() {
+  showSection('chatSection');
+  chat.renderChat();
+  updateSidebar(4);
+}
+
 // ================= UTILITÁRIOS DE TELA =================
 
 function showSection(sectionId) {
@@ -880,10 +1075,12 @@ function showSection(sectionId) {
     'favoritesSection',
     'myLoansSection',
     'historySection',
-    'configSection'
+    'configSection',
+    'chatSection'
   ];
 
   sections.forEach(id => {
+    // Pequeno ajuste para garantir que o container do Aluno.php (PHP) também funcione com as mesmas IDs
     const el = document.getElementById(id);
 
     if (el) el.style.display = 'none';
@@ -892,6 +1089,10 @@ function showSection(sectionId) {
   const target = document.getElementById(sectionId);
 
   if (target) target.style.display = 'block';
+
+  // Atualiza o menu lateral baseado na seção
+  const menuMapping = { 'bookCatalog': 0, 'favoritesSection': 1, 'myLoansSection': 2, 'historySection': 3, 'chatSection': 4, 'configSection': 5 };
+  if(menuMapping[sectionId] !== undefined) updateSidebar(menuMapping[sectionId]);
 
   if (sectionId === 'configSection') {
     syncSettingsUI();
