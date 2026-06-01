@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteca Escolar - Seleção de Portal</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="background.css">
+</head>
+<body>
+
+<div class="portal-selector">
+
+  <header>
+    <div class="header-left">
+      <img src="Imagens/imagem2.png" class="logo" alt="Logo da Biblioteca Escolar" aria-label="Logo">
+      <div class="titulo-escola">
+        Escola Estadual <br>
+        <strong>Professor Gonçalves Couto</strong>
+      </div>
+    </div>
+    <div style="flex: 1;"></div> <!-- Spacer -->
+    <button onclick="window.location.href='Aluno.php'" class="btn-logout" style="margin-right: 10px;">👨‍🎓 Portal Aluno</button>
+    <button onclick="window.location.href='Professor.php'" class="btn-logout">👨‍🏫 Portal Professor</button>
+  </header>
+
+  <main style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px;">
+    
+    <h1 style="color:#FFC20E ; font-size: 36px; margin-bottom: 40px; text-align: center;">
+      Bem-vindo à Biblioteca Escolar
+    </h1>
+
+    <div class="portal-buttons" style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+      
+      <!-- PORTAL ALUNO -->
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='Aluno.php'">
+        <div style="height: 180px; background: linear-gradient(135deg,  #2E3192, #1B1464); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 64px;">👨‍🎓</span>
+        </div>
+        <div class="card-content">
+          <h3>Portal do Aluno</h3>
+          <p>Visualize livros, faça empréstimos e gerencie seus registros</p>
+          <span class="categoria">Para Estudantes</span>
+          <button class="btn-emprestar" style="margin-top: 10px;">Acessar →</button>
+        </div>
+      </div>
+
+      <!-- PORTAL PROFESSOR -->
+      <div class="card" style="width: 300px; text-align: center; cursor: pointer;" onclick="window.location.href='Professor.php'">
+        <div style="height: 180px; background: linear-gradient(135deg, #2E3192, #1B1464); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 64px;">👨‍🏫</span>
+        </div>
+        <div class="card-content">
+          <h3>Portal do Professor</h3>
+          <p>Gerencie empréstimos, visualize estatísticas e controle a biblioteca</p>
+          <span class="categoria">Administração</span>
+          <button class="btn-pdf" style="margin-top: 10px;">Acessar →</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="Script.js"></script>
+</body>
+</html>
