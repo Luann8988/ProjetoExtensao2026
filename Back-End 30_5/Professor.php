@@ -26,9 +26,29 @@ if(isset($_POST['email']) && isset($_POST['senha'])) {
 $sql_alunos = "SELECT * FROM alunos";
 $query_alunos = $mysqli->query($sql_alunos) or die($mysqli->error);
 
+// mostrar emprestimos
+$sql_emprestimos = "SELECT e.IDemprestimo, a.nome AS nome_aluno, l.Titulo AS titulo_livro, e.data_emprestimo, e.data_devolucao, e.status 
+                    FROM emprestimos e
+                    JOIN alunos a ON e.IDaluno = a.IDaluno
+                    JOIN livros l ON e.IDlivro = l.IDlivro
+                    ORDER BY e.data_emprestimo DESC";
 
-//lançamentos de livros -------------------------------------eu parei aki no lancamento de livrps,  aultima coisa que fz foicolocar id noas labels ondde vai ficar o livro
+$totalemprestimos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos")->fetch_assoc()['total'];
+$totalemprestimosativos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 1")->fetch_assoc()['total'];
+$totalemprestimosatrasados = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 4")->fetch_assoc()['total'];
+$totalemprestimosdevolvidos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado   = 2")->fetch_assoc()['total'];
 
+
+//lançamentos de livros 
+/*
+o canpo atrasado da tabela emprestimos vai funcionar assim:
+0 = ainda não foi pego pelo aluno
+1 = foi pego pelo aluno e ainda não devolveu
+2 = foi pego pelo aluno e já devolveu
+3 = foi pego pelo aluno e já devolveu, mas atrasou a devolução
+4 = foi pego pelo aluno e ainda não devolveu, mas já passou da data de devolução
+
+*/
 if(isset($_POST['uploadLivro'])) {
 
         $titulo = $mysqli->real_escape_string($_POST['Titulo']);
@@ -158,10 +178,18 @@ if(isset($_FILES['arquivo'])){
                 <div id="dashboard" class="section active">
                     <h2 style="color:#FFC20E;">📊 Dashboard</h2>
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Total Empréstimos</div></div>
-                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Ativos</div></div>
-                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Atrasados</div></div>
-                        <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">Devoluções</div></div>
+                        <div class="stat-card"><div class="stat-number">
+                            <?php echo $totalemprestimos; ?>
+                        </div><div class="stat-label">Total Empréstimos</div></div>
+                        <div class="stat-card"><div class="stat-number">
+                            <?php echo $totalemprestimosativos; ?>
+                        </div><div class="stat-label">Ativos</div></div>
+                        <div class="stat-card"><div class="stat-number">
+                            <?php echo $totalemprestimosatrasados; ?>
+                        </div><div class="stat-label">Atrasados</div></div>
+                        <div class="stat-card"><div class="stat-number">
+                            <?php echo $totalemprestimosdevolvidos; ?>
+                        </div><div class="stat-label">Devoluções</div></div>
                     </div>
                     <div class="data-section">
                         <div class="data-header">📋 Empréstimos Recentes</div>
