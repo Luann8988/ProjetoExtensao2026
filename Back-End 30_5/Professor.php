@@ -27,18 +27,57 @@ $sql_alunos = "SELECT * FROM alunos";
 $query_alunos = $mysqli->query($sql_alunos) or die($mysqli->error);
 
 // mostrar emprestimos
-$sql_emprestimos = "SELECT e.IDemprestimo, a.nome AS nome_aluno, l.Titulo AS titulo_livro, e.data_emprestimo, e.data_devolucao, e.status 
-                    FROM emprestimos e
-                    JOIN alunos a ON e.IDaluno = a.IDaluno
-                    JOIN livros l ON e.IDlivro = l.IDlivro
-                    ORDER BY e.data_emprestimo DESC";
-
+$sql_emprestimos = "select * from emprestimos 
+inner join livros on (emprestimos.FK_IDlivro = livros.IDlivro) 
+inner join alunos on (emprestimos.FK_IDaluno = alunos.IDaluno);";
+                    
+$query_emprestimos = $mysqli->query($sql_emprestimos) or die($mysqli->error);
 $totalemprestimos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos")->fetch_assoc()['total'];
 $totalemprestimosativos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 1")->fetch_assoc()['total'];
 $totalemprestimosatrasados = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 4")->fetch_assoc()['total'];
 $totalemprestimosdevolvidos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado   = 2")->fetch_assoc()['total'];
 
+function nomearStatus($atrasado) {
+    switch ($atrasado) {
+        case 0:
+            return "Não pegou o livro ainda.";
+        case 1:
+            return "Foi pego pelo aluno e ainda não devolveu.";
+        case 2:
+            return "Foi pego pelo aluno e já devolveu.";
+        case 3:
+            return "Foi pego pelo aluno e já devolveu, mas atrasou a devolução.";
+        case 4:
+            return "Foi pego pelo aluno e ainda não devolveu, mas já passou da data de devolução.";
+        default:
+            return "Sem imformação de status.";
+    }
+}
+/* usar de exemplo
+if (isset($_GET['deletar'])){
+    $id = intval($_GET['deletar']);
+    $sql_query = $mysqli->query("SELECT * FROM arquivos WHERE id = '$id'") or die($mysqli->error);
+    $arquivo = $sql_query->fetch_assoc();
+    $caminhoArquivo = $arquivo['path'];
 
+    if (file_exists($caminhoArquivo)){//verifica se arquivo existe
+        unlink($caminhoArquivo);//exclui o arquivo do servidor
+        $dellComcluido = $mysqli->query("DELETE FROM arquivos WHERE id = '$id'") or die($mysqli->error);//exclui no banco de dados
+        if ($dellComcluido){
+            echo "<alert>arquivo excluido com sucesso</alert>";
+        } else {
+            echo "<p>erro ao excluir arquivo</p>";
+        }
+    }
+} 
+
+<td>
+    <a href="upload.php?deletar=<?php echo $material['id']; ?>" onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
+        Deletar
+    </a>
+</td>
+
+*/
 //lançamentos de livros 
 /*
 o canpo atrasado da tabela emprestimos vai funcionar assim:
@@ -195,7 +234,23 @@ if(isset($_FILES['arquivo'])){
                         <div class="data-header">📋 Empréstimos Recentes</div>
                         <table class="data-table">
                             <thead><tr><th>Código</th><th>Aluno</th><th>Livro</th><th>Data Emp.</th><th>Data Dev.</th><th>Status</th></tr></thead>
-                            <tbody id="dashboardTable"></tbody>
+                            <tbody id="listaEmprestimos">
+                                <?php
+                                while($emprestimos = $query_emprestimos->fetch_assoc()){
+                                ?>
+                                <tr>
+                                    <td><a><?php echo $emprestimos['FK_IDaluno']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['nome']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['Titulo']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['data_emprestimo']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['data_emprestimo']; ?></a></td>
+                                    <td>
+                                        <a> <?php echo nomearStatus($emprestimos['atrasado']) ?> </a>
+                                    </td>
+                                <?php
+                                }
+                                ?>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -252,7 +307,26 @@ if(isset($_FILES['arquivo'])){
 
                 <!-- DEVOLUÇÕES -->
                 <div id="devolucoes" class="section">
-                    <div class="data-section"><div class="data-header">🔄 Devoluções</div><div id="returnLoansList"></div></div>
+                    <div class="data-section">
+                        <div class="data-header">🔄 Devoluções</div>
+                        <div id="returnLoansList">
+                            <table  style="width: 100%;"><thead><tr><th>Livro</th><th>Entrega</th><th>Ação</th></tr></thead>
+                            <tbody id="listaEmprestimos">
+                                <?php
+                                while($emprestimos = $query_emprestimos->fetch_assoc()){
+                                ?>
+                                <tr>
+                                    <td><a><?php echo $emprestimos['Titulo']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['atrasado']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['data_devolucao']; ?></a>
+                                </td>
+                                <?php
+                                }
+                                ?>
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
