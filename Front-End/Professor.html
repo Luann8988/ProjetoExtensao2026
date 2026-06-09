@@ -81,32 +81,29 @@
     <h2 style="color:#FFC20E;">📊 Dashboard</h2>
 
     <div class="stats-grid">
-
       <div class="stat-card">
-        <div class="stat-number">0</div>
+        <div class="stat-number" id="totalEmprestimos">0</div>
         <div class="stat-label">Total Empréstimos</div>
         <div class="stat-change">+0%</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-number">0</div>
+        <div class="stat-number" id="emprestimosAtivos">0</div>
         <div class="stat-label">Ativos</div>
         <div class="stat-change">+0%</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-number">0</div>
+        <div class="stat-number" id="emprestimosAtrasados">0</div>
         <div class="stat-label">Atrasados</div>
         <div class="stat-change">+0%</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-number">0</div>
+        <div class="stat-number" id="devoluToday">0</div>
         <div class="stat-label">Devoluções</div>
         <div class="stat-change">+0%</div>
       </div>
-
-
     </div>
 
     <!-- GRÁFICOS -->
@@ -120,7 +117,16 @@
     <!-- TABELA -->
     <div class="data-section">
       <div class="data-header">📋 Empréstimos Recentes</div>
-
+      <div style="float: right; display: flex; gap: 10px; align-items: center; margin-top: -35px; margin-right: 10px;">
+        <label for="filterLoanStatus" style="font-size: 14px; color: #cbd5e1;">Filtrar por Status:</label>
+        <select id="filterLoanStatus" onchange="carregarDashboard(this.value)" style="padding: 5px 10px; border-radius: 5px; background: #1f2937; color: white; border: 1px solid #334155;">
+          <option value="all">Todos</option>
+          <option value="active">Em Dia</option>
+          <option value="overdue">Atrasados</option>
+          <option value="returned">Devolvidos</option>
+        </select>
+      </div>
+      
       <table class="data-table">
         <thead>
           <tr>
@@ -133,15 +139,7 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr>
-            <td>#001</td>
-            <td>João</td>
-            <td>Dom Casmurro</td>
-            <td>10/04</td>
-            <td>20/04</td>
-            <td>Ativo</td>
-          </tr>
+        <tbody id="dashboardLoansBody">
         </tbody>
       </table>
     </div>

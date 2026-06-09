@@ -514,7 +514,6 @@ function renderBookCard(book) {
   const studentId = localStorage.getItem('studentId');
   const isFav = library.isFavorite(studentId, book.id);
   const stars = '⭐'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
-  const qrCodeUrl = `https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=isbn:${book.isbn}`;
   
   return `
     <div class="card">
@@ -536,7 +535,6 @@ function renderBookCard(book) {
             : `<button class="btn-secondary" onclick="reservarLivro(${book.id})">Reservar (Fila: ${book.reservations || 0})</button>`
           }
           ${book.pdfUrl ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>` : ''}
-          <button class="btn-pdf" style="background:#444" onclick="window.open('${qrCodeUrl}')">QR Code</button>
         </div>
       </div>
     </div>
@@ -762,14 +760,30 @@ function carregarDashboard() {
   if (tbody) {
     tbody.innerHTML = library.loans
       .slice(-5)
-      .map(l => `
-        <tr>
-          <td>${l.studentName}</td>
-          <td>${l.bookTitle}</td>
-          <td>${l.dataEmp}</td>
-          <td>${l.status}</td>
-        </tr>
-      `)
+      .map(l => {
+        const isOverdue = library.isOverdue(l);
+        let statusClass = 'status-active';
+        let statusText = 'Em Dia';
+
+        if (l.status.includes('returned')) {
+          statusClass = 'status-returned';
+          statusText = 'Devolvido';
+        } else if (isOverdue) {
+          statusClass = 'status-overdue';
+          statusText = 'Atrasado';
+        }
+
+        return `
+          <tr>
+            <td style="color: var(--accent); font-weight: bold;">${l.codigo || '#'+l.id.toString().slice(-3)}</td>
+            <td>${l.studentName}</td>
+            <td>${l.bookTitle}</td>
+            <td>${l.dataEmp}</td>
+            <td>${l.dataDev}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+          </tr>
+        `;
+      })
       .reverse()
       .join('');
   }
