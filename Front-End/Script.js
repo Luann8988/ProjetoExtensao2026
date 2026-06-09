@@ -1206,6 +1206,25 @@ function syncSettingsUI() {
   }
 }
 
+function initParticles() {
+  const container = document.getElementById('particles');
+  if (!container) return;
+
+  const particleCount = 40; // Quantidade de partículas
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    
+    const size = Math.random() * 5 + 2 + 'px'; // Tamanhos variados entre 2px e 7px
+    particle.style.width = size;
+    particle.style.height = size;
+    particle.style.left = Math.random() * 100 + 'vw';
+    particle.style.setProperty('--d', Math.random() * 15 + 10 + 's'); // Duração entre 10s e 25s
+    particle.style.animationDelay = Math.random() * 20 + 's';
+    container.appendChild(particle);
+  }
+}
+
 function updateSidebar(activeIndex) {
   const navItems = document.querySelectorAll('.sidebar li');
 
@@ -1259,6 +1278,9 @@ document.addEventListener('DOMContentLoaded', () => {
       adicionarNovoLivro
     );
   }
+
+  // Inicializa o efeito de partículas se o container existir
+  initParticles();
 
   const pageType = getCurrentPageType();
 

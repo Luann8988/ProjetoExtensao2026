@@ -15,6 +15,8 @@
 
 <body>
 
+<div class="particles-container" id="particles"></div>
+
 <div class="portal-selector">
 
   <header>
@@ -64,7 +66,7 @@
   >
 
     <div style="text-align: center; margin-bottom: 40px; max-width: 800px;">
-      <h1 style="color:#FFC20E; font-size: 40px; font-weight: 700; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 12px; text-shadow: 1px 2px 4px rgba(0,0,0,0.2);">
+      <h1 style="font-family: 'Montserrat', sans-serif; color:#FFC20E; font-size: 40px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 12px; text-shadow: 1px 2px 4px rgba(0,0,0,0.2);">
         Bem-vindo à Biblioteca Escolar
       </h1>
       <p style="color: #cbd5e1; font-size: 1.1rem; line-height: 1.6; font-weight: 400; max-width: 650px; margin: 0 auto;">
@@ -84,7 +86,7 @@
 
       <!-- PORTAL ALUNO -->
       <div 
-        class="card"
+        class="card glass-card"
         style="
           width: 300px;
           text-align: center;
@@ -96,20 +98,20 @@
         <div 
           style="
             height: 180px;
-            background: linear-gradient(135deg, #2E3192, #1B1464);
+            background: rgba(46, 49, 146, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
           "
         >
-          <span style="font-size: 64px;">👨‍🎓</span>
+          <i class="fas fa-user-graduate card-icon"></i>
         </div>
 
         <div class="card-content">
 
-          <h3>Portal do Aluno</h3>
+          <h3 style="color: var(--accent);">Portal do Aluno</h3>
 
-          <p>
+          <p style="color: #cbd5e1;">
             Visualize livros, faça empréstimos e gerencie seus registros
           </p>
 
@@ -129,7 +131,7 @@
 
       <!-- PORTAL PROFESSOR -->
       <div 
-        class="card"
+        class="card glass-card"
         style="
           width: 300px;
           text-align: center;
@@ -141,20 +143,20 @@
         <div 
           style="
             height: 180px;
-            background: linear-gradient(135deg, #2E3192, #1B1464);
+            background: rgba(46, 49, 146, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
           "
         >
-          <span style="font-size: 64px;">👨‍🏫</span>
+          <i class="fas fa-chalkboard-user card-icon"></i>
         </div>
 
         <div class="card-content">
 
-          <h3>Portal do Professor</h3>
+          <h3 style="color: var(--accent);">Portal do Professor</h3>
 
-          <p>
+          <p style="color: #cbd5e1;">
             Gerencie empréstimos, visualize estatísticas e controle a biblioteca
           </p>
 

@@ -1,4 +1,7 @@
 
+/* Importação de fontes modernas */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;800&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -68,8 +71,75 @@ body {
   min-height: 100vh;
 }
 
+/* Animação Neon para os Cards */
+@keyframes neon-glow {
+  0%, 100% {
+    border-color: rgba(255, 194, 14, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 0 5px rgba(255, 194, 14, 0.2);
+  }
+  50% {
+    border-color: rgba(255, 194, 14, 0.8);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 194, 14, 0.5), inset 0 0 5px rgba(255, 194, 14, 0.2);
+  }
+}
+
+/* Efeito de Vidro (Glassmorphism) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 194, 14, 0.3) !important;
+  border-radius: 20px !important;
+  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease !important;
+  animation: neon-glow 3s infinite ease-in-out;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-10px);
+  animation: none; /* Para a animação ao focar */
+  border-color: var(--accent) !important;
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 194, 14, 0.6) !important;
+}
+
+/* Estilização dos ícones Font Awesome nos cards */
+.card-icon {
+  font-size: 64px;
+  color: var(--accent);
+  text-shadow: 0 0 15px rgba(255, 194, 14, 0.5);
+}
+
+/* Container e Estilo das Partículas */
+.particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Fica atrás de tudo */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(255, 194, 14, 0.15); /* Amarelo sutil */
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float-up var(--d) linear infinite;
+  opacity: 0;
+}
+
+@keyframes float-up {
+  0% { transform: translateY(110vh) scale(0); opacity: 0; }
+  20% { opacity: 0.5; }
+  80% { opacity: 0.5; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
+
 body.login-body {
-  background: #1e293b; /* Azul ardósia profundo que realça o amarelo */
+  /* Gradiente radial: luz central em #334155 que escurece para #0f172a nas bordas */
+  background: radial-gradient(circle at 50% 35%, #334155 0%, #0f172a 100%);
 }
 
 /* HEADER */
@@ -1025,25 +1095,44 @@ button:focus-visible, input:focus-visible {
 /* HEADER */
 #professorContainer header {
   background: linear-gradient(135deg, #2E3192, #1B1464);
-  padding: 14px 20px;
+  padding: 8px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 3px solid #FFC20E;
+  border-bottom: 1px solid rgba(255, 194, 14, 0.3);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
+/* Reduzindo elementos internos do header do professor para economizar espaço */
+#professorContainer header .logo {
+  width: 45px;
+}
+
+#professorContainer header .titulo-escola {
+  font-size: 17px;
+}
+
+#professorContainer header input {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+#professorContainer .btn-logout {
+  padding: 5px 12px;
+  font-size: 13px;
+}
+
 /* SIDEBAR */
 #professorContainer .sidebar-prof {
-  width: 230px;
+  width: 210px;
   background: #0f172a;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 62px);
   position: fixed;
-  top: 70px;
+  top: 62px;
   left: 0;
-  padding: 20px;
+  padding: 15px;
   border-right: 1px solid #1e293b;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -1065,7 +1154,7 @@ button:focus-visible, input:focus-visible {
 }
 
 #professorContainer .sidebar-prof li {
-  padding: 12px;
+  padding: 10px 12px;
   margin-bottom: 8px;
   border-radius: 10px;
   cursor: pointer;
@@ -1086,9 +1175,9 @@ button:focus-visible, input:focus-visible {
 
 /* CONTEÚDO */
 #professorContainer .dashboard-content {
-  margin-left: 250px;
-  padding: 25px;
-  height: calc(100vh - 70px);
+  margin-left: 225px;
+  padding: 20px;
+  height: calc(100vh - 62px);
   overflow-y: auto;
 }
 
@@ -1126,7 +1215,7 @@ button:focus-visible, input:focus-visible {
 
 #professorContainer .stat-card {
   background: #111827;
-  padding: 18px;
+  padding: 15px;
   border-radius: 12px;
   border-left: 4px solid #FFC20E;
   transition: 0.3s;
@@ -1138,7 +1227,7 @@ button:focus-visible, input:focus-visible {
 }
 
 #professorContainer .stat-number {
-  font-size: 28px;
+  font-size: 24px;
   color: #FFC20E;
   font-weight: bold;
 }
@@ -1162,7 +1251,7 @@ button:focus-visible, input:focus-visible {
 }
 
 #professorContainer .data-table td {
-  padding: 15px;
+  padding: 12px 15px;
   background: #111827;
   border: none;
   font-size: 14px;
@@ -1258,14 +1347,14 @@ button:focus-visible, input:focus-visible {
     margin-bottom: 20px;
 }
 .professor-avatar {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #1B1464;
 }
 .professor-name {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     color: #FFC20E;
 }
