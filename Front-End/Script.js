@@ -468,13 +468,41 @@ function saveStudentProfile(e) {
       JSON.stringify(profile)
     );
 
-    hideModal('modalStudentProfile');
+    const modal = document.getElementById('modalStudentProfile');
+    if (modal) hideModal('modalStudentProfile');
     loadProfileHeader(profile);
 
     showToast('Perfil salvo! 🎉');
   } else {
     showToast('Preencha todos os campos!', 'error');
   }
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDark);
+  showToast(isDark ? 'Modo Escuro Ativado 🌙' : 'Modo Claro Ativado ☀️', 'info');
+}
+
+function exportMyData() {
+  const studentId = localStorage.getItem('studentId');
+  const profile = JSON.parse(localStorage.getItem('studentProfile'));
+  const myLoans = library.loans.filter(l => l.studentId === studentId);
+  
+  const data = {
+    perfil: profile,
+    historico_emprestimos: myLoans,
+    exportado_em: new Date().toLocaleString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `meus_dados_biblioteca_${studentId}.json`;
+  a.click();
+  showToast('Seus dados foram exportados! 💾');
 }
 
 function resetLibraryData() {
@@ -755,7 +783,7 @@ function carregarDashboard() {
   if (atEmp) atEmp.textContent = stats.overdue;
   if (dToday) dToday.textContent = stats.devoluToday;
 
-  const tbody = document.getElementById('dashboardTable');
+  const tbody = document.getElementById('dashboardLoansBody');
 
   if (tbody) {
     tbody.innerHTML = library.loans
@@ -773,6 +801,10 @@ function carregarDashboard() {
           statusText = 'Atrasado';
         }
 
+        const actionBtn = (isOverdue && !l.status.includes('returned')) 
+          ? `<button class="btn-email-alert" onclick="enviarLembreteEmail(${l.id})" title="Enviar lembrete por e-mail">📧</button>`
+          : '-';
+
         return `
           <tr>
             <td style="color: var(--accent); font-weight: bold;">${l.codigo || '#'+l.id.toString().slice(-3)}</td>
@@ -781,12 +813,49 @@ function carregarDashboard() {
             <td>${l.dataEmp}</td>
             <td>${l.dataDev}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td style="text-align:center;">${actionBtn}</td>
           </tr>
         `;
       })
       .reverse()
       .join('');
   }
+}
+
+function enviarLembreteEmail(loanId) {
+  const loan = library.loans.find(l => l.id === loanId);
+  if (!loan) return;
+  
+  const subject = encodeURIComponent(`Lembrete de Devolução: ${loan.bookTitle}`);
+  const body = encodeURIComponent(`Olá ${loan.studentName},\n\nIdentificamos que o livro "${loan.bookTitle}" está com a data de devolução (${loan.dataDev}) atrasada. Por favor, pedimos que compareça à biblioteca o quanto antes.\n\nAtenciosamente,\nBiblioteca Escolar.`);
+  
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  showToast('Abrindo gerenciador de e-mail...', 'info');
+}
+
+function renderAlunos(term = '') {
+  const grid = document.getElementById('alunosGrid');
+  if (!grid) return;
+
+  // Mapeia alunos únicos a partir dos empréstimos
+  const studentsMap = new Map();
+  library.loans.forEach(l => {
+    if (!studentsMap.has(l.studentId)) {
+      studentsMap.set(l.studentId, { name: l.studentName, serie: l.serie });
+    }
+  });
+
+  const filtered = Array.from(studentsMap.values()).filter(s => 
+    s.name.toLowerCase().includes(term.toLowerCase()) || s.serie.toLowerCase().includes(term.toLowerCase())
+  );
+
+  grid.innerHTML = filtered.length ? filtered.map(s => `
+    <div class="card" style="padding: 15px; text-align: center; background: #111827; border: 1px solid #1e293b;">
+      <div style="font-size: 30px; margin-bottom: 5px;">👤</div>
+      <h3 style="font-size: 16px; color: var(--accent);">${s.name}</h3>
+      <p style="font-size: 13px; color: #94a3b8;">${s.serie}</p>
+    </div>
+  `).join('') : '<p style="padding: 20px;">Nenhum aluno encontrado.</p>';
 }
 
 function navegarProfessor(sectionId, el) {
@@ -810,6 +879,10 @@ function navegarProfessor(sectionId, el) {
 
   if (sectionId === 'dashboard') {
     carregarDashboard();
+  }
+
+  if (sectionId === 'alunos') {
+    renderAlunos();
   }
 
   if (sectionId === 'devolucoes') {

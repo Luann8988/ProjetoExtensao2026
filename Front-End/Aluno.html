@@ -170,6 +170,7 @@
           <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
             <button class="btn-secondary w-100" onclick="toggleDarkMode()">🌓 Alternar Modo Escuro/Claro</button>
             <button class="btn-pdf w-100" onclick="showToast('Notificações ativadas!', 'info')">🔔 Ativar Notificações</button>
+            <button class="btn-primary w-100" style="background: #34d399; color: white; border: none;" onclick="exportMyData()">💾 Exportar Meus Dados (JSON)</button>
             <hr>
             <p style="font-size: 13px; color: var(--text-light); margin-bottom: 5px;">Área Restrita:</p>
             <button class="btn-biblioteca w-100" style="background: var(--error);" onclick="resetLibraryData()">🗑️ Limpar Meus Dados e Histórico</button>
@@ -177,9 +178,17 @@
         </div>
 
           <div class="data-section">
-            <div class="data-header">❓ Suporte</div>
-            <div style="padding: 20px;">
-              <p>Dúvidas sobre o funcionamento da biblioteca? <a href="mailto:suporte@escola.com">Contate o bibliotecário</a></p>
+            <div class="data-header">❓ Suporte e Ajuda</div>
+            <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+              <p style="margin:0; font-size: 14px;">Precisa de ajuda com um livro ou erro no sistema?</p>
+              <div style="display: flex; gap: 10px;">
+                <a href="mailto:suporte.biblioteca@escola.mg.gov.br?subject=Ajuda%20Portal%20Aluno" class="btn-primary" style="text-decoration: none; flex: 1; text-align: center; padding: 10px; border-radius: 8px;">
+                  <i class="fas fa-envelope"></i> E-mail
+                </a>
+                <a href="https://wa.me/5532999999999?text=Olá!%20Sou%20aluno%20da%20biblioteca%20e%20preciso%20de%20ajuda." target="_blank" class="btn-secondary" style="text-decoration: none; flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-weight: bold;">
+                  <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+              </div>
             </div>
           </div>
         </div>

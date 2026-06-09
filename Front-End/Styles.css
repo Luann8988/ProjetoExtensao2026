@@ -43,6 +43,21 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Suavização da troca de tema */
+body, 
+header, 
+.sidebar, 
+.sidebar-prof, 
+.card, 
+.data-section, 
+.stat-card, 
+.data-table td,
+#professorContainer,
+.dashboard-content,
+.stats-grid .stat-card {
+  transition: background-color 0.4s ease, background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
 .stars { color: #FFC20E; margin-bottom: 5px; font-size: 0.9rem; }
 
 body {
@@ -831,10 +846,20 @@ button:focus-visible, input:focus-visible {
   box-shadow: 0 10px 25px rgba(46,49,146,0.4);
 }
 
-.dark-mode {
-    background-color: #121212;
-    color: white;
-}
+ body.dark-mode {
+   --bg-light: #0f172a;
+   --bg-white: #1e293b;
+   --text-dark: #f1f5f9;
+   --text-light: #94a3b8;
+ }
+ 
+ body.dark-mode .card, 
+ body.dark-mode .data-section,
+ body.dark-mode .sidebar {
+   background: var(--bg-white);
+   color: var(--text-dark);
+   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+ }
 
 .level-badge {
     display: inline-block;
@@ -1316,4 +1341,31 @@ button:focus-visible, input:focus-visible {
 @keyframes flash {
   0% { opacity: 1; }
   100% { opacity: 0.3; }
+}
+
+.btn-email-alert {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-email-alert:hover {
+  background: #2563eb;
+}
+
+.search-box-alunos {
+  float: right;
+}
+
+.search-box-alunos input {
+  background: #1f2937;
+  border: 1px solid #334155;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 13px;
 }

@@ -126,7 +126,7 @@
           <option value="returned">Devolvidos</option>
         </select>
       </div>
-      
+
       <table class="data-table">
         <thead>
           <tr>
@@ -136,6 +136,7 @@
             <th>Data Emp.</th>
             <th>Data Dev.</th>
             <th>Status</th>
+            <th>Ação</th>
           </tr>
         </thead>
 
@@ -149,22 +150,16 @@
   <!-- ALUNOS -->
   <div id="alunos" class="section" style="display:none;">
     <div class="data-section">
-      <div class="data-header">👥 Alunos</div>
-
-      <div class="grid">
-
-        <div class="card">
-          <h3>Maria</h3>
-          <p>7º Ano</p>
+      <div class="data-header">
+        <span>👥 Alunos</span>
+        <div class="search-box-alunos">
+           <input type="text" id="searchAlunosTab" placeholder="Filtrar por nome ou série..." oninput="renderAlunos(this.value)">
         </div>
-
-        <div class="card">
-          <h3>João</h3>
-          <p>8º Ano</p>
-        </div>
-
       </div>
-      
+
+      <div id="alunosGrid" class="grid" style="padding: 20px;">
+        <!-- Preenchido via JavaScript -->
+      </div>
     </div>
   </div>
 
