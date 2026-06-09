@@ -69,7 +69,7 @@ body {
 }
 
 body.login-body {
-  background: #ffffff;
+  background: #1e293b; /* Azul ardósia profundo que realça o amarelo */
 }
 
 /* HEADER */
