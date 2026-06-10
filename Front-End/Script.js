@@ -14,7 +14,7 @@ class Book {
     this.rating = Math.floor(Math.random() * 2) + 4; // Simula rating inicial 4-5
 
     // Agora os PDFs são carregados da pasta PDF/
-    this.pdfUrl = pdfFile ? PDF_PATH + pdfFile : null;
+    this.pdfUrl = (pdfFile && pdfFile.startsWith('http')) ? pdfFile : (pdfFile ? PDF_PATH + pdfFile : null);
 
     this.description = description;
     this.isbn = isbn;
@@ -1078,7 +1078,7 @@ function returnLoanProf(loanId) {
 }
 
 async function buscarDadosGoogleBooks() {
-  const isbn = document.getElementById('newIsbn').value.trim();
+  let isbn = document.getElementById('newIsbn').value.trim().replace(/[-\s]/g, ''); // Limpa hífens e espaços
   const btn = document.querySelector('.btn-search-isbn');
   
   if (!isbn) {
@@ -1091,17 +1091,28 @@ async function buscarDadosGoogleBooks() {
   btn.disabled = true;
 
   try {
-    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-    const data = await response.json();
+    // Tenta busca específica por ISBN
+    let response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    let data = await response.json();
+
+    // Se não achar com prefixo isbn:, tenta busca geral pelo número
+    if (data.totalItems === 0) {
+      response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${isbn}`);
+      data = await response.json();
+    }
 
     if (data.totalItems > 0) {
       const info = data.items[0].volumeInfo;
       document.getElementById('newTitle').value = info.title || '';
       document.getElementById('newAuthor').value = info.authors ? info.authors.join(', ') : 'Autor desconhecido';
+      document.getElementById('newCategory').value = info.categories ? info.categories.join(', ') : 'Geral';
       
       if (info.imageLinks) {
         const coverUrl = (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail).replace('http:', 'https:');
         document.getElementById('newCoverUrl').value = coverUrl;
+        atualizarPreview();
+      } else {
+        document.getElementById('newCoverUrl').value = '';
         atualizarPreview();
       }
       showToast('Livro encontrado!');
@@ -1128,12 +1139,24 @@ function atualizarPreview() {
   }
 }
 
-function renderProfessorBooks() {
+function renderProfessorBooks(searchTerm = '') {
   const grid = document.getElementById('profBooksGrid');
   if (!grid) return;
   
-  // Reutiliza a função de renderização de cards já existente para manter o padrão visual
-  grid.innerHTML = library.books.map(book => renderBookCard(book, true)).join(''); // Passa 'true' para indicar visão do professor
+  const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+  const filteredBooks = library.books.filter(book =>
+    book.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+    book.author.toLowerCase().includes(lowerCaseSearchTerm)
+  );
+
+  if (filteredBooks.length > 0) {
+    grid.innerHTML = filteredBooks.map(book => renderBookCard(book, true)).join(''); // Passa 'true' para indicar visão do professor
+  } else {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-light);">
+                        <i class="fas fa-search" style="font-size: 30px; margin-bottom: 10px;"></i><br>Nenhum livro encontrado com esses filtros.
+                      </div>`;
+  }
 }
 
 /**
@@ -1166,10 +1189,11 @@ function adicionarNovoLivro(event) {
   const isbn = document.getElementById('newIsbn').value;
   const titulo = document.getElementById('newTitle').value;
   const autor = document.getElementById('newAuthor').value;
+  const categoria = document.getElementById('newCategory').value || 'Geral';
   const coverUrl = document.getElementById('newCoverUrl').value;
   const bookUrl = document.getElementById('newBookUrl').value;
 
-  const novoLivro = new Book(Date.now(), titulo, autor, coverUrl || 'capa-padrao.png', bookUrl, 'Livro adicionado via portal.', isbn, 5, 5);
+  const novoLivro = new Book(Date.now(), titulo, autor, coverUrl || 'capa-padrao.png', bookUrl, 'Livro adicionado via portal.', isbn, 5, 5, categoria);
   
   library.books.push(novoLivro);
   library.saveData();
