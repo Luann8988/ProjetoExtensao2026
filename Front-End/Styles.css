@@ -691,12 +691,45 @@ main {
   outline: none;
 }
 
+.isbn-search-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+
+.isbn-search-row .form-group {
+  flex-grow: 1;
+  margin-bottom: 0;
+}
+
+.btn-search-isbn {
+  height: 46px;
+  padding: 0 15px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.btn-search-isbn:hover {
+  background: var(--primary-dark);
+}
+
 .image-preview {
-  max-width: 100px;
-  max-height: 150px;
+  max-width: 150px;
+  max-height: 220px;
   border-radius: 8px;
   margin-top: 10px;
   border: 2px solid #e2e8f0;
+  display: none; /* Escondido até carregar uma imagem */
+  object-fit: cover;
+  box-shadow: var(--shadow-md);
 }
 
 /* SIDEBAR PROFESSOR */
@@ -731,6 +764,19 @@ main {
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
+.btn-danger {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: var(--transition);
+}
+
+.btn-danger:hover {
+  background: #dc2626; /* A slightly darker red */
+}
 /* LOGIN */
 .login-container {
   display: flex;
@@ -1004,7 +1050,7 @@ button:focus-visible, input:focus-visible {
 /* HEADER */
 #professorContainer header {
   background: linear-gradient(135deg, #2E3192, #1B1464);
-  padding: 8px 20px;
+  padding: 13px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1360,6 +1406,22 @@ button:focus-visible, input:focus-visible {
 }
 
 .search-box-alunos input {
+  background: #1f2937;
+  border: 1px solid #334155;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.search-box-prof-books {
+  float: right;
+  /* Ajuste a margem superior conforme necessário para alinhar com o título "Livros" */
+  margin-top: -35px; 
+  margin-right: 10px;
+}
+
+.search-box-prof-books input {
   background: #1f2937;
   border: 1px solid #334155;
   color: white;

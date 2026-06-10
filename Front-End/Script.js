@@ -538,7 +538,12 @@ function selectAvatar(img) {
 
 // ================= LIVROS E EMPRÉSTIMOS =================
 
-function renderBookCard(book) {
+/**
+ * Renderiza um card de livro.
+ * @param {Book} book - O objeto livro a ser renderizado.
+ * @param {boolean} isProfessorView - Indica se o card está sendo renderizado na visão do professor.
+ */
+function renderBookCard(book, isProfessorView = false) {
   const studentId = localStorage.getItem('studentId');
   const isFav = library.isFavorite(studentId, book.id);
   const stars = '⭐'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
@@ -546,6 +551,10 @@ function renderBookCard(book) {
   return `
     <div class="card">
       <div class="favorite-badge ${isFav ? 'active' : ''}" onclick="toggleFav(${book.id}, event)">
+        ${isProfessorView ? `
+          <button class="btn-danger btn-sm" onclick="deleteBook(${book.id}, event)" style="position: absolute; top: 5px; right: 5px; padding: 5px 8px; font-size: 12px;">
+            <i class="fas fa-trash"></i>
+          </button>` : ''}
         ${isFav ? '❤️' : '🤍'}
       </div>
       <img src="${book.image}" alt="${book.title}" class="capa">
@@ -562,6 +571,7 @@ function renderBookCard(book) {
             ? `<button class="btn-emprestar" onclick="emprestarLivro(${book.id})">Emprestar</button>` 
             : `<button class="btn-secondary" onclick="reservarLivro(${book.id})">Reservar (Fila: ${book.reservations || 0})</button>`
           }
+          ${isProfessorView ? `<button class="btn-danger mt-2" onclick="deleteBook(${book.id}, event)">Excluir Livro</button>` : ''}
           ${book.pdfUrl ? `<button class="btn-pdf" onclick="openPdf('${book.pdfUrl}')">Ler PDF</button>` : ''}
         </div>
       </div>
@@ -885,6 +895,10 @@ function navegarProfessor(sectionId, el) {
     renderAlunos();
   }
 
+  if (sectionId === 'livros') {
+    renderProfessorBooks();
+  }
+
   if (sectionId === 'devolucoes') {
     loadReturnLoans();
   }
@@ -1063,37 +1077,109 @@ function returnLoanProf(loanId) {
   }
 }
 
+async function buscarDadosGoogleBooks() {
+  const isbn = document.getElementById('newIsbn').value.trim();
+  const btn = document.querySelector('.btn-search-isbn');
+  
+  if (!isbn) {
+    showToast("Por favor, digite um ISBN.", "error");
+    return;
+  }
+
+  const originalContent = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    const data = await response.json();
+
+    if (data.totalItems > 0) {
+      const info = data.items[0].volumeInfo;
+      document.getElementById('newTitle').value = info.title || '';
+      document.getElementById('newAuthor').value = info.authors ? info.authors.join(', ') : 'Autor desconhecido';
+      
+      if (info.imageLinks) {
+        const coverUrl = (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail).replace('http:', 'https:');
+        document.getElementById('newCoverUrl').value = coverUrl;
+        atualizarPreview();
+      }
+      showToast('Livro encontrado!');
+    } else {
+      showToast('Nenhum livro encontrado para este ISBN.', 'error');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar livro:', error);
+    showToast('Erro ao consultar o ISBN.', 'error');
+  } finally {
+    btn.innerHTML = originalContent;
+    btn.disabled = false;
+  }
+}
+
+function atualizarPreview() {
+  const url = document.getElementById('newCoverUrl').value;
+  const img = document.getElementById('coverPreview');
+  if (url && img) {
+    img.src = url;
+    img.style.display = 'block';
+  } else if (img) {
+    img.style.display = 'none';
+  }
+}
+
+function renderProfessorBooks() {
+  const grid = document.getElementById('profBooksGrid');
+  if (!grid) return;
+  
+  // Reutiliza a função de renderização de cards já existente para manter o padrão visual
+  grid.innerHTML = library.books.map(book => renderBookCard(book, true)).join(''); // Passa 'true' para indicar visão do professor
+}
+
+/**
+ * Exclui um livro da biblioteca.
+ * @param {number} bookId - O ID do livro a ser excluído.
+ * @param {Event} event - O evento de clique para parar a propagação.
+ */
+function deleteBook(bookId, event) {
+  event.stopPropagation(); // Impede que o clique no botão acione outros eventos do card
+
+  if (!confirm('Tem certeza que deseja excluir este livro? Esta ação não pode ser desfeita.')) {
+    return;
+  }
+
+  const initialBookCount = library.books.length;
+  library.books = library.books.filter(book => book.id !== bookId);
+
+  if (library.books.length < initialBookCount) {
+    library.saveData();
+    showToast('Livro excluído com sucesso!', 'success');
+    renderProfessorBooks(); // Re-renderiza a lista de livros do professor
+  } else {
+    showToast('Erro ao excluir o livro.', 'error');
+  }
+}
+
 function adicionarNovoLivro(event) {
   event.preventDefault();
 
+  const isbn = document.getElementById('newIsbn').value;
   const titulo = document.getElementById('newTitle').value;
   const autor = document.getElementById('newAuthor').value;
-  const desc = document.getElementById('newDesc').value;
+  const coverUrl = document.getElementById('newCoverUrl').value;
+  const bookUrl = document.getElementById('newBookUrl').value;
 
-  // Agora digita apenas o nome do arquivo PDF
-  const pdf = document.getElementById('newPdf').value.trim();
-
-  const novoLivro = new Book(
-    Date.now(),
-    titulo,
-    autor,
-    'capa-padrao.png',
-    pdf,
-    desc,
-    '000-000',
-    5,
-    5
-  );
-
+  const novoLivro = new Book(Date.now(), titulo, autor, coverUrl || 'capa-padrao.png', bookUrl, 'Livro adicionado via portal.', isbn, 5, 5);
+  
   library.books.push(novoLivro);
-
   library.saveData();
 
-  alert('Livro adicionado com sucesso!');
-
+  showToast('Livro adicionado com sucesso!');
   hideModal('modalAddBook');
-
-  navegarProfessor('dashboardSection');
+  renderProfessorBooks(); // Atualiza a lista na tela imediatamente
+  
+  event.target.reset(); // Limpa o formulário para o próximo uso
+  if (document.getElementById('coverPreview')) document.getElementById('coverPreview').style.display = 'none';
 }
 
 // ================= CHAT SYSTEM =================

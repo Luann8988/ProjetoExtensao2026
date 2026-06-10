@@ -222,12 +222,12 @@
       <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
       <h3>Novo Livro</h3>
       <form id="addBookForm">
-        <div class="form-group">
-          <label>ISBN (Busca Automática)</label>
-          <div style="display: flex; gap: 5px;">
+        <div class="isbn-search-row">
+          <div class="form-group">
+            <label>ISBN (Busca Automática)</label>
             <input type="text" id="newIsbn" placeholder="Ex: 9788535914849">
-            <button type="button" class="btn-primary" onclick="buscarDadosGoogleBooks()">🔍 Buscar</button>
           </div>
+          <button type="button" class="btn-search-isbn" onclick="buscarDadosGoogleBooks()">🔍 Buscar</button>
         </div>
         <div class="form-group">
           <label>Título</label>
@@ -238,8 +238,13 @@
           <input type="text" id="newAuthor" required>
         </div>
         <div class="form-group">
-          <label>PDF (nome do arquivo)</label>
-          <input type="text" id="newPdf" placeholder="ex: livro.pdf">
+          <label>URL da Capa (Imagem)</label>
+          <input type="text" id="newCoverUrl" placeholder="Link da imagem..." oninput="atualizarPreview()">
+          <img id="coverPreview" class="image-preview" src="" alt="Preview">
+        </div>
+        <div class="form-group">
+          <label>Link do Livro (URL ou PDF)</label>
+          <input type="text" id="newBookUrl" placeholder="https://link-do-livro.com">
         </div>
         <button type="submit" class="btn-primary w-100">Salvar Livro</button>
       </form>
