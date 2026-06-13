@@ -47,35 +47,18 @@
 
     <main>
       <aside class="sidebar">
-        <h3>Meu Painel</h3>
+        <h3 style="padding: 0 15px; font-size: 14px; text-transform: uppercase; color: var(--text-light); margin-bottom: 15px;">Menu Principal</h3>
         <ul>
-          <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
-          <li onclick="showFavorites()">⭐ Favoritos</li>
-          <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
-          <li onclick="showHistory()">📜 Histórico</li>
-          <li onclick="showChat()">💬 Bate-papo</li>
-          <li onclick="showSection('configSection')">⚙️ Configurações</li>
+          <li class="active" onclick="showBooks()"><i class="fas fa-book"></i> Catálogo de Livros</li>
+          <li onclick="showFavorites()"><i class="fas fa-star"></i> Meus Favoritos</li>
+          <li onclick="showMyLoans()"><i class="fas fa-bookmark"></i> Empréstimos</li>
+          <li onclick="showHistory()"><i class="fas fa-history"></i> Histórico</li>
+          <li onclick="showSection('configSection')"><i class="fas fa-user-cog"></i> Configurações</li>
         </ul>
       </aside>
 
       <section class="dashboard-content">
     
-        <div class="netflix-profile-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
-          <img id="headerAvatar" src="" class="profile-avatar-preview" alt="Seu avatar" style="display: none;">
-          <div>
-            <h2 id="headerUserName">Bem-vindo, Aluno!</h2>
-            <p id="headerUserSerie">Complete seu perfil</p>
-            <span id="readerLevelBadge" class="level-badge" style="display:none;"></span>
-          </div>
-        <div class="stats-mini" style="margin-left: auto; text-align: right; min-width: 160px;">
-          <div style="font-size: 14px; margin-bottom: 5px; font-weight: 500;">Livros Ativos: <b id="statCount">0</b>/3</div>
-          <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-            <div id="loanProgressBar" style="width: 0%; height: 100%; background: #FFC20E; transition: width 0.4s ease-out;"></div>
-          </div>
-        </div>
-
-        </div>
-
         <!-- CATÁLOGO DE LIVROS -->
         <div id="bookCatalog">
           <div class="data-section">
@@ -125,9 +108,6 @@
                   <th>Empréstimo</th>
                   <th>Devolução</th>
                   <th>Status Final</th>
-                  <th>Avaliação</th>
-                  <th>Comentário</th>
-                  <th>Recomendações</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,35 +125,10 @@
             </div>
           </div>
 
-          <div class="data-section">
-            <div class="data-header">👤 Editar Perfil</div>
-            <form id="profileSettingsForm" onsubmit="saveStudentProfile(event)" style="padding: 20px;">
-              <div class="form-group">
-                <label>Seu Nome</label>
-                <input type="text" id="profileName" required>
-              </div>
-              <div class="form-group">
-                <label>Sua Série/Turma</label>
-                <input type="text" id="profileSerie" required>
-              </div>
-              <div class="form-group">
-                <label>Estilo do Avatar ( Seed )</label>
-                <input type="text" id="avatarSeedInput" placeholder="Ex: Felix, Daisy, etc">
-                <small style="color: var(--text-light)">Dica: Mude o texto para gerar um avatar novo!</small>
-              </div>
-              <button type="submit" class="btn-emprestar">Salvar Alterações</button>
-            </form>
-          </div>
-
         <div class="data-section">
-          <div class="data-header">🎨 Preferências e Dados</div>
-          <div style="padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-            <button class="btn-secondary w-100" onclick="toggleDarkMode()">🌓 Alternar Modo Escuro/Claro</button>
-            <button class="btn-pdf w-100" onclick="showToast('Notificações ativadas!', 'info')">🔔 Ativar Notificações</button>
-            <button class="btn-primary w-100" style="background: #34d399; color: white; border: none;" onclick="exportMyData()">💾 Exportar Meus Dados (JSON)</button>
-            <hr>
-            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 5px;">Área Restrita:</p>
-            <button class="btn-biblioteca w-100" style="background: var(--error);" onclick="resetLibraryData()">🗑️ Limpar Meus Dados e Histórico</button>
+          <div class="data-header">⚙️ Gestão de Dados</div>
+          <div style="padding: 20px;">
+            <button class="btn-danger w-100" onclick="limparLivros()">🗑️ Limpar Catálogo e Resetar Biblioteca</button>
           </div>
         </div>
 
@@ -189,23 +144,6 @@
                   <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
               </div>
-            </div>
-          </div>
-        </div>
-
-
-        <!-- BATE-PAPO -->
-        <div id="chatSection" style="display:none;">
-          <div class="data-section">
-            <div class="data-header">💬 Conversar com o Professor</div>
-            <div class="chat-container">
-              <div id="chatMessages" class="chat-messages"></div>
-              <form class="chat-input-area" onsubmit="handleChatSubmit(event, 'aluno')">
-                <input type="text" placeholder="Digite sua mensagem..." required>
-                <button type="submit" class="chat-send-btn" aria-label="Enviar">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </form>
             </div>
           </div>
         </div>

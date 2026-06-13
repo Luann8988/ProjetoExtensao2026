@@ -22,6 +22,14 @@ if(isset($_POST['email']) && isset($_POST['senha'])) {
     }
 }
 
+// Lógica de Exclusão de Livro
+if(isset($_GET['excluir_livro'])) {
+    $id = intval($_GET['excluir_livro']);
+    $mysqli->query("DELETE FROM livros WHERE IDlivro = '$id'") or die($mysqli->error);
+    header("Location: Professor.php");
+    exit;
+}
+
 //mostrar alunos
 $sql_alunos = "SELECT * FROM alunos";
 $query_alunos = $mysqli->query($sql_alunos) or die($mysqli->error);
@@ -95,16 +103,18 @@ if(isset($_POST['uploadLivro'])) {
         $descricao = $mysqli->real_escape_string($_POST['Descricao']);
         $isbn = $mysqli->real_escape_string($_POST['ISBN']);
         $quantidade = (int)$_POST['Quantidade'];
+        $categoria = $mysqli->real_escape_string($_POST['Categoria']);
+        $capa = $mysqli->real_escape_string($_POST['CapaURL']);
+        $pdf = $mysqli->real_escape_string($_POST['PdfURL']);
     
-        $sql_insert_livro = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade) VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade')";
+        $sql_insert_livro = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade, Categoria, capa, pdf) 
+                             VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade', '$categoria', '$capa', '$pdf')";
+                             
         if ($mysqli->query($sql_insert_livro)) {
-            echo "<p>Livro cadastrado com sucesso!</p>";
+            echo "<script>alert('Livro cadastrado com sucesso!'); window.location.href='Professor.php';</script>";
         } else {
-            echo "<p>Erro ao cadastrar livro: " . $mysqli->error . "</p>";
+            echo "<script>alert('Erro ao cadastrar livro: " . $mysqli->error . "');</script>";
         }
-
-
-
 }
 
 
@@ -204,37 +214,47 @@ if(isset($_FILES['arquivo'])){
                 </div>
                 <div class="separator"></div>
                 <ul>
-                    <li class="menu-item active" onclick="rolarParaSessao('dashboard', this)">📊 Dashboard</li>
-                    <li class="menu-item" onclick="rolarParaSessao('alunos', this)">👥 Alunos</li>
-                    <li class="menu-item" onclick="rolarParaSessao('relatorios', this)">📈 Relatórios</li>
-                    <li class="menu-item" onclick="rolarParaSessao('livros', this)">📚 Livros</li>
-                    <li class="menu-item" onclick="rolarParaSessao('devolucoes', this)">🔄 Devoluções</li>
+                    <li class="menu-item active" onclick="navegarProfessor('dashboardSection', this)">📊 Dashboard</li>
+                    <li class="menu-item" onclick="navegarProfessor('alunosSection', this)">👥 Alunos</li>
+                    <li class="menu-item" onclick="navegarProfessor('relatoriosSection', this)">📈 Relatórios</li>
+                    <li class="menu-item" onclick="navegarProfessor('livrosSection', this)">📚 Livros</li>
+                    <li class="menu-item" onclick="navegarProfessor('devolucoesSection', this)">🔄 Devoluções</li>
                 </ul>
             </aside>
 
             <section class="dashboard-content">
                 <!-- DASHBOARD -->
-                <div id="dashboard" class="section active">
-                    <h2 style="color:#FFC20E;">📊 Dashboard</h2>
+                <div id="dashboardSection" class="section active">
+                    <h2 style="color:#FFC20E; margin-bottom: 25px; font-size: 24px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chart-line"></i> Visão Geral da Biblioteca
+                    </h2>
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-number">
-                            <?php echo $totalemprestimos; ?>
-                        </div><div class="stat-label">Total Empréstimos</div></div>
-                        <div class="stat-card"><div class="stat-number">
-                            <?php echo $totalemprestimosativos; ?>
-                        </div><div class="stat-label">Ativos</div></div>
-                        <div class="stat-card"><div class="stat-number">
-                            <?php echo $totalemprestimosatrasados; ?>
-                        </div><div class="stat-label">Atrasados</div></div>
-                        <div class="stat-card"><div class="stat-number">
-                            <?php echo $totalemprestimosdevolvidos; ?>
-                        </div><div class="stat-label">Devoluções</div></div>
+                        <div class="stat-card" style="border-left-color: #3b82f6;">
+                            <i class="fas fa-exchange-alt" style="font-size: 20px; color: #3b82f6; margin-bottom: 10px;"></i>
+                            <div class="stat-number"><?php echo $totalemprestimos; ?></div>
+                            <div class="stat-label">Total Realizado</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #10b981;">
+                            <i class="fas fa-check-circle" style="font-size: 20px; color: #10b981; margin-bottom: 10px;"></i>
+                            <div class="stat-number"><?php echo $totalemprestimosativos; ?></div>
+                            <div class="stat-label">Empréstimos Ativos</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #ef4444;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 20px; color: #ef4444; margin-bottom: 10px;"></i>
+                            <div class="stat-number"><?php echo $totalemprestimosatrasados; ?></div>
+                            <div class="stat-label">Livros Atrasados</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #f59e0b;">
+                            <i class="fas fa-undo" style="font-size: 20px; color: #f59e0b; margin-bottom: 10px;"></i>
+                            <div class="stat-number"><?php echo $totalemprestimosdevolvidos; ?></div>
+                            <div class="stat-label">Devolvidos</div>
+                        </div>
                     </div>
                     <div class="data-section">
                         <div class="data-header">📋 Empréstimos Recentes</div>
                         <table class="data-table">
                             <thead><tr><th>Código</th><th>Aluno</th><th>Livro</th><th>Data Emp.</th><th>Data Dev.</th><th>Status</th></tr></thead>
-                            <tbody id="listaEmprestimos">
+                            <tbody id="dashboardTable">
                                 <?php
                                 while($emprestimos = $query_emprestimos->fetch_assoc()){
                                 ?>
@@ -256,7 +276,7 @@ if(isset($_FILES['arquivo'])){
                 </div>
 
                 <!-- ALUNOS -->
-                <div id="alunos" class="section">
+                <div id="alunosSection" class="section">
                     <div class="data-section">
                         <div class="data-header">👥 Alunos</div>
                         <div class="grid" id="alunosGrid">
@@ -274,44 +294,34 @@ if(isset($_FILES['arquivo'])){
                 </div>
 
                 <!-- RELATÓRIOS -->
-                <div id="relatorios" class="section">
+                <div id="relatoriosSection" class="section">
                     <div class="data-section"><div class="data-header">📈 Relatórios</div><button class="btn-primary">Exportar CSV</button></div>
                 </div>
 
                 <!-- LIVROS -->
-                <div id="livros" class="section">
-                    <div class="data-section"><div class="data-header">📚 Livros</div>
+                <div id="livrosSection" class="section">
+                    <div class="data-section">
+                        <div class="data-header">
+                            <span>📚 Gestão de Acervo</span>
+                        </div>
+                        <div style="padding: 20px;">
+                            <button class="btn-secondary" onclick="showModal('modalAddBook')">
+                                <i class="fas fa-plus"></i> Novo Livro
+                            </button>
+                        </div>
 
-                    <div class="data-section"><!-- Formulário de upload de materia -->
-                        <form method='post' enctype="multipart/form-data" action="">
-                            <p><input type="file" name="arquivo" id="arquivo"></p>
-                            <button name="uploadMaterial" type="submit">Enviar</button>
-                        </form>
-                    </div>
-
-                    <div class="data-section"><!-- Formulário de upload de livros -->
-                        <form method='post' enctype="multipart/form-data" action="">
-                            <input type="string" name="Titulo" id="Titulo" placeholder="Título" required>
-                            <input type="string" name="Autor" id="Autor" placeholder="Autor" required>
-                            <input type="string" name="Descricao" id="Descricao" placeholder="Descrição" required>
-                            <input type="string" name="ISBN" id="ISBN" placeholder="ISBN" required>
-                            <input type="int" name="Quantidade" id="Quantidade" placeholder="Quantidade" required>
-                            <button name="uploadLivro" type="submit">Cadastrar Livro</button>
-                        </form>
-                    </div>
-                        <button class="btn-secondary" onclick="showModal('modalAddBook')">
-                            Adicionar Livro
-                        </button>
+                        <!-- Container onde o JavaScript carregará os livros estáticos -->
+                        <div id="profBooksGrid" class="grid" style="padding: 20px;"></div>
                     </div>
                 </div>
 
                 <!-- DEVOLUÇÕES -->
-                <div id="devolucoes" class="section">
+                <div id="devolucoesSection" class="section" style="width: 100%;">
                     <div class="data-section">
                         <div class="data-header">🔄 Devoluções</div>
                         <div id="returnLoansList">
                             <table  style="width: 100%;"><thead><tr><th>Livro</th><th>Entrega</th><th>Ação</th></tr></thead>
-                            <tbody id="listaEmprestimos">
+                            <tbody>
                                 <?php
                                 while($emprestimos = $query_emprestimos->fetch_assoc()){
                                 ?>
@@ -330,6 +340,49 @@ if(isset($_FILES['arquivo'])){
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- MODAL ADICIONAR LIVRO -->
+    <div id="modalAddBook" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
+            <h3>Cadastrar Novo Livro</h3>
+            <form id="addBookForm" method="POST" action="">
+                <div class="form-group">
+                    <label>ISBN (Opcional)</label>
+                    <input type="text" id="newIsbn" name="ISBN" placeholder="Ex: 9788570011234">
+                </div>
+                <div class="form-group">
+                    <label>Título do Livro</label>
+                    <input type="text" id="newTitle" name="Titulo" required>
+                </div>
+                <div class="form-group">
+                    <label>Autor</label>
+                    <input type="text" id="newAuthor" name="Autor" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="newDesc" name="Descricao" rows="2" style="width: 100%; border-radius: 8px; border: 1px solid #ccc; padding: 10px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="text" id="newCategory" name="Categoria" placeholder="Ex: Clássicos, Drama, Romance">
+                </div>
+                <div class="form-group">
+                    <label>Capa (URL da Imagem ou nome do arquivo)</label>
+                    <input type="text" id="newCoverUrl" name="CapaURL" placeholder="http://exemplo.com/capa.jpg">
+                </div>
+                <div class="form-group">
+                    <label>Conteúdo (URL do PDF, Site ou Link externo)</label>
+                    <input type="text" id="newPdf" name="PdfURL" placeholder="http://exemplo.com/livro.pdf">
+                </div>
+                <div class="form-group">
+                    <label>Quantidade em Estoque</label>
+                    <input type="number" id="newQty" name="Quantidade" value="1" min="1" required>
+                </div>
+                <button name="uploadLivro" type="submit" class="btn-primary w-100">Adicionar ao Catálogo</button>
+            </form>
+        </div>
     </div>
 
     <!-- JavaScript passa o ID do professor para o cliente (opcional) -->

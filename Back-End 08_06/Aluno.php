@@ -141,12 +141,13 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
             <h3>Meu Painel</h3>
             <ul>
               <li class="active" onclick="showBooks()">📚 Catálogo de Livros</li>
-              <li onclick="showSection('materialsSection')">📁 Materiais de Estudo</li>
+              <li onclick="showSection('materiaisOutros')">📁 Outros Materiais</li>
               <li onclick="showMyLoans()">📋 Meus Empréstimos</li>
               <li onclick="showHistory()">📜 Histórico</li>
-              <li onclick="showSection('configSection')">⚙️ Configurações</li>
             </ul>
+
           </aside>
+
 
           <section class="dashboard-content">
             <div class="netflix-profile-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
@@ -172,28 +173,28 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
               </div>
             </div>
 
-            <!-- Materiais de Estudo (PHP Integration) -->
-            <div id="materialsSection" style="display:none;">
+            <!-- Outros Materiais (visualização simples) -->
+            <div id="materiaisOutros" style="display:none;">
               <div class="data-section">
-                <div class="data-header">📁 Materiais e Documentos</div>
+                <div class="data-header">📁 Outros Materiais</div>
                 <div style="padding: 20px;">
-                  <table class="data-table">
+                  <table class="data-table" id="materiaisOutrosTable">
                     <thead>
-                      <tr><th>Nome do Arquivo</th><th>Data de Envio</th><th>Ação</th></tr>
-                    </thead>
-                    <tbody>
-                      <?php while($material = $sql_query->fetch_assoc()): ?>
                       <tr>
-                        <td><?php echo $material['nome']; ?></td>
-                        <td><?php echo date('d/m/Y', strtotime($material['date_upload'])); ?></td>
-                        <td><a href="<?php echo $material['path']; ?>" target="_blank" class="btn-pdf" style="text-decoration:none; padding: 5px 10px;">Baixar</a></td>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
                       </tr>
-                      <?php endwhile; ?>
+                    </thead>
+                    <tbody id="materiaisOutrosBody">
+                      <!-- Carregado via JS (api_materiais.php) -->
+                      <tr><td colspan="3">Carregando...</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
+
 
             <!-- Meus Empréstimos -->
             <div id="myLoansSection" style="display:none;">
@@ -211,53 +212,32 @@ $sql_query = $mysqli->query("SELECT * FROM materiais") or die($mysqli->error);
             <!-- Histórico -->
             <div id="historySection" style="display:none;">
               <div class="data-section">
-                <div class="data-header">📜 Histórico Completo</div>
-                <table class="data-table" id="historyTable">
-                  <thead><tr><th>Livro</th><th>Empréstimo</th><th>Devolução</th><th>Status</th><th>Avaliação</th><th>Comentário</th><th>Recomendações</th></tr></thead>
-                  <tbody></tbody>
-                </table>
+                    <div class="data-header">📜 Histórico Completo</div>
+                    <table class="data-table" id="historyTable">
+                      <thead>
+                        <tr>
+                          <th>Livro</th>
+                          <th>Empréstimo</th>
+                          <th>Devolução</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+
               </div>
             </div>
 
             <!-- Configurações (resumido) -->
             <div id="configSection" style="display:none;">
                 <div class="data-section">
-                    <div class="data-header">📈 Seu Nível de Leitura</div>
+                <div class="data-section">
+                    <div class="data-header">⚙️ Configurações</div>
                     <div style="padding: 20px;">
-                        <p id="levelStatsInfo" style="margin: 0; font-size: 15px; color: var(--text-dark);">Calculando estatísticas...</p>
+                        <p style="margin:0; color: var(--text-light);">Área de configurações removida do escopo.</p>
                     </div>
                 </div>
 
-                <div class="data-section">
-                    <div class="data-header">👤 Editar Perfil</div>
-                    <form id="profileSettingsForm" onsubmit="saveStudentProfile(event)" style="padding: 20px;">
-                        <div class="form-group">
-                            <label>Seu Nome</label>
-                            <input type="text" id="profileName" value="<?php echo $_SESSION['nome_aluno']; ?>" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Sua Série/Turma</label>
-                            <input type="text" id="profileSerie" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Estilo do Avatar ( Seed )</label>
-                            <input type="text" id="avatarSeedInput" placeholder="Ex: Felix, Daisy, etc">
-                        </div>
-                        <button type="submit" class="btn-emprestar">Salvar Alterações</button>
-                    </form>
-                </div>
-
-                <div class="data-section">
-                    <div class="data-header">🎨 Aparência e Sistema</div>
-                    <div style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
-                        <button class="btn-secondary" onclick="toggleDarkMode()">🌓 Alternar Modo Escuro/Claro</button>
-                    </div>
-                </div>
-
-                <div class="data-section">
-                    <div class="data-header">🔐 Segurança</div>
-                    <div style="padding: 20px;"><p>As senhas são protegidas por criptografia MD5/Hash.</p></div>
-                </div>
             </div>
           </section>
         </main>
