@@ -53,23 +53,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo']
 
 */
 
-// LÓGICA DE INSERÇÃO (Coloque no topo do arquivo, fora do loop while)
-
-// LÓGICA DE INSERÇÃO CORRIGIDA (Topo do arquivo Aluno.php)
+// Logica de solicitar empréstimo
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'])) {
     $idLivro = intval($_POST['id_livro']);
-    $idAluno = $_SESSION['id_aluno'];
+    $IDaluno = $_SESSION['id_aluno'];
 
     // 1. VERIFICAÇÃO PRÉVIA: Verifica se este aluno já tem este livro registrado
-    $sql_check = "SELECT * FROM emprestimos WHERE FK_IDaluno = '$idAluno' AND FK_IDlivro = '$idLivro'";
+    $sql_check = "SELECT * FROM emprestimos WHERE FK_IDaluno = '$IDaluno' AND FK_IDlivro = '$idLivro'";
     $result_check = $mysqli->query($sql_check);
 
     if ($result_check && $result_check->num_rows > 0) {
         // Se encontrar algum registro, impede o INSERT e mostra aviso amigável
         echo "<script>alert('Você já possui ou já solicitou o empréstimo deste livro!');</script>";
     } else {
-        // 2. INSERÇÃO: Se não houver duplicata, procede com o cadastro normalmente
-        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo, data_devolucao) VALUES ('$idAluno', '$idLivro', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY))";
+        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo) VALUES ('$IDaluno', '$idLivro', CURDATE())";
+        //        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo, data_devolucao) VALUES ('$IDaluno', '$idLivro', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY))";
         
         if ($mysqli->query($sql_code)) {
             echo "<script>alert('Empréstimo solicitado com sucesso!');</script>";
@@ -79,7 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'
     }
 }
 
-
+function nomearStatus($atrasado) {
+    switch ($atrasado) {
+        case 0:
+            return "O livro ainda não foi pego.";
+        case 1:
+            return "Aguardando devolução.";
+        case 2:
+            return "Devolvido.";
+        case 3:
+            return "Entregue porém atrasado.";
+        case 4:
+            return "Devolução atrasada.";
+        default:
+            return "Sem imformação de status.";
+    }
+}
 
 
 ?>
@@ -119,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'
                     <li class="menu-item active" onclick="rolarParaSessao('catalogolivros', this)" data-section="catalogolivros">📚 Catálogo</li>
                     <li class="menu-item" onclick="rolarParaSessao('catalogomateriais', this)" data-section="catalogomateriais">📱 materiais</li>
                     <li class="menu-item" onclick="rolarParaSessao('catalogoemprestimos', this)" data-section="catalogoemprestimos">📋 Empréstimos</li>
-                    <li class="menu-item" onclick="rolarParaSessao('catalogohistorico', this)" data-section="catalogohistorico">📜 Histórico</li>
+
                 </ul>
             </aside>
 
@@ -135,7 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'
                                     <p><strong><?= htmlspecialchars($livro['Autor']) ?></strong></p>
                                     
                                     <div class="actions">
-                                        <button class="btn-secondary" onclick="abrirVisualizador(<?= htmlspecialchars(json_encode($livro)) ?>)">Ver Detalhes</button>
                                         
                                         <form method="POST" action="">
                                             <input type="hidden" name="id_livro" value="<?= $livro['IDlivro'] ?>">
@@ -177,22 +189,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'
                     <div class="data-section" style="width: 100%; max-width: 100%;">
                         <div class="data-header">📋 Meus Empréstimos</div>
                         <div>
-                            <table  style="width: 100%;"><thead><tr><th>Livro</th><th>Entrega</th><th>Ação</th></tr></thead>
+                            <table  style="width: 100%;"><thead><tr><th>Livro</th><th>Solicitação</th><th>Estado</th></tr></thead>
                             <tbody id="listaEmprestimos">
                                 <?php
                                 while($emprestimos = $query_emprestimos->fetch_assoc()){
                                 ?>
                                 <tr>
                                     <td><a><?php echo $emprestimos['Titulo']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['Autor']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['data_devolucao']; ?></a>
+                                    <td><a><?php echo $emprestimos['data_emprestimo']; ?></a></td>
+                                    <td><a><?php echo nomearStatus($emprestimos['atrasado']); ?></a>
                                 </td>
                                 <?php
                                 }
                                 ?>
                             </tbody>
                             </table>
-                    
                         </div>
                     </div>
                 </div>

@@ -1092,7 +1092,9 @@ async function buscarDadosGoogleBooks() {
 
   try {
     // Tenta busca específica por ISBN
-    let response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    let response = await fetch(`https://ww
+      
+      w.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
     let data = await response.json();
 
     // Se não achar com prefixo isbn:, tenta busca geral pelo número
