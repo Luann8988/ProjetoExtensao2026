@@ -152,70 +152,44 @@
   <!-- LIVROS -->
   <div id="livros" class="section" style="display:none;">
     <div class="data-section">
-      <div class="data-header">
-        <span>📚 Livros</span>
+      <div class="data-header" style="border-radius: 12px 12px 0 0;">
+        <span>📚 Gestão do Acervo Bibliográfico</span>
       </div>
-      <div id="profBooksGrid" class="grid" style="margin-top: 20px;"></div>
+      <div class="px-4 py-4">
+        <input type="text" id="searchBooksProf" class="form-control bg-dark text-white border-secondary py-3 px-4 shadow-sm" style="border-radius: 12px; font-size: 16px;" placeholder="🔍 Pesquisar por título, autor ou código ISBN..." onkeyup="filterProfessorBooks()">
+      </div>
 
-    </div>
-  </div>
+      <!-- BARRA DE AÇÕES -->
+      <div class="books-toolbar">
+        <div class="prof-actions-group">
+          <button class="btn-secondary" onclick="showModal('modalAddBook')">
+            <i class="fas fa-plus"></i> Manual
+          </button>
+          <button class="btn-primary" onclick="showModal('modalIsbnSearch')">
+            <i class="fas fa-barcode"></i> Por ISBN
+          </button>
+          <button class="btn-secondary" style="background: #ef4444; color: white;" onclick="showModal('modalUploadPdf')">
+            <i class="fas fa-file-pdf"></i> Enviar PDF
+          </button>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <select id="sortProfBooks" class="form-select bg-dark text-white border-secondary" style="width: 180px;" onchange="renderProfessorBooks()">
+            <option value="recent">Mais Recentes</option>
+            <option value="az">A - Z</option>
+          </select>
+        </div>
+      </div>
 
-  <!-- OUTROS MATERIAIS -->
-  <div id="materiaisOutros" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">📁 Outros Materiais</div>
-
-      <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-        <form id="addMaterialForm" style="display:flex; flex-direction: column; gap: 12px;" onsubmit="return cadastrarMaterialOutros(event);">
-
-          <div class="form-group">
-            <label>Nome do Material</label>
-            <input type="text" name="nome" required>
-          </div>
-
-          <div class="form-group">
-            <label>Tipo de Material</label>
-            <select name="tipo" class="form-select">
-              <option value="Documento">📄 Documento (PDF/Word)</option>
-              <option value="Video">🎬 Vídeo / Aula</option>
-              <option value="Audio">🎧 Áudio / Podcast</option>
-              <option value="Equipamento">🛠️ Equipamento Físico</option>
-              <option value="Link">🔗 Link Externo</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Descrição</label>
-            <input type="text" name="descricao">
-          </div>
-
-          <div class="form-group">
-            <label>Quantidade</label>
-            <input type="number" name="quantidade" min="0" required>
-          </div>
-
-          <button type="submit" class="btn-primary">Salvar Material</button>
-        </form>
-
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Tipo</th>
-              <th>Descrição</th>
-              <th>Quantidade</th>
-            </tr>
-          </thead>
-          <tbody id="materiaisOutrosBody">
-          </tbody>
-        </table>
+      <div id="profBooksGrid" class="grid-prof-container">
+         <!-- Skeleton Loading por padrão -->
+         <div class="skeleton-prof"></div>
+         <div class="skeleton-prof"></div>
+         <div class="skeleton-prof"></div>
       </div>
     </div>
   </div>
 
-
-
-  <!-- MODAL ADICIONAR LIVRO (fora do escopo; mantido no legacy, mas não impacta a exibição mínima de quantidade) -->
   <div id="modalAddBook" class="modal">
 
     <div class="modal-content" style="max-width: 500px;">
@@ -260,6 +234,54 @@
         </div>
         <button type="submit" name="uploadLivro" class="btn-primary w-100">Salvar Livro no Acervo</button>
       </form>
+    </div>
+  </div>
+
+  <!-- OUTROS MATERIAIS -->
+  <div id="materiaisOutros" class="section" style="display:none;">
+    <div class="data-section">
+      <div class="data-header">📁 Gestão de Outros Materiais</div>
+      <div style="padding: 25px;">
+        <form id="addMaterialForm" class="row g-3 mb-4 shadow-sm p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid #334155;">
+          <div class="col-md-4">
+            <label class="form-label text-light small fw-bold">Nome do Material</label>
+            <input type="text" name="nome" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Projetor Epson" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label text-light small fw-bold">Tipo</label>
+            <select name="tipo" class="form-select bg-dark text-white border-secondary">
+              <option value="Equipamento">🛠️ Equipamento</option>
+              <option value="Documento">📄 Documento</option>
+              <option value="Video">🎬 Vídeo</option>
+              <option value="Outro">📦 Outro</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label text-light small fw-bold">Qtd.</label>
+            <input type="number" name="quantidade" class="form-control bg-dark text-white border-secondary" value="1" min="1" required>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Adicionar Item</button>
+          </div>
+          <div class="col-12 mt-2">
+            <input type="text" name="descricao" class="form-control bg-dark text-white border-secondary" placeholder="Descrição curta ou observação...">
+          </div>
+        </form>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th>Qtd</th>
+            </tr>
+          </thead>
+          <tbody id="materiaisOutrosBody">
+            <!-- Preenchido via Script.js -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

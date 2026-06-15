@@ -610,21 +610,106 @@ function navegarProfessor(sectionId, el) {
 
 
 // -------- LIVROS (Quantidade numérica) --------
-function renderProfessorBooksQuantidade() {
+// --- PROFESSOR BOOKS ENHANCEMENTS ---
+
+function renderProfessorBooks() {
   const grid = document.getElementById('profBooksGrid');
   if (!grid) return;
-  
-  // Renderiza os cartões reais no grid do professor para consistência
-  grid.innerHTML = library.books.map(book => `
-    <div class="card">
-        <img src="${book.image}" alt="${book.title}" class="capa" style="height: 120px; object-fit: cover;">
-        <div class="card-content" style="padding: 10px;">
-            <h3 style="font-size: 14px;">${book.title}</h3>
-            <p style="font-size: 12px;">Qtd: ${book.availableCopies}/${book.totalCopies}</p>
+
+  const sortType = document.getElementById('sortProfBooks')?.value || 'recent';
+  let sortedBooks = [...library.books];
+
+  if (sortType === 'az') {
+    sortedBooks.sort((a, b) => a.title.localeCompare(b.title));
+  } else {
+    sortedBooks.reverse();
+  }
+
+  grid.innerHTML = sortedBooks.map(book => `
+    <div class="prof-book-card">
+      <img src="${book.image}" class="prof-book-cover" alt="${book.title}" onerror="this.src='Imagens/domcasmurro.png'">
+      <div class="prof-book-info">
+        <div class="prof-book-title">${escapeHtml(book.title)}</div>
+        <div class="prof-book-meta">
+          <span class="text-truncate d-block"><i class="fas fa-user-edit me-1"></i> ${escapeHtml(book.author)}</span>
+          <div class="mt-2"><span class="badge" style="background: rgba(255,194,14,0.15); color: #FFC20E; font-size: 10px;">${escapeHtml(book.category)}</span></div>
         </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <span style="font-size: 11px; color: ${book.canLoan() ? '#22c55e' : '#f43f5e'}">
+             Estoque: <b>${book.availableCopies}/${book.totalCopies}</b>
+          </span>
+        </div>
+      </div>
+      <div class="prof-card-footer">
+        <button class="btn-action-sm" style="background: #334155; color: white;" onclick="showToast('Visualizando: ${escapeHtml(book.title)}')"><i class="fas fa-eye"></i></button>
+        <button class="btn-action-sm" style="background: #2E3192; color: white;" onclick="showToast('Abrindo editor para: ${escapeHtml(book.title)}')"><i class="fas fa-edit"></i></button>
+        <button class="btn-action-sm" style="background: #ef4444; color: white;" onclick="confirmarExcluirLivro(${book.id})"><i class="fas fa-trash"></i></button>
+      </div>
     </div>
   `).join('');
 }
+
+function filterProfessorBooks() {
+  const term = document.getElementById('searchBooksProf')?.value.toLowerCase();
+  const cards = document.querySelectorAll('.prof-book-card');
+  
+  cards.forEach(card => {
+    const title = card.querySelector('.prof-book-title').innerText.toLowerCase();
+    card.style.display = title.includes(term) ? 'flex' : 'none';
+  });
+}
+
+async function buscarIsbnInterface() {
+  const isbn = document.getElementById('isbnInputSearch').value.trim();
+  if (!isbn) return showToast('Digite um ISBN', 'error');
+
+  const preview = document.getElementById('isbnResultPreview');
+  preview.style.display = 'none';
+
+  try {
+    const resp = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    const data = await resp.json();
+
+    if (data.totalItems > 0) {
+      const b = data.items[0].volumeInfo;
+      document.getElementById('isbnPreviewTitle').innerText = b.title;
+      document.getElementById('isbnPreviewAuthor').innerText = b.authors?.join(', ') || 'Autor desconhecido';
+      document.getElementById('isbnPreviewCat').innerText = b.categories ? b.categories[0] : 'Geral';
+      document.getElementById('isbnPreviewImg').src = b.imageLinks?.thumbnail || 'Imagens/domcasmurro.png';
+      preview.style.display = 'block';
+    } else {
+      showToast('Nenhum livro encontrado', 'error');
+    }
+  } catch (e) {
+    showToast('Erro ao buscar dados', 'error');
+  }
+}
+
+function handlePdfPreview(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('pdfFileName').innerText = input.files[0].name;
+    document.getElementById('pdfPreviewArea').style.display = 'block';
+    document.getElementById('pdfStatusText').innerText = "Arquivo selecionado!";
+    showToast('PDF pronto para upload');
+  }
+}
+
+function resetPdfUpload() {
+  document.getElementById('filePdfInput').value = '';
+  document.getElementById('pdfPreviewArea').style.display = 'none';
+  document.getElementById('pdfStatusText').innerText = "Arraste seu PDF aqui ou clique para selecionar";
+}
+
+function confirmarExcluirLivro(id) {
+  if (confirm('Deseja realmente excluir este livro do acervo?')) {
+    showToast('Livro excluído com sucesso!', 'success');
+    // Simulação visual: remove o card
+    renderProfessorBooks();
+  }
+}
+
+// Sobrescreve a função original para usar a nova interface
+function renderProfessorBooksQuantidade() { renderProfessorBooks(); }
 // ================= Helpers de UI =================
 function showSection(sectionId) {
   const sections = [

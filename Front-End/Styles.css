@@ -2829,3 +2829,103 @@ button:focus-visible, input:focus-visible {
   border-radius: 5px;
   font-size: 13px;
 }
+
+/* --- ESTILIZAÇÃO DO GRID DO PROFESSOR --- */
+.grid-prof-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 30px;
+  padding: 30px 25px 60px;
+}
+
+.books-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background: rgba(15, 23, 42, 0.8);
+  margin: 0 25px 10px;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.prof-book-card {
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  height: 410px; /* Ajustado de 380px para 410px para evitar corte dos botões */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.prof-book-card:hover {
+  transform: translateY(-5px);
+  border-color: #FFC20E;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.prof-book-cover {
+  width: 100%;
+  height: 200px; /* Reduzido de 260px para 200px */
+  object-fit: cover; /* Faz a imagem preencher o espaço sem esticar */
+  background: #0f172a;
+}
+
+.prof-book-info {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.prof-book-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8rem; /* Pequeno ajuste para títulos de duas linhas */
+}
+
+.prof-book-meta {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: auto;
+}
+
+.prof-card-footer {
+  padding: 10px 15px;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #334155;
+}
+
+.prof-card-footer .btn-action-sm {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.prof-card-footer .btn-action-sm:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
+.skeleton-prof {
+  height: 410px;
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 12px;
+}
