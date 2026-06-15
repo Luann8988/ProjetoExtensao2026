@@ -1,20 +1,21 @@
 const IMAGES_PATH = 'Imagens/';
 const PDF_PATH = 'PDF/'; // Pasta para os arquivos PDF
-const STORAGE_VERSION = '1.1'; 
+const STORAGE_VERSION = '1.3'; 
 const OVERDUE_DAYS = 7;
 
 class Book {
-  constructor(id, title, author, image, pdfUrl, description, isbn, totalCopies, availableCopies = totalCopies) {
+  constructor(id, title, author, image, pdfUrl, description, isbn, totalCopies, availableCopies = totalCopies, category = 'Geral') {
     this.id = id;
     this.title = title;
     this.author = author;
-    this.image = IMAGES_PATH + image;
+    this.image = image.startsWith('http') ? image : IMAGES_PATH + image;
     // Agora o PDF aponta para a pasta correta
-    this.pdfUrl = pdfUrl ? PDF_PATH + pdfUrl : null; 
+    this.pdfUrl = (pdfUrl && pdfUrl.startsWith('http')) ? pdfUrl : (pdfUrl ? PDF_PATH + pdfUrl : null); 
     this.description = description;
     this.isbn = isbn;
     this.totalCopies = totalCopies;
     this.availableCopies = availableCopies;
+    this.category = category;
   }
 
   canLoan() {
@@ -52,19 +53,14 @@ class LoanManager {
   initBooks() {
     this.books = [
       new Book(1, 'Dom Casmurro', 'Machado de Assis', 'domcasmurro.png', 'domcasmurro.pdf', 'Romance clássico sobre amor e traição.', '9788570011234', 5, 3),
-      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Naturalismo brasileiro retratando cortiço.', '9788570014569', 4, 1),
-      new Book(3, 'Capitães da Areia', 'Jorge Amado', 'capitaesdeareia.png', 'capitaesdeareia.pdf', 'Aventura dos meninos de rua em Salvador.', '9788570017898', 6, 4),
-      new Book(4, 'Vidas Secas', 'Graciliano Ramos', 'VidasSecas.jpg', 'vidassecas.pdf', 'Drama da família de retirantes no sertão.', '9788570012347', 3, 2),
-      new Book(5, 'Memórias Póstumas de Brás Cubas', 'Machado de Assis', 'memorias.jpg', 'memorias.pdf', 'Narrativa inovadora do defunto-autor.', '9788570015678', 5, 5),
-      new Book(6, 'A Moreninha', 'Joaquim Manuel de Macedo', 'Morena.jpg', 'moreninha.pdf', 'Romance romântico ambientado no Rio.', '9788570018901', 4, 2),
-      new Book(7, 'O Primo Basílio', 'Eça de Queirós', 'primobasilio.jpg', 'primobasilio.pdf', 'Crítica social e adultério em Lisboa.', '9788570013458', 5, 3),
-      new Book(8, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista sobre Isaura.', '9788570016789', 4, 1),
-      new Book(9, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor e dinheiro.', '9788570019012', 6, 4),
-      new Book(10, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5),
-      new Book(11, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2),
-      new Book(12, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Naturalismo sobre racismo e sociedade.', '9788570016780', 3, 1),
-      new Book(13, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre visão e realidade.', '9788570018900', 5, 4),
-      new Book(14, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais e amorosos.', '9788570015670', 4, 2),
+      new Book(2, 'O Cortiço', 'Aluísio Azevedo', 'ocortico.png', 'ocortico.pdf', 'Romance naturalista que retrata a vida em um cortiço carioca.', '9788570011235', 4, 1, 'Clássicos'),
+      new Book(3, 'A Escrava Isaura', 'Bernardo Guimarães', 'escravaisaura.png', 'escravaisaura.pdf', 'Romance abolicionista que narra a luta de Isaura pela liberdade.', '9788570016789', 4, 1, 'Drama'),
+      new Book(4, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor, dinheiro e convenções sociais.', '9788570019012', 6, 4, 'Romance'),
+      new Book(5, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5, 'Aventura'),
+      new Book(6, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2, 'Romance'),
+      new Book(7, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Romance naturalista sobre racismo e preconceito.', '9788570016780', 3, 1, 'Drama'),
+      new Book(8, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre a percepção da realidade.', '9788570018900', 5, 4, 'Clássicos'),
+      new Book(9, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais.', '9788570015670', 4, 2, 'Drama'),
     ];
   }
 
@@ -158,58 +154,7 @@ function hideModal(id) {
 
 
 function afterStudentLogin() {
-  setupStudentProfile();
-  loadProfileHeader();
   showBooks();
-}
-
-function loadProfileHeader() {
-  const profile = localStorage.getItem('studentProfile');
-  if (profile) {
-    const {name, serie, avatarSeed} = JSON.parse(profile);
-    const nameEl = document.getElementById('headerUserName');
-    const serieEl = document.getElementById('headerUserSerie');
-    const avatarEl = document.getElementById('headerAvatar');
-    
-    if(nameEl) nameEl.textContent = `Olá, ${name}!`;
-    if(serieEl) serieEl.textContent = serie;
-    if(avatarEl) {
-        avatarEl.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}`;
-        avatarEl.style.display = 'block';
-    }
-  }
-}
-
-function setupStudentProfile() {
-  const profileSaved = localStorage.getItem('studentProfile');
-  if (!profileSaved) {
-    showModal('modalStudentProfile');
-  }
-}
-
-function saveStudentProfile(e) {
-  e.preventDefault();
-  const name = document.getElementById('profileName').value.trim();
-  const serie = document.getElementById('profileSerie').value.trim();
-  const avatarSeed = localStorage.getItem('selectedAvatarSeed') || 'student1';
-  if (name && serie) {
-    const profile = {name, serie, avatarSeed};
-    localStorage.setItem('studentProfile', JSON.stringify(profile));
-    hideModal('modalStudentProfile');
-    loadProfileHeader();
-    showToast('Perfil salvo! 🎉');
-  } else {
-    showToast('Preencha todos os campos!', 'error');
-  }
-}
-
-function selectAvatar(img) {
-  document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
-  img.classList.add('selected');
-  const seed = img.dataset.seed;
-  document.getElementById('avatarPreview').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-  document.getElementById('avatarPreview').style.display = 'block';
-  localStorage.setItem('selectedAvatarSeed', seed);
 }
 
 // ================= LIVROS E EMPRÉSTIMOS =================
@@ -247,9 +192,9 @@ function openPdf(url) {
 
 function emprestarLivro(bookId) {
     const studentId = localStorage.getItem('studentId') || window.studentId;
-    const profile = JSON.parse(localStorage.getItem('studentProfile') || '{"name":"Anônimo","serie":"N/A"}');
+    const studentName = localStorage.getItem('studentName') || window.studentName || "Aluno";
 
-    const loan = library.createLoan(studentId, profile.name, profile.serie, bookId);
+    const loan = library.createLoan(studentId, studentName, "N/A", bookId);
     if (loan) {
         showToast(`Emprestado: ${loan.bookTitle}`);
         showBooks();
@@ -290,14 +235,17 @@ function showHistory() {
   const tbody = document.querySelector('#historyTable tbody');
   if(!tbody) return;
 
-  tbody.innerHTML = history.map(loan => `
-    <tr>
-      <td>${loan.bookTitle}</td>
-      <td>${loan.dataEmp}</td>
-      <td>${loan.dataDevolucao || 'Pendente'}</td>
-      <td>${loan.status.replace('_returned', '')}</td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = history.map(loan => {
+    const statusClean = loan.status.includes('overdue') ? 'Devolvido com Atraso' : 'Devolvido';
+    return `
+      <tr>
+        <td>${loan.bookTitle}</td>
+        <td>${loan.dataEmp}</td>
+        <td>${loan.dataDevolucao || 'Pendente'}</td>
+        <td>${statusClean}</td>
+      </tr>
+    `;
+  }).join('');
   updateSidebar(2);
 }
 
@@ -350,20 +298,39 @@ function carregarDashboard() {
 }
 
 function navegarProfessor(sectionId, el) {
-  const sections = ["dashboardSection", "alunosSection", "relatoriosSection", "livrosSection", "devolucoesSection", "configSection"];
+  const sections = ["dashboardSection", "alunosSection", "relatoriosSection", "livrosSection", "devolucoesSection"];
   sections.forEach(id => {
     const sec = document.getElementById(id);
     if (sec) sec.style.display = "none";
   });
 
   const target = document.getElementById(sectionId);
-  if (target) target.style.display = "block";
+  if (target) {
+      target.style.display = "block";
+      target.classList.add('active');
+  }
 
   document.querySelectorAll(".sidebar-prof li").forEach(li => li.classList.remove("active"));
   if (el) el.classList.add("active");
 
   if(sectionId === 'dashboardSection') carregarDashboard();
   if(sectionId === 'devolucoesSection') loadReturnLoans();
+  if(sectionId === 'livrosSection') renderProfessorBooks();
+}
+
+function renderProfessorBooks() {
+  const grid = document.getElementById('profBooksGrid');
+  if (!grid) return;
+
+  grid.innerHTML = library.books.map(book => `
+    <div class="card">
+        <img src="${book.image}" alt="${book.title}" class="capa" style="height: 150px; object-fit: cover;">
+        <div class="card-content">
+            <h3 style="font-size: 16px;">${book.title}</h3>
+            <p style="font-size: 13px;">Disponível: <strong>${book.availableCopies}/${book.totalCopies}</strong></p>
+        </div>
+    </div>
+  `).join('');
 }
 
 function loadReturnLoans() {
@@ -393,24 +360,37 @@ function adicionarNovoLivro(event) {
     const titulo = document.getElementById('newTitle').value;
     const autor = document.getElementById('newAuthor').value;
     const desc = document.getElementById('newDesc').value;
-    const pdf = document.getElementById('newPdf').value; 
-    
+    const pdf = document.getElementById('newPdf').value;
+    const isbn = document.getElementById('newIsbn').value || "000-000";
+    const category = document.getElementById('newCategory').value || "Geral";
+    const capa = document.getElementById('newCoverUrl').value || "capa-padrao.png";
+    const qty = parseInt(document.getElementById('newQty').value) || 1;
+
     const novoLivro = new Book(
         Date.now(), 
         titulo,
         autor,
-        "capa-padrao.png", 
+        capa, 
         pdf, 
         desc,
-        "000-000",
-        5, 5 
+        isbn,
+        qty, qty,
+        category
     );
 
     library.books.push(novoLivro);
     library.saveData(); 
-    alert("Livro adicionado com sucesso!");
-    hideModal('modalAddBook');
-    navegarProfessor('dashboardSection');
+    
+    if (confirm("📚 Livro adicionado com sucesso!\n\nDeseja adicionar mais um livro agora?")) {
+        event.target.reset(); // Limpa o formulário para o próximo livro
+        const preview = document.getElementById('coverPreview');
+        if (preview) preview.style.display = 'none';
+        showToast('Pronto para o próximo cadastro');
+    } else {
+        hideModal('modalAddBook');
+        renderProfessorBooks();
+        carregarDashboard();
+    }
 }
 
 // ================= UTILITÁRIOS DE TELA =================
@@ -448,9 +428,6 @@ function setupSearch() {
 document.addEventListener('DOMContentLoaded', () => {
     library.loadData();
     setupSearch();
-
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) profileForm.addEventListener('submit', saveStudentProfile);
 
     const addBookForm = document.getElementById('addBookForm');
     if (addBookForm) addBookForm.addEventListener('submit', adicionarNovoLivro);
@@ -491,7 +468,5 @@ function afterStudentLogin() {
         localStorage.setItem('studentId', window.studentId);
         localStorage.setItem('studentName', window.studentName);
     }
-    setupStudentProfile();
-    loadProfileHeader();
     showBooks(); 
 }

@@ -23,6 +23,13 @@ if(!isset($_SESSION['id_aluno'])) {
     ON emprestimos.FK_IDlivro = livros.IDlivro
     where emprestimos.FK_IDaluno = ".$_SESSION['id_aluno']  ;
     $query_emprestimos = $mysqli->query($sql_emprestimos) or die($mysqli->error);
+
+    // histórico (devolvidos)
+    $sql_historico = "SELECT * FROM emprestimos 
+    INNER JOIN livros ON emprestimos.FK_IDlivro = livros.IDlivro
+    WHERE emprestimos.FK_IDaluno = ".$_SESSION['id_aluno']." 
+    AND atrasado IN (2, 3)";
+    $query_historico = $mysqli->query($sql_historico) or die($mysqli->error);
 }
 
 // Lógica de Login (Simplificada para o exemplo)
@@ -66,13 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_emprestimo'
         // Se encontrar algum registro, impede o INSERT e mostra aviso amigável
         echo "<script>alert('Você já possui ou já solicitou o empréstimo deste livro!');</script>";
     } else {
-        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo) VALUES ('$IDaluno', '$idLivro', CURDATE())";
-        //        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo, data_devolucao) VALUES ('$IDaluno', '$idLivro', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY))";
+        // 2. INSERÇÃO: Se não houver duplicata, procede com o cadastro normalmente
+        $sql_code = "INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo, data_devolucao) VALUES ('$idAluno', '$idLivro', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY))";
         
         if ($mysqli->query($sql_code)) {
             echo "<script>alert('Empréstimo solicitado com sucesso!');</script>";
         } else {
-            echo "<script>alert('Erro ao solicitar o empréstimo no sistema.');</script>";
+            echo "<script>alert('Lamentamos, mas este livro está esgotado no momento.');</script>";
         }
     }
 }
@@ -164,20 +171,14 @@ function nomearStatus($atrasado) {
 
                 <div id="catalogomateriais" class="aba-conteudo">
                     <div class="data-section" style="width: 100%; max-width: 100%;"> 
-                        <div class="data-header">📱 Catálogo de Materiais</div>
+                        <div class="data-header">📁 Catálogo de Outros Materiais</div>
                         <div class="grid">
                         <?php while($material = $query_materiais->fetch_assoc()): ?>
                             <div class="card book-card">
                                 <div class="card-content">
                                     <h3><?= htmlspecialchars($material['nome']) ?></h3>
-                                    <p><strong><?= htmlspecialchars($material['date_upload']) ?></strong></p>
-                                    
-                                    <div class="actions">
-                                        <button onclick="window.open('<?php echo $material['path']; ?>', '_blank')" class="btn-secondary">
-                                            Ver Detalhes
-                                        </button>
-                                    </div>
-
+                                    <p><?= htmlspecialchars($material['descricao'] ?? 'Sem descrição disponível') ?></p>
+                                    <p><strong>Quantidade disponível:</strong> <?= (int)$material['quantidade'] ?></p>
                                 </div>
                             </div>
                         <?php endwhile; ?>
@@ -196,8 +197,8 @@ function nomearStatus($atrasado) {
                                 ?>
                                 <tr>
                                     <td><a><?php echo $emprestimos['Titulo']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['data_emprestimo']; ?></a></td>
-                                    <td><a><?php echo nomearStatus($emprestimos['atrasado']); ?></a>
+                                    <td><a><?php echo $emprestimos['Autor']; ?></a></td>
+                                    <td><a><?php echo $emprestimos['data_devolucao']; ?></a>
                                 </td>
                                 <?php
                                 }
@@ -208,12 +209,60 @@ function nomearStatus($atrasado) {
                     </div>
                 </div>
 
-                <div id="catalogohistorico" class="aba-conteudo" style="display:none; width: 100%;">
-                    <div class="data-header">📜 Histórico</div>
-                    <table class="data-table" style="width: 100%;"><tbody id="listaHistorico"></tbody></table>
+                <div id="catalogohistorico" class="aba-conteudo" style="width: 100%;">
+                    <div class="data-section" style="width: 100%; max-width: 100%;">
+                        <div class="data-header">📜 Histórico Completo</div>
+                        <table class="data-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Livro</th>
+                                    <th>Empréstimo</th>
+                                    <th>Devolução</th>
+                                    <th>Status Final</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaHistorico">
+                                <?php while($hist = $query_historico->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($hist['Titulo']) ?></td>
+                                    <td><?= date('d/m/Y', strtotime($hist['data_emprestimo'])) ?></td>
+                                    <td><?= $hist['data_devolucao'] ? date('d/m/Y', strtotime($hist['data_devolucao'])) : '---' ?></td>
+                                    <td>
+                                        <span class="<?= $hist['atrasado'] == 3 ? 'status-overdue' : 'status-active' ?>">
+                                            <?= $hist['atrasado'] == 3 ? 'Devolvido com Atraso' : 'Devolvido' ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </main>
+
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Sobre a Biblioteca</h4>
+                    <p>A biblioteca da Escola Estadual Professor Gonçalves Couto é um espaço dedicado ao incentivo à leitura e à pesquisa.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Catálogo</a></li>
+                        <li><a href="#" style="color: inherit; text-decoration: none;">Regulamento</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p><i class="fas fa-envelope"></i> biblioteca@escola.edu.br</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 <strong>Biblioteca Escolar</strong> - Escola Estadual Professor Gonçalves Couto. Muriaé-MG.
+            </div>
+        </footer>
     </div>
 
     <div id="modalViewer" class="modal">

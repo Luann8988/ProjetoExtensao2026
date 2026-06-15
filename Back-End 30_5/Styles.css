@@ -173,10 +173,10 @@ main {
 
 .card-content {
   padding: 8px 10px;
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .card h3 {
@@ -249,6 +249,9 @@ main {
 
 .card-content {
   padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .card h3 {
@@ -301,6 +304,13 @@ main {
   opacity: 0.85;
 }
 
+.actions {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+}
+
 /* STATS */
 .stats-grid {
   display: grid;
@@ -343,29 +353,31 @@ main {
   margin-bottom: 20px;
 }
 
+/* TABLES */
+.data-section {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
 #bookCatalog .data-section {
-  width: 100%; /* Corrigido de 1200% para 100% */
-  max-width: 1200px;       
-  margin: 0 auto;          
-  padding: 0 20px;          
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
   border-radius: 8px;
   margin-bottom: 20px;
 }
 
-/* Layout dos livros: Classe ajustada de .books para .grid para coincidir com o HTML */
-#bookCatalog .grid {
+/* Layout dos livros */
+#bookCatalog .data-section .books {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Força exatamente 3 itens por linha */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
   gap: 20px;
-  padding: 20px 40px;
-}
-
-/* Responsividade (Opcional, mas recomendado para padrões web) */
-@media (max-width: 900px) {
-  #bookCatalog .grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-  #bookCatalog .grid { grid-template-columns: 1fr; }
+  padding: 20px 0;
+  width: 100%;
 }
 
 .data-header {
@@ -1088,5 +1100,3 @@ button:focus-visible, input:focus-visible {
     font-size: 14px;
     color: #cbd5e1;
 }
-
-

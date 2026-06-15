@@ -7,11 +7,6 @@
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Bibliotecas para Exportação -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body class="login-body">
@@ -63,13 +58,10 @@
   <ul>
     <li class="menu-item active" onclick="navegarProfessor('dashboard', this)">📊 Dashboard</li>
     <li class="menu-item" onclick="navegarProfessor('alunos', this)">👥 Alunos</li>
-    <li class="menu-item" onclick="navegarProfessor('relatorios', this)">📈 Relatórios</li>
     <li class="menu-item" onclick="navegarProfessor('livros', this)">📚 Livros</li>
     <li class="menu-item" onclick="navegarProfessor('devolucoes', this)">🔄 Devoluções</li>
-    <li class="menu-item" onclick="navegarProfessor('notificacoes', this)">🔔 Notificações</li>
-    <li class="menu-item" onclick="navegarProfessor('turmas', this)">🏫 Turmas</li>
-    <li class="menu-item" onclick="navegarProfessor('reservas', this)">🗂️ Reservas</li>
-    <li class="menu-item" onclick="navegarProfessor('chatSection', this)">💬 Chat Alunos</li>
+    <li class="menu-item" onclick="navegarProfessor('materiaisOutros', this)">📁 Outros Materiais</li>
+
   </ul>
 </aside>
 
@@ -106,13 +98,7 @@
       </div>
     </div>
 
-    <!-- GRÁFICOS -->
-    <div class="data-section" style="padding: 20px;">
-      <h3 style="color: var(--primary);">📊 Estatísticas de Gêneros</h3>
-      <div style="max-width: 400px; margin: 0 auto;">
-        <canvas id="genreChart"></canvas>
-      </div>
-    </div>
+
 
     <!-- TABELA -->
     <div class="data-section">
@@ -149,12 +135,10 @@
 
   <!-- ALUNOS -->
   <div id="alunos" class="section" style="display:none;">
+
     <div class="data-section">
       <div class="data-header">
         <span>👥 Alunos</span>
-        <div class="search-box-alunos">
-           <input type="text" id="searchAlunosTab" placeholder="Filtrar por nome ou série..." oninput="renderAlunos(this.value)">
-        </div>
       </div>
 
       <div id="alunosGrid" class="grid" style="padding: 20px;">
@@ -163,99 +147,118 @@
     </div>
   </div>
 
-  <!-- RELATÓRIOS -->
-  <div id="relatorios" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">📈 Relatórios</div>
-      <div style="padding: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="btn-primary" onclick="exportarRelatorio('csv')"><i class="fas fa-file-csv"></i> Exportar CSV</button>
-        <button class="btn-secondary" onclick="exportarRelatorio('excel')"><i class="fas fa-file-excel"></i> Exportar Excel</button>
-        <button class="btn-pdf" style="background: #e74c3c; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold;" onclick="exportarRelatorio('pdf')">
-          <i class="fas fa-file-pdf"></i> Exportar PDF
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- NOTIFICAÇÕES -->
-  <div id="notificacoes" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">🔔 Central de Notificações</div>
-      <div id="notificacoesList" style="padding: 20px;">
-        <!-- Preenchido via JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- TURMAS -->
-  <div id="turmas" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">🏫 Gerenciamento de Turmas</div>
-      <div id="turmasGrid" class="grid" style="padding: 20px;">
-        <!-- Preenchido via JavaScript -->
-      </div>
-    </div>
-  </div>
-
-  <!-- RESERVAS -->
-  <div id="reservas" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">🗂️ Controle de Reservas</div>
-      <div id="reservasList" style="padding: 20px;">
-        <!-- Preenchido via JavaScript -->
-      </div>
-    </div>
-  </div>
 
   <!-- LIVROS -->
   <div id="livros" class="section" style="display:none;">
     <div class="data-section">
       <div class="data-header">
         <span>📚 Livros</span>
-        <div class="search-box-prof-books">
-          <input type="text" id="searchProfBooks" placeholder="Filtrar por título ou autor..." oninput="debounce(() => renderProfessorBooks(this.value))">
-        </div>
       </div>
-      <button class="btn-secondary" onclick="showModal('modalAddBook')">Adicionar Novo Livro</button>
       <div id="profBooksGrid" class="grid" style="margin-top: 20px;"></div>
+
     </div>
   </div>
 
-  <!-- MODAL ADICIONAR LIVRO -->
+  <!-- OUTROS MATERIAIS -->
+  <div id="materiaisOutros" class="section" style="display:none;">
+    <div class="data-section">
+      <div class="data-header">📁 Outros Materiais</div>
+
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+        <form id="addMaterialForm" style="display:flex; flex-direction: column; gap: 12px;" onsubmit="return cadastrarMaterialOutros(event);">
+
+          <div class="form-group">
+            <label>Nome do Material</label>
+            <input type="text" name="nome" required>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Material</label>
+            <select name="tipo" class="form-select">
+              <option value="Documento">📄 Documento (PDF/Word)</option>
+              <option value="Video">🎬 Vídeo / Aula</option>
+              <option value="Audio">🎧 Áudio / Podcast</option>
+              <option value="Equipamento">🛠️ Equipamento Físico</option>
+              <option value="Link">🔗 Link Externo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" name="descricao">
+          </div>
+
+          <div class="form-group">
+            <label>Quantidade</label>
+            <input type="number" name="quantidade" min="0" required>
+          </div>
+
+          <button type="submit" class="btn-primary">Salvar Material</button>
+        </form>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody id="materiaisOutrosBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- MODAL ADICIONAR LIVRO (fora do escopo; mantido no legacy, mas não impacta a exibição mínima de quantidade) -->
   <div id="modalAddBook" class="modal">
-    <div class="modal-content">
+
+    <div class="modal-content" style="max-width: 500px;">
       <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
-      <h3>Novo Livro</h3>
-      <form id="addBookForm">
+      <h3>Cadastrar Novo Livro</h3>
+      <form id="addBookForm" method="POST" action="Professor.php">
         <div class="isbn-search-row">
           <div class="form-group">
             <label>ISBN (Busca Automática)</label>
-            <input type="text" id="newIsbn" placeholder="Ex: 9788535914849">
+            <input type="text" id="newIsbn" name="ISBN" placeholder="Ex: 9788535914849">
           </div>
           <button type="button" class="btn-search-isbn" onclick="buscarDadosGoogleBooks()">🔍 Buscar</button>
         </div>
         <div class="form-group">
           <label>Título</label>
-          <input type="text" id="newTitle" required>
+          <input type="text" id="newTitle" name="Titulo" required>
         </div>
         <div class="form-group">
           <label>Autor</label>
-          <input type="text" id="newAuthor" required>
+          <input type="text" id="newAuthor" name="Autor" required>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="newDesc" name="Descricao" rows="2" style="width: 100%; border-radius: 8px; border: 1px solid #ccc; padding: 10px;"></textarea>
         </div>
         <div class="form-group">
           <label>Categoria</label>
-          <input type="text" id="newCategory" placeholder="Ex: Romance, Aventura, Didático">
+          <input type="text" id="newCategory" name="Categoria" placeholder="Ex: Romance, Aventura, Didático">
         </div>
         <div class="form-group">
           <label>URL da Capa (Imagem)</label>
-          <input type="text" id="newCoverUrl" placeholder="Link da imagem..." oninput="atualizarPreview()">
+          <input type="text" id="newCoverUrl" name="CapaURL" placeholder="Link da imagem..." oninput="atualizarPreview()">
           <img id="coverPreview" class="image-preview" src="" alt="Preview">
         </div>
         <div class="form-group">
           <label>Link do Livro (URL ou PDF)</label>
-          <input type="text" id="newBookUrl" placeholder="https://link-do-livro.com">
+          <input type="text" id="newBookUrl" name="PdfURL" placeholder="https://link-do-livro.com">
         </div>
-        <button type="submit" class="btn-primary w-100">Salvar Livro</button>
+        <div class="form-group">
+          <label>Quantidade em Estoque</label>
+          <input type="number" name="Quantidade" value="1" min="1">
+        </div>
+        <button type="submit" name="uploadLivro" class="btn-primary w-100">Salvar Livro no Acervo</button>
       </form>
     </div>
   </div>
@@ -269,27 +272,16 @@
   </div>
 
 
-  <!-- CHAT ALUNOS -->
-  <div id="chatSection" class="section" style="display:none;">
-    <div class="data-section">
-      <div class="data-header">💬 Central de Atendimento aos Alunos</div>
-      <div class="chat-container">
-        <div id="chatMessages" class="chat-messages"></div>
-        <form class="chat-input-area" onsubmit="handleChatSubmit(event, 'professor')">
-          <input type="text" placeholder="Responder aluno..." required>
-          <button type="submit" class="chat-send-btn" aria-label="Enviar">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
+  <!-- CHAT ALUNOS REMOVIDO (fora do escopo) -->
+
 
   <!-- FIM SEÇÕES -->
    
 </section>
 
   </main>
+
+ 
 
   </div>
 

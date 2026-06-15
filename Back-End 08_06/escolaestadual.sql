@@ -123,12 +123,13 @@ DROP TABLE IF EXISTS `materiais`;
 CREATE TABLE IF NOT EXISTS `materiais` (
   `IDmaterial` int NOT NULL AUTO_INCREMENT,
   `nome` varchar(100) NOT NULL,
-  `path` varchar(100) NOT NULL,
+  `descricao` varchar(500) DEFAULT NULL,
+  `quantidade` int NOT NULL,
+  `usuario` int DEFAULT NULL,
   `date_upload` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `usuario` int NOT NULL,
-  PRIMARY KEY (`IDmaterial`),
-  KEY `usuario` (`usuario`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`IDmaterial`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 -- --------------------------------------------------------
 -- --------------------------------------------------------
