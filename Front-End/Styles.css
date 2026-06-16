@@ -865,6 +865,15 @@ main {
   font-weight: bold;
 }
 
+.sidebar li i {
+  transition: text-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar li:hover i {
+  text-shadow: 0 0 10px rgba(255, 194, 14, 0.8);
+  transform: scale(1.1);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
