@@ -57,6 +57,7 @@ class LoanManager {
     this.loans = [];
     this.books = [];
     this.favorites = [];
+    this.trash = []; // Lixeira para livros excluídos
     this.initBooks();
   }
 
@@ -148,8 +149,10 @@ class LoanManager {
     localStorage.setItem('libraryData_v' + STORAGE_VERSION, JSON.stringify({
       books: this.books,
       loans: this.loans,
-      favorites: this.favorites
+      favorites: this.favorites,
+      trash: this.trash || []
     }));
+    this.updateTrashCounter();
   }
 
   loadData() {
@@ -188,6 +191,40 @@ class LoanManager {
     }
     this.loans = parsed.loans || [];
     this.favorites = parsed.favorites || [];
+    this.trash = parsed.trash || [];
+
+    this.cleanupTrash();
+    this.updateTrashCounter();
+  }
+
+  cleanupTrash() {
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const initialCount = this.trash.length;
+
+    this.trash = this.trash.filter(book => {
+      // Mantém se não tiver data (legado) ou se for mais recente que 30 dias
+      return !book.deletedAt || (now - book.deletedAt) < THIRTY_DAYS_MS;
+    });
+
+    if (this.trash.length !== initialCount) {
+      this.saveData();
+    }
+  }
+
+  getExpiringTrashItems() {
+    const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    return this.trash.filter(book => {
+      if (!book.deletedAt) return false; // Itens legados sem data de exclusão não expiram
+
+      const timeInTrash = now - book.deletedAt;
+      const timeRemaining = THIRTY_DAYS_MS - timeInTrash;
+
+      return timeRemaining > 0 && timeRemaining <= TWO_DAYS_MS;
+    });
   }
 
   toggleFavorite(studentId, bookId) {
@@ -199,6 +236,14 @@ class LoanManager {
 
   isFavorite(studentId, bookId) {
     return this.favorites.some(f => f.studentId === studentId && f.bookId === bookId);
+  }
+
+  updateTrashCounter() {
+    const counter = document.getElementById('trashCounter');
+    if (counter) {
+      counter.textContent = this.trash.length;
+      counter.style.display = this.trash.length > 0 ? 'inline-block' : 'none';
+    }
   }
 }
 
@@ -335,15 +380,14 @@ async function renderMateriaisOutros() {
     body.innerHTML = materiais.length
       ? materiais.map(m => `
         <tr>
-          <td>${escapeHtml(m.nome)}</td>
-          <td><span class="categoria">${escapeHtml(m.tipo || 'Geral')}</span></td>
-          <td>${escapeHtml(m.descricao ?? '')}</td>
+          <td><strong>${escapeHtml(m.nome)}</strong></td>
           <td>${parseInt(m.quantidade, 10) || 0}</td>
+          <td><span class="badge bg-secondary">Anexo</span></td>
         </tr>
       `).join('')
-      : '<tr><td colspan="4" style="text-align:center;">Nenhum material cadastrado.</td></tr>';
+      : '<tr><td colspan="3" style="text-align:center; padding: 20px;">Ainda não há materiais enviados.</td></tr>';
   } catch (e) {
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center; color: var(--error);">Erro ao carregar materiais</td></tr>';
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Ainda não há materiais enviados.</td></tr>';
   }
 }
 
@@ -556,6 +600,16 @@ function carregarDashboard() {
   if (atEmp) atEmp.textContent = stats.overdue;
   if (dToday) dToday.textContent = stats.devoluToday;
 
+  // Alerta para itens na lixeira prestes a expirar
+  const expiringTrash = library.getExpiringTrashItems();
+  if (expiringTrash.length > 0) {
+    const message = expiringTrash.length === 1
+      ? `ATENÇÃO: Um livro na lixeira expira em menos de 2 dias: "${expiringTrash[0].title}".`
+      : `ATENÇÃO: ${expiringTrash.length} livros na lixeira expiram em menos de 2 dias.`;
+    showToast(message, 'warning');
+  }
+
+
   const tbody = document.getElementById('dashboardLoansBody');
   if (!tbody) return;
 
@@ -616,16 +670,28 @@ function renderProfessorBooks() {
   const grid = document.getElementById('profBooksGrid');
   if (!grid) return;
 
+  const searchTerm = document.getElementById('searchBooksProf')?.value.toLowerCase() || '';
   const sortType = document.getElementById('sortProfBooks')?.value || 'recent';
-  let sortedBooks = [...library.books];
+  
+  // Filtra os livros antes de renderizar para não perder a pesquisa ao apagar ou editar
+  let filteredBooks = library.books.filter(book => 
+    book.title.toLowerCase().includes(searchTerm) || 
+    book.author.toLowerCase().includes(searchTerm) ||
+    (book.isbn && book.isbn.includes(searchTerm))
+  );
 
   if (sortType === 'az') {
-    sortedBooks.sort((a, b) => a.title.localeCompare(b.title));
+    filteredBooks.sort((a, b) => a.title.localeCompare(b.title));
   } else {
-    sortedBooks.reverse();
+    filteredBooks.reverse();
   }
 
-  grid.innerHTML = sortedBooks.map(book => `
+  if (filteredBooks.length === 0) {
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:40px; color: #cbd5e1;">Nenhum livro encontrado com este termo.</div>';
+    return;
+  }
+
+  grid.innerHTML = filteredBooks.map(book => `
     <div class="prof-book-card">
       <img src="${book.image}" class="prof-book-cover" alt="${book.title}" onerror="this.src='Imagens/domcasmurro.png'">
       <div class="prof-book-info">
@@ -641,8 +707,8 @@ function renderProfessorBooks() {
         </div>
       </div>
       <div class="prof-card-footer">
-        <button class="btn-action-sm" style="background: #334155; color: white;" onclick="showToast('Visualizando: ${escapeHtml(book.title)}')"><i class="fas fa-eye"></i></button>
-        <button class="btn-action-sm" style="background: #2E3192; color: white;" onclick="showToast('Abrindo editor para: ${escapeHtml(book.title)}')"><i class="fas fa-edit"></i></button>
+        <button class="btn-action-sm" style="background: #334155; color: white;" onclick="visualizarLivro(${book.id})"><i class="fas fa-eye"></i></button>
+        <button class="btn-action-sm" style="background: #2E3192; color: white;" onclick="editarLivro(${book.id})"><i class="fas fa-edit"></i></button>
         <button class="btn-action-sm" style="background: #ef4444; color: white;" onclick="confirmarExcluirLivro(${book.id})"><i class="fas fa-trash"></i></button>
       </div>
     </div>
@@ -650,13 +716,7 @@ function renderProfessorBooks() {
 }
 
 function filterProfessorBooks() {
-  const term = document.getElementById('searchBooksProf')?.value.toLowerCase();
-  const cards = document.querySelectorAll('.prof-book-card');
-  
-  cards.forEach(card => {
-    const title = card.querySelector('.prof-book-title').innerText.toLowerCase();
-    card.style.display = title.includes(term) ? 'flex' : 'none';
-  });
+  renderProfessorBooks(); // Agora a renderização já trata o filtro internamente
 }
 
 async function buscarIsbnInterface() {
@@ -700,12 +760,148 @@ function resetPdfUpload() {
   document.getElementById('pdfStatusText').innerText = "Arraste seu PDF aqui ou clique para selecionar";
 }
 
-function confirmarExcluirLivro(id) {
-  if (confirm('Deseja realmente excluir este livro do acervo?')) {
-    showToast('Livro excluído com sucesso!', 'success');
-    // Simulação visual: remove o card
+let livroEmEdicaoId = null;
+
+function visualizarLivro(id) {
+    const book = library.books.find(b => b.id === id);
+    if (book) {
+        alert(`Detalhes do Livro:\n\nTítulo: ${book.title}\nAutor: ${book.author}\nISBN: ${book.isbn || 'N/A'}\nEstoque: ${book.availableCopies}/${book.totalCopies}`);
+    }
+}
+
+function editarLivro(id) {
+    const book = library.books.find(b => b.id === id);
+    if (!book) return;
+    livroEmEdicaoId = id;
+    document.getElementById('newTitle').value = book.title;
+    document.getElementById('newAuthor').value = book.author;
+    document.getElementById('newDesc').value = book.description || '';
+    document.getElementById('newCategory').value = book.category || '';
+    document.getElementById('newCoverUrl').value = book.image;
+    document.getElementById('newBookUrl').value = book.pdfUrl || '';
+    showModal('modalAddBook');
+    atualizarPreview();
+}
+
+function salvarLivro(e) {
+    e.preventDefault();
+    const form = e.target;
+    const fd = new FormData(form);
+    const bookData = {
+        title: fd.get('Titulo'),
+        author: fd.get('Autor'),
+        description: fd.get('Descricao'),
+        category: fd.get('Categoria'),
+        image: fd.get('CapaURL'),
+        pdfFile: fd.get('PdfURL'),
+        isbn: fd.get('ISBN'),
+        totalCopies: parseInt(fd.get('Quantidade')) || 1
+    };
+
+    if (livroEmEdicaoId) {
+        const book = library.books.find(b => b.id === livroEmEdicaoId);
+        if (book) {
+            Object.assign(book, bookData);
+            book.availableCopies = bookData.totalCopies; // Reset estoque para simplificar
+        }
+        livroEmEdicaoId = null;
+        showToast('Livro atualizado!');
+    } else {
+        const newBook = new Book(Date.now(), bookData.title, bookData.author, bookData.image, bookData.pdfFile, bookData.description, bookData.isbn, bookData.totalCopies);
+        newBook.category = bookData.category;
+        library.books.push(newBook);
+        showToast('Livro adicionado!');
+    }
+    library.saveData();
     renderProfessorBooks();
-  }
+    hideModal('modalAddBook');
+    form.reset();
+    document.getElementById('coverPreview').style.display = 'none';
+}
+
+function salvarPdfManual(e) {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const title = fd.get('Titulo');
+    const pdfFile = fd.get('pdfFile'); // Em localstorage guardamos apenas o nome
+    const capa = fd.get('CapaURL') || 'Imagens/domcasmurro.png';
+
+    const newBook = new Book(Date.now(), title, 'Autor Digital', capa, pdfFile.name, 'Livro digital enviado via PDF.', 'DIGITAL', 999);
+    library.books.push(newBook);
+    library.saveData();
+    renderProfessorBooks();
+    hideModal('modalUploadPdf');
+    showToast('PDF Registado com sucesso!');
+}
+
+function confirmarExcluirLivro(id) {
+    const book = library.books.find(b => b.id === id);
+    if (!book) return;
+
+    if (confirm(`Mover "${book.title}" para a lixeira?`)) {
+        const index = library.books.indexOf(book);
+        if (index > -1) {
+            const bookToDelete = library.books[index];
+            bookToDelete.deletedAt = Date.now(); // Define a data para o cálculo de expiração
+            library.trash.push(bookToDelete);
+            library.books.splice(index, 1);
+            library.saveData();
+            renderProfessorBooks();
+            showToast('Livro movido para a lixeira.');
+        }
+    }
+}
+
+function renderLixeira() {
+    const body = document.getElementById('lixeiraBody');
+    if (!body) return;
+
+    if (!library.trash || library.trash.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" class="text-center">A lixeira está vazia.</td></tr>';
+        return;
+    }
+
+    body.innerHTML = library.trash.map((book, index) => {
+        const diffMs = Date.now() - (book.deletedAt || Date.now());
+        const diasRestantes = Math.max(0, 30 - Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+
+        return `
+        <tr>
+            <td>${escapeHtml(book.title)}</td>
+            <td>${escapeHtml(book.author)}</td>
+            <td>
+                <span class="badge ${diasRestantes <= 5 ? 'bg-danger' : 'bg-info'}">
+                    ${diasRestantes} dias
+                </span>
+            </td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-success" onclick="restaurarLivro(${index})"><i class="fas fa-undo"></i> Restaurar</button>
+            </td>
+        </tr>
+    `;}).join('');
+}
+
+function esvaziarLixeira() {
+    if (!library.trash || library.trash.length === 0) return showToast('A lixeira já está vazia!', 'error');
+    
+    if (confirm('Deseja realmente excluir permanentemente todos os itens da lixeira? Esta ação não pode ser desfeita.')) {
+        library.trash = [];
+        library.saveData();
+        renderLixeira();
+        showToast('Lixeira esvaziada com sucesso!', 'success');
+    }
+}
+
+function restaurarLivro(index) {
+    const book = library.trash[index];
+    if (book) {
+        library.books.push(book);
+        library.trash.splice(index, 1);
+        library.saveData();
+        renderProfessorBooks();
+        renderLixeira();
+        showToast(`"${book.title}" restaurado com sucesso!`);
+    }
 }
 
 // Sobrescreve a função original para usar a nova interface
@@ -829,21 +1025,40 @@ function renderAlunos(filter = '') {
 }
 
 /* Busca por ISBN (Todos os meios de adicionar livros) */
-async function buscarDadosGoogleBooks() {
-    const isbn = document.getElementById('newIsbn').value.trim();
-    if (!isbn) return showToast('Digite um ISBN válido', 'error');
+async function buscarDadosGoogleBooks(event) {
+    const isbnInput = document.getElementById('newIsbn');
+    const term = isbnInput.value.trim();
+    if (!term) return showToast('Digite um título ou ISBN', 'error');
 
-    const btn = document.querySelector('.btn-search-isbn');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+    // 1. Verifica se o livro já existe no ACERVO LOCAL
+    const existing = library.books.find(b => 
+        (b.isbn && b.isbn === term) || 
+        b.title.toLowerCase() === term.toLowerCase()
+    );
+
+    if (existing) {
+        document.getElementById('newTitle').value = existing.title;
+        document.getElementById('newAuthor').value = existing.author;
+        document.getElementById('newDesc').value = existing.description || '';
+        document.getElementById('newCategory').value = existing.category || 'Geral';
+        document.getElementById('newCoverUrl').value = existing.image;
+        atualizarPreview();
+        return showToast('Livro encontrado no seu acervo local!', 'success');
+    }
+
+    // 2. Se não existir localmente, busca na API do Google
+    const btn = event?.currentTarget || document.querySelector('.btn-search-isbn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
 
   try {
-    // Tenta busca específica por ISBN
-    let response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+    let query = /^\d+$/.test(term) ? `isbn:${term}` : term;
+    let response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`);
     let data = await response.json();
 
-    // Se não achar com prefixo isbn:, tenta busca geral pelo número
-    if (data.totalItems === 0) {
-      response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${isbn}`);
+    if (data.totalItems === 0 && query.startsWith('isbn:')) {
+      response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(term)}`);
       data = await response.json();
     }
 
@@ -852,19 +1067,20 @@ async function buscarDadosGoogleBooks() {
             document.getElementById('newTitle').value = info.title || '';
             document.getElementById('newAuthor').value = info.authors ? info.authors.join(', ') : '';
             document.getElementById('newDesc').value = info.description || '';
-            document.getElementById('newCategory').value = info.categories ? info.categories[0] : '';
+            document.getElementById('newCategory').value = info.categories ? info.categories[0] : 'Geral';
             if (info.imageLinks && info.imageLinks.thumbnail) {
                 document.getElementById('newCoverUrl').value = info.imageLinks.thumbnail;
                 atualizarPreview();
             }
-            showToast('Dados importados com sucesso!');
+            showToast('Livro encontrado!');
         } else {
-            showToast('ISBN não encontrado na base do Google.', 'error');
+            showToast('Livro não encontrado.', 'error');
         }
     } catch (error) {
         showToast('Erro ao conectar com API do Google.', 'error');
     } finally {
-        btn.innerHTML = '🔍 Buscar';
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
 }
 

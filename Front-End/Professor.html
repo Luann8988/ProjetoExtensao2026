@@ -165,15 +165,16 @@
           <button class="btn-secondary" onclick="showModal('modalAddBook')">
             <i class="fas fa-plus"></i> Manual
           </button>
-          <button class="btn-primary" onclick="showModal('modalIsbnSearch')">
-            <i class="fas fa-barcode"></i> Por ISBN
-          </button>
           <button class="btn-secondary" style="background: #ef4444; color: white;" onclick="showModal('modalUploadPdf')">
             <i class="fas fa-file-pdf"></i> Enviar PDF
           </button>
         </div>
         
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-3 align-items-center">
+          <button class="btn btn-sm" style="background: #334155; color: #cbd5e1; border: 1px solid #475569;" onclick="showModal('modalLixeira'); renderLixeira();">
+            <i class="fas fa-trash-restore me-1"></i> Lixeira 
+            <span id="trashCounter" class="badge bg-danger ms-1" style="display: none; font-size: 10px;">0</span>
+          </button>
           <select id="sortProfBooks" class="form-select bg-dark text-white border-secondary" style="width: 180px;" onchange="renderProfessorBooks()">
             <option value="recent">Mais Recentes</option>
             <option value="az">A - Z</option>
@@ -195,13 +196,13 @@
     <div class="modal-content" style="max-width: 500px;">
       <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
       <h3>Cadastrar Novo Livro</h3>
-      <form id="addBookForm" method="POST" action="Professor.php">
-        <div class="isbn-search-row">
-          <div class="form-group">
-            <label>ISBN (Busca Automática)</label>
-            <input type="text" id="newIsbn" name="ISBN" placeholder="Ex: 9788535914849">
+      <form id="addBookForm" onsubmit="salvarLivro(event)">
+        <div class="form-group mb-3">
+          <label class="fw-bold mb-1">ISBN (Busca Automática)</label>
+          <div class="input-group">
+            <input type="text" id="newIsbn" name="ISBN" class="form-control bg-white text-dark border-secondary" placeholder="Ex: Harry Potter ou ISBN">
+            <button type="button" class="btn btn-primary" onclick="buscarDadosGoogleBooks(event)">🔍 Buscar</button>
           </div>
-          <button type="button" class="btn-search-isbn" onclick="buscarDadosGoogleBooks()">🔍 Buscar</button>
         </div>
         <div class="form-group">
           <label>Título</label>
@@ -237,34 +238,81 @@
     </div>
   </div>
 
+  <!-- MODAL ENVIAR PDF -->
+  <div id="modalUploadPdf" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="close" onclick="hideModal('modalUploadPdf')">&times;</button>
+      <div class="text-center mb-4">
+        <i class="fas fa-file-pdf fa-3x mb-3" style="color: #ef4444;"></i>
+        <h3>Upload de Livro Digital</h3>
+        <p class="text-muted small">Adicione arquivos PDF ao acervo digital da biblioteca</p>
+      </div>
+      <form id="uploadPdfForm" onsubmit="salvarPdfManual(event)" class="mt-2">
+        <div class="form-group mb-3">
+          <label class="form-label small fw-bold text-dark">Título do Livro</label>
+          <input type="text" name="Titulo" class="form-control bg-white text-dark border-secondary" placeholder="Ex: Harry Potter e a Pedra Filosofal" required style="border: 2px solid #dee2e6;">
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label small fw-bold text-dark">Arquivo do Livro (PDF)</label>
+          <div class="upload-area border-dashed p-3 text-center rounded bg-light border-secondary">
+            <input type="file" name="pdfFile" accept=".pdf" required class="form-control bg-white text-dark border-secondary mb-2">
+            <span class="text-dark tiny">Selecione o arquivo .pdf original do livro</span>
+          </div>
+        </div>
+        <div class="form-group mb-4">
+          <label class="form-label small fw-bold text-dark">URL da Imagem da Capa (Opcional)</label>
+          <input type="text" name="CapaURL" class="form-control bg-white text-dark border-secondary" placeholder="https://link-da-imagem.com/foto.jpg" style="border: 2px solid #dee2e6;">
+        </div>
+        <button type="submit" name="uploadPdf" class="btn-primary w-100 mt-3">Enviar PDF ao Acervo</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL LIXEIRA -->
+  <div id="modalLixeira" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <button class="close" onclick="hideModal('modalLixeira')">&times;</button>
+      <h3>♻️ Itens Excluídos</h3>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <p class="text-muted small mb-0">Aqui estão os livros que você removeu recentemente.</p>
+        <button class="btn btn-sm btn-outline-danger" onclick="esvaziarLixeira()"><i class="fas fa-trash-alt"></i> Esvaziar Lixeira</button>
+      </div>
+      <div class="table-responsive mt-3">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Expira em</th>
+              <th class="text-end">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="lixeiraBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- OUTROS MATERIAIS -->
   <div id="materiaisOutros" class="section" style="display:none;">
     <div class="data-section">
       <div class="data-header">📁 Gestão de Outros Materiais</div>
       <div style="padding: 25px;">
-        <form id="addMaterialForm" class="row g-3 mb-4 shadow-sm p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid #334155;">
-          <div class="col-md-4">
-            <label class="form-label text-light small fw-bold">Nome do Material</label>
-            <input type="text" name="nome" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Projetor Epson" required>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label text-light small fw-bold">Tipo</label>
-            <select name="tipo" class="form-select bg-dark text-white border-secondary">
-              <option value="Equipamento">🛠️ Equipamento</option>
-              <option value="Documento">📄 Documento</option>
-              <option value="Video">🎬 Vídeo</option>
-              <option value="Outro">📦 Outro</option>
-            </select>
+        <form id="addMaterialForm" class="row g-3 mb-4 p-4 rounded bg-dark border border-secondary shadow-sm" method="POST" action="Professor.php" enctype="multipart/form-data">
+          <div class="col-md-5">
+            <label class="form-label text-light small fw-bold">Nome do Recurso</label>
+            <input type="text" name="nome" class="form-control bg-dark text-white border-secondary" placeholder="Ex: Projetor, Apostila..." required>
           </div>
           <div class="col-md-2">
             <label class="form-label text-light small fw-bold">Qtd.</label>
             <input type="number" name="quantidade" class="form-control bg-dark text-white border-secondary" value="1" min="1" required>
           </div>
-          <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-warning w-100 fw-bold">Adicionar Item</button>
+          <div class="col-md-5">
+            <label class="form-label text-light small fw-bold">Anexo (PDF, Word, PPT...)</label>
+            <input type="file" name="materialFile" class="form-control bg-dark text-white border-secondary" accept=".pdf,.doc,.docx,.ppt,.pptx">
           </div>
-          <div class="col-12 mt-2">
-            <input type="text" name="descricao" class="form-control bg-dark text-white border-secondary" placeholder="Descrição curta ou observação...">
+          <div class="col-12 mt-3 text-end">
+            <button type="submit" name="addMaterial" class="btn btn-warning px-4 fw-bold">Adicionar Material</button>
           </div>
         </form>
 
@@ -272,9 +320,8 @@
           <thead>
             <tr>
               <th>Nome</th>
-              <th>Tipo</th>
-              <th>Descrição</th>
               <th>Qtd</th>
+              <th>Ação / Arquivo</th>
             </tr>
           </thead>
           <tbody id="materiaisOutrosBody">
@@ -302,9 +349,6 @@
 </section>
 
   </main>
-
- 
-
   </div>
 
   <script src="Script.js"></script>
