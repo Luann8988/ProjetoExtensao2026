@@ -1,13 +1,4 @@
-/*
-  Script.js (versão simplificada)
-  - Mantém: login UI, Favoritos (localStorage), Meus Empréstimos/Histórico (localStorage legado), render de catálogo
-  - Integra “Outros Materiais” via PHP/DB: Back-End 08_06/api_materiais.php
-  - Remove: avaliação por estrelas, avatar/seed, chat, notificações, turmas, reservas, gráficos, e lógica fora do escopo.
 
-  Observação:
-  - O sistema atual possui partes legadas em localStorage para livros/empréstimos.
-  - Esta versão evita adicionar novas funcionalidades fora do escopo.
-*/
 
 const IMAGES_PATH = 'Imagens/';
 const PDF_PATH = 'PDF/';
@@ -1046,43 +1037,43 @@ async function buscarDadosGoogleBooks(event) {
         return showToast('Livro encontrado no seu acervo local!', 'success');
     }
 
-    // 2. Se não existir localmente, busca na API do Google
+// 2. Se não existir localmente, busca no BACK-END (evita expor chave no front-end)
     const btn = event?.currentTarget || document.querySelector('.btn-search-isbn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     btn.disabled = true;
 
-  try {
-    let query = /^\d+$/.test(term) ? `isbn:${term}` : term;
-    let response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`);
-    let data = await response.json();
+    try {
+const resp = await fetch(`../Back-End 08_06/api_livros.php?action=buscar_por_isbn&isbn=${encodeURIComponent(term)}`);
+      const data = await resp.json();
 
-    if (data.totalItems === 0 && query.startsWith('isbn:')) {
-      response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(term)}`);
-      data = await response.json();
-    }
+      if (data.ok) {
+        document.getElementById('newTitle').value = data.titulo || '';
+        document.getElementById('newAuthor').value = data.autor || '';
+        document.getElementById('newDesc').value = data.descricao || '';
+        document.getElementById('newCategory').value = data.categoria || 'Geral';
 
-        if (data.totalItems > 0) {
-            const info = data.items[0].volumeInfo;
-            document.getElementById('newTitle').value = info.title || '';
-            document.getElementById('newAuthor').value = info.authors ? info.authors.join(', ') : '';
-            document.getElementById('newDesc').value = info.description || '';
-            document.getElementById('newCategory').value = info.categories ? info.categories[0] : 'Geral';
-            if (info.imageLinks && info.imageLinks.thumbnail) {
-                document.getElementById('newCoverUrl').value = info.imageLinks.thumbnail;
-                atualizarPreview();
-            }
-            showToast('Livro encontrado!');
-        } else {
-            showToast('Livro não encontrado.', 'error');
+        if (data.thumbnail) {
+          document.getElementById('newCoverUrl').value = data.thumbnail;
+          atualizarPreview();
         }
+
+        // já ajuda a manter o ISBN no formulário caso ele esteja no input
+        const isbnField = document.getElementById('newIsbn');
+        if (isbnField && !isbnField.value) isbnField.value = term;
+
+        showToast('Livro encontrado!');
+      } else {
+        showToast(data.error || 'Livro não encontrado.', 'error');
+      }
     } catch (error) {
-        showToast('Erro ao conectar com API do Google.', 'error');
+      showToast('Erro ao buscar ISBN.', 'error');
     } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
 }
+
 
 function atualizarPreview() {
     const url = document.getElementById('newCoverUrl').value;

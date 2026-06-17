@@ -13,6 +13,62 @@ function json_response($data, $code = 200) {
 
 $action = $_GET['action'] ?? '';
 
+// ===================== BUSCA POR ISBN (Google Books) =====================
+if ($action === 'buscar_por_isbn') {
+  $googleApiKey = 'AIzaSyAXkFHczitsFeFVQpboxTgdms532i0q_A4';
+
+  $isbn = $_GET['isbn'] ?? '';
+  $isbn = trim($isbn);
+
+  if ($isbn === '') {
+    json_response(['ok' => false, 'error' => 'ISBN inválido'], 422);
+  }
+
+  $query = 'isbn:' . $isbn;
+  $url = 'https://www.googleapis.com/books/v1/volumes?q=' . urlencode($query) . '&maxResults=1&key=' . urlencode($googleApiKey);
+
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+  $raw = curl_exec($ch);
+  $err = curl_error($ch);
+  $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+
+  if ($raw === false) {
+    json_response(['ok' => false, 'error' => 'Falha de rede: ' . $err], 500);
+  }
+
+  $data = json_decode($raw, true);
+  if (!is_array($data)) {
+    json_response(['ok' => false, 'error' => 'Resposta inválida da API do Google'], 502);
+  }
+
+  if (isset($data['totalItems']) && intval($data['totalItems']) > 0 && isset($data['items'][0]['volumeInfo'])) {
+    $v = $data['items'][0]['volumeInfo'];
+
+    $title = $v['title'] ?? '';
+    $authors = $v['authors'] ?? [];
+    $author = is_array($authors) ? implode(', ', $authors) : (string)$authors;
+    $description = $v['description'] ?? '';
+    $categories = $v['categories'] ?? [];
+    $category = (is_array($categories) && count($categories) > 0) ? (string)$categories[0] : 'Geral';
+    $thumbnail = $v['imageLinks']['thumbnail'] ?? '';
+
+    json_response([
+      'ok' => true,
+      'titulo' => $title,
+      'autor' => $author,
+      'descricao' => $description,
+      'categoria' => $category,
+      'thumbnail' => $thumbnail,
+      'isbn' => $isbn,
+    ]);
+  }
+
+  json_response(['ok' => false, 'error' => 'Nenhum livro encontrado para este ISBN'], 404);
+}
+
 // Exclusão de livro (somente professor)
 if ($action === 'excluir') {
   if (!isset($_SESSION['id_professor'])) {
