@@ -1016,70 +1016,182 @@ function renderAlunos(filter = '') {
 }
 
 /* Busca por ISBN (Todos os meios de adicionar livros) */
-async function buscarDadosGoogleBooks(event) {
+async function buscarDadosGoogleBooks() {
+
+    const API_KEY = "AIzaSyAXkFHczitsFeFVQpboxTgdms532i0q_A4";
+
     const isbnInput = document.getElementById('newIsbn');
-    const term = isbnInput.value.trim();
-    if (!term) return showToast('Digite um título ou ISBN', 'error');
 
-    // 1. Verifica se o livro já existe no ACERVO LOCAL
-    const existing = library.books.find(b => 
-        (b.isbn && b.isbn === term) || 
-        b.title.toLowerCase() === term.toLowerCase()
-    );
-
-    if (existing) {
-        document.getElementById('newTitle').value = existing.title;
-        document.getElementById('newAuthor').value = existing.author;
-        document.getElementById('newDesc').value = existing.description || '';
-        document.getElementById('newCategory').value = existing.category || 'Geral';
-        document.getElementById('newCoverUrl').value = existing.image;
-        atualizarPreview();
-        return showToast('Livro encontrado no seu acervo local!', 'success');
+    if (!isbnInput) {
+        console.error('Campo ISBN não encontrado.');
+        return;
     }
 
-// 2. Se não existir localmente, busca no BACK-END (evita expor chave no front-end)
-    const btn = event?.currentTarget || document.querySelector('.btn-search-isbn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    btn.disabled = true;
+    const isbn = isbnInput.value
+        .trim()
+        .replace(/[-\s]/g, '');
+
+    if (!isbn) {
+        showToast('Digite um ISBN.', 'error');
+        return;
+    }
+
+    const btn = document.querySelector('.btn-search-isbn');
+    let originalContent = '';
+
+    if (btn) {
+        originalContent = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+    }
 
     try {
-const resp = await fetch(`../Back-End 08_06/api_livros.php?action=buscar_por_isbn&isbn=${encodeURIComponent(term)}`);
-      const data = await resp.json();
 
-      if (data.ok) {
-        document.getElementById('newTitle').value = data.titulo || '';
-        document.getElementById('newAuthor').value = data.autor || '';
-        document.getElementById('newDesc').value = data.descricao || '';
-        document.getElementById('newCategory').value = data.categoria || 'Geral';
+        // Busca principal por ISBN
+        let response = await fetch(
+            `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${API_KEY}`
+        );
 
-        if (data.thumbnail) {
-          document.getElementById('newCoverUrl').value = data.thumbnail;
-          atualizarPreview();
+        if (!response.ok) {
+            throw new Error(`Erro HTTP ${response.status}`);
         }
 
-        // já ajuda a manter o ISBN no formulário caso ele esteja no input
-        const isbnField = document.getElementById('newIsbn');
-        if (isbnField && !isbnField.value) isbnField.value = term;
+        let data = await response.json();
 
-        showToast('Livro encontrado!');
-      } else {
-        showToast(data.error || 'Livro não encontrado.', 'error');
-      }
+        // Segunda tentativa
+        if (!data.items || data.totalItems === 0) {
+
+            response = await fetch(
+                `https://www.googleapis.com/books/v1/volumes?q=${isbn}&key=${API_KEY}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`Erro HTTP ${response.status}`);
+            }
+
+            data = await response.json();
+        }
+
+        if (!data.items || data.items.length === 0) {
+            showToast('Livro não encontrado.', 'error');
+            return;
+        }
+
+        const livro = data.items[0].volumeInfo;
+
+        // Título
+        const titulo = document.getElementById('newTitle');
+        if (titulo) {
+            titulo.value = livro.title || '';
+        }
+
+        // Autor
+        const autor = document.getElementById('newAuthor');
+        if (autor) {
+            autor.value = livro.authors
+                ? livro.authors.join(', ')
+                : '';
+        }
+
+        // Descrição
+        const descricao = document.getElementById('newDescription');
+        if (descricao) {
+            descricao.value = livro.description || '';
+        }
+
+        // Categoria
+        const categoria = document.getElementById('newCategory');
+        if (categoria) {
+            categoria.value = livro.categories
+                ? livro.categories.join(', ')
+                : '';
+        }
+
+        // URL da capa
+        const capaUrl =
+            livro.imageLinks?.extraLarge ||
+            livro.imageLinks?.large ||
+            livro.imageLinks?.medium ||
+            livro.imageLinks?.thumbnail ||
+            livro.imageLinks?.smallThumbnail ||
+            '';
+
+        const campoCapa = document.getElementById('newCover');
+
+        if (campoCapa) {
+            campoCapa.value = capaUrl;
+        }
+
+        // Mostrar imagem da capa
+        const preview = document.getElementById('bookCoverPreview');
+
+        if (preview) {
+
+            if (capaUrl) {
+
+                preview.src = capaUrl.replace(
+                    'http://',
+                    'https://'
+                );
+
+                preview.style.display = 'block';
+
+            } else {
+
+                preview.src = '';
+                preview.style.display = 'none';
+
+            }
+        }
+
+        showToast('Livro encontrado com sucesso!', 'success');
+
+        console.log({
+            isbn,
+            titulo: livro.title,
+            autor: livro.authors,
+            descricao: livro.description,
+            categoria: livro.categories,
+            capa: capaUrl
+        });
+
     } catch (error) {
-      showToast('Erro ao buscar ISBN.', 'error');
+
+        console.error(error);
+
+        showToast(
+            'Erro ao consultar o Google Books.',
+            'error'
+        );
+
     } finally {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
+
+        if (btn) {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+
     }
 }
-
-
 function atualizarPreview() {
+
     const url = document.getElementById('newCoverUrl').value;
     const img = document.getElementById('coverPreview');
+
+    if (!img) return;
+
     if (url) {
         img.src = url;
         img.style.display = 'block';
+    } else {
+        img.style.display = 'none';
     }
 }
+
+document.getElementById('newIsbn').addEventListener('blur', function () {
+    if (this.value.trim() !== '') {
+        buscarDadosGoogleBooks();
+    }
+});
+
+
