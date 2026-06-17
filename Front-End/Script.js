@@ -1119,13 +1119,13 @@ async function buscarDadosGoogleBooks() {
         const campoCapa = document.getElementById('newCoverUrl');
 
         if (campoCapa) {
-            campoCapa.value = capaUrl;
+            campoCapa.value = capaUrl.replace('http://', 'https://');
         }
 
         // Link do Livro
         const linkInput = document.getElementById('newBookUrl');
         if (linkInput) {
-            linkInput.value = livro.infoLink || '';
+            linkInput.value = livro.infoLink || livro.previewLink || '';
         }
 
         // Mostrar imagem da capa
@@ -1135,11 +1135,7 @@ async function buscarDadosGoogleBooks() {
 
             if (capaUrl) {
 
-                preview.src = capaUrl.replace(
-                    'http://',
-                    'https://'
-                );
-
+                preview.src = capaUrl.replace('http://', 'https://');
                 preview.style.display = 'block';
 
             } else {
@@ -1194,8 +1190,8 @@ function atualizarPreview() {
     }
 }
 
-document.getElementById('newIsbn').addEventListener('blur', function () {
-    if (this.value.trim() !== '') {
-        buscarDadosGoogleBooks();
-    }
-});
+        if (this.value.trim() !== '') {
+            buscarDadosGoogleBooks();
+        }
+    ;
+
