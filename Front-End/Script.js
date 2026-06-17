@@ -932,10 +932,45 @@ function setupSearch() {
   if (searchAluno) searchAluno.oninput = () => debounce(filterBooks);
 }
 
+function setupIsbnMask() {
+  const isbnInput = document.getElementById('newIsbn');
+  if (!isbnInput) return;
+
+  isbnInput.addEventListener('input', (e) => {
+    let value = e.target.value;
+    
+    // Aplica a máscara apenas se começar com um número (ISBN) 
+    // para não interferir na busca por Título.
+    if (value.length > 0 && /\d/.test(value[0])) {
+      let digits = value.replace(/\D/g, '');
+      if (digits.length > 13) digits = digits.substring(0, 13);
+      
+      let masked = '';
+      if (digits.length > 0) {
+        masked = digits.substring(0, 3);
+        if (digits.length > 3) {
+          masked += '-' + digits.substring(3, 4);
+          if (digits.length > 4) {
+            masked += '-' + digits.substring(4, 6);
+            if (digits.length > 6) {
+              masked += '-' + digits.substring(6, 12);
+              if (digits.length > 12) {
+                masked += '-' + digits.substring(12, 13);
+              }
+            }
+          }
+        }
+      }
+      e.target.value = masked;
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   library.loadData();
 
   setupSearch();
+  setupIsbnMask();
 
   // Renderiza materiais quando a seção existir
   if (document.getElementById('materiaisOutrosBody')) {
@@ -1189,9 +1224,11 @@ function atualizarPreview() {
         img.style.display = 'none';
     }
 }
-
+const isbnInputBlur = document.getElementById('newIsbn');
+if (isbnInputBlur) {
+    isbnInputBlur.addEventListener('blur', function () {
         if (this.value.trim() !== '') {
             buscarDadosGoogleBooks();
         }
-    ;
-
+    });
+}
