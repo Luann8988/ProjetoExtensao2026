@@ -1050,7 +1050,44 @@ function renderAlunos(filter = '') {
     `).join('');
 }
 
-/* Busca por ISBN (Todos os meios de adicionar livros) */
+/* Validação e Busca por ISBN */
+function isValidIsbn(isbn) {
+    const cleaned = isbn.replace(/[-\s]/g, '');
+    if (cleaned.length === 10) {
+        let sum = 0;
+        for (let i = 0; i < 9; i++) sum += parseInt(cleaned[i]) * (10 - i);
+        let last = cleaned[9].toUpperCase();
+        sum += (last === 'X') ? 10 : parseInt(last);
+        return sum % 11 === 0;
+    } 
+    if (cleaned.length === 13) {
+        let sum = 0;
+        for (let i = 0; i < 12; i++) sum += parseInt(cleaned[i]) * (i % 2 === 0 ? 1 : 3);
+        let checksum = (10 - (sum % 10)) % 10;
+        return checksum === parseInt(cleaned[12]);
+    }
+    return false;
+}
+
+function limparCamposNovoLivro() {
+    const fields = ['newTitle', 'newAuthor', 'newDesc', 'newCategory', 'newPages', 'newCoverUrl', 'newBookUrl'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const preview = document.getElementById('coverPreview');
+    if (preview) {
+        preview.src = '';
+        preview.style.display = 'none';
+    }
+    const isbnInput = document.getElementById('newIsbn');
+    if (isbnInput) {
+        isbnInput.classList.remove('is-invalid');
+        isbnInput.style.border = '';
+        isbnInput.style.boxShadow = '';
+    }
+}
+
 async function buscarDadosGoogleBooks() {
 
     const API_KEY = "AIzaSyAXkFHczitsFeFVQpboxTgdms532i0q_A4";
@@ -1062,14 +1099,30 @@ async function buscarDadosGoogleBooks() {
         return;
     }
 
-    const isbn = isbnInput.value
-        .trim()
-        .replace(/[-\s]/g, '');
+    const rawInput = isbnInput.value.trim();
+    const cleanedIsbn = rawInput.replace(/[-\s]/g, '');
 
-    if (!isbn) {
+    if (!rawInput) {
+        limparCamposNovoLivro();
         showToast('Digite um ISBN.', 'error');
         return;
     }
+
+    // Validação matemática: Se parece um ISBN, verifica o dígito
+    const isLikelyIsbn = /^\d+X?$/i.test(cleanedIsbn) && (cleanedIsbn.length === 10 || cleanedIsbn.length === 13);
+    
+    if (isLikelyIsbn && !isValidIsbn(cleanedIsbn)) {
+        limparCamposNovoLivro();
+        isbnInput.classList.add('is-invalid');
+        showToast('ISBN inválido! Verifique o número.', 'error');
+        return;
+    }
+
+    // Aviso Visual: Destaca o campo enquanto a busca (e validação de rede) ocorre
+    limparCamposNovoLivro();
+    isbnInput.value = rawInput; 
+    isbnInput.style.border = '2px solid #FFC20E';
+    isbnInput.style.boxShadow = '0 0 10px rgba(255, 194, 14, 0.4)';
 
     const btn = document.querySelector('.btn-search-isbn');
     let originalContent = '';
@@ -1084,7 +1137,7 @@ async function buscarDadosGoogleBooks() {
 
         // Busca principal por ISBN
         let response = await fetch(
-            `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${API_KEY}`
+            `https://www.googleapis.com/books/v1/volumes?q=isbn:${cleanedIsbn}&key=${API_KEY}`
         );
 
         if (!response.ok) {
@@ -1097,7 +1150,7 @@ async function buscarDadosGoogleBooks() {
         if (!data.items || data.totalItems === 0) {
 
             response = await fetch(
-                `https://www.googleapis.com/books/v1/volumes?q=${isbn}&key=${API_KEY}`
+                `https://www.googleapis.com/books/v1/volumes?q=${cleanedIsbn}&key=${API_KEY}`
             );
 
             if (!response.ok) {
@@ -1126,6 +1179,12 @@ async function buscarDadosGoogleBooks() {
             autor.value = livro.authors
                 ? livro.authors.join(', ')
                 : '';
+        }
+
+        // Preencher Número de Páginas
+        const paginas = document.getElementById('newPages');
+        if (paginas) {
+            paginas.value = livro.pageCount || '';
         }
 
         // Descrição
@@ -1184,7 +1243,7 @@ async function buscarDadosGoogleBooks() {
         showToast('Livro encontrado com sucesso!', 'success');
 
         console.log({
-            isbn,
+            isbn: cleanedIsbn,
             titulo: livro.title,
             autor: livro.authors,
             descricao: livro.description,
@@ -1207,6 +1266,8 @@ async function buscarDadosGoogleBooks() {
             btn.innerHTML = originalContent;
             btn.disabled = false;
         }
+        isbnInput.style.border = '';
+        isbnInput.style.boxShadow = '';
 
     }
 }
