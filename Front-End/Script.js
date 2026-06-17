@@ -1094,7 +1094,7 @@ async function buscarDadosGoogleBooks() {
         }
 
         // Descrição
-        const descricao = document.getElementById('newDescription');
+        const descricao = document.getElementById('newDesc');
         if (descricao) {
             descricao.value = livro.description || '';
         }
@@ -1116,14 +1116,20 @@ async function buscarDadosGoogleBooks() {
             livro.imageLinks?.smallThumbnail ||
             '';
 
-        const campoCapa = document.getElementById('newCover');
+        const campoCapa = document.getElementById('newCoverUrl');
 
         if (campoCapa) {
             campoCapa.value = capaUrl;
         }
 
+        // Link do Livro
+        const linkInput = document.getElementById('newBookUrl');
+        if (linkInput) {
+            linkInput.value = livro.infoLink || '';
+        }
+
         // Mostrar imagem da capa
-        const preview = document.getElementById('bookCoverPreview');
+        const preview = document.getElementById('coverPreview');
 
         if (preview) {
 
@@ -1193,5 +1199,3 @@ document.getElementById('newIsbn').addEventListener('blur', function () {
         buscarDadosGoogleBooks();
     }
 });
-
-
