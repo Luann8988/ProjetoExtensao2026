@@ -23,8 +23,10 @@ if(isset($_POST['email']) && isset($_POST['senha'])) {
 }
 
 //mostrar alunos
-$sql_alunos = "SELECT * FROM alunos";
-$query_alunos = $mysqli->query($sql_alunos) or die($mysqli->error);
+$q_alunos = isset($_GET['search_aluno']) ? $mysqli->real_escape_string($_GET['search_aluno']) : '';
+$where_alunos = $q_alunos ? "WHERE nome LIKE '%$q_alunos%' OR Email LIKE '%$q_alunos%'" : "";
+$sql_alunos = "SELECT * FROM alunos $where_alunos ORDER BY nome ASC";
+$query_alunos = $mysqli->query($sql_alunos);
 
 // mostrar livros
 $sql_livros = "SELECT * FROM livros";
@@ -112,24 +114,121 @@ if (isset($_GET['deletar_material'])){
     }
 }
 
-//adicionar livro
-if(isset($_POST['uploadLivro'])) {
-
+// 1. GESTÃO DE LIVROS: Cadastro, Edição e Exclusão
+if(isset($_POST['uploadLivro']) || isset($_POST['editarLivro'])) {
         $titulo = $mysqli->real_escape_string($_POST['Titulo']);
         $autor = $mysqli->real_escape_string($_POST['Autor']);
         $descricao = $mysqli->real_escape_string($_POST['Descricao']);
         $isbn = $mysqli->real_escape_string($_POST['ISBN']);
         $quantidade = (int)$_POST['Quantidade'];
+        $categoria = $mysqli->real_escape_string($_POST['Categoria'] ?? 'Geral');
+        $paginas = (int)($_POST['Paginas'] ?? 0);
+        $capa = $mysqli->real_escape_string($_POST['CapaURL'] ?? '');
+        $pdf = $mysqli->real_escape_string($_POST['PdfURL'] ?? '');
     
-        $sql_insert_livro = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade) VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade')";
-        if ($mysqli->query($sql_insert_livro)) {
-            echo "<p>Livro cadastrado com sucesso!</p>";
+        if(isset($_POST['editarLivro'])) {
+            $id = intval($_POST['IDlivro']);
+            $sql = "UPDATE livros SET Titulo='$titulo', Autor='$autor', Descricao='$descricao', ISBN='$isbn', Quantidade='$quantidade', Categoria='$categoria', Paginas='$paginas', CapaURL='$capa', PdfURL='$pdf' WHERE IDlivro=$id";
+            $msg = "atualizado";
         } else {
-            echo "<p>Erro ao cadastrar livro: " . $mysqli->error . "</p>";
+            $sql = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade, Categoria, Paginas, CapaURL, PdfURL) VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade', '$categoria', '$paginas', '$capa', '$pdf')";
+            $msg = "cadastrado";
+        }
+
+        if ($mysqli->query($sql)) {
+            echo "<script>alert('Livro $msg com sucesso!'); window.location.href = 'Professor.php';</script>";
+        } else {
+            echo "<script>alert('Erro: " . $mysqli->error . "');</script>";
         }
 }
 
-//deletar livro
+// 2. GESTÃO DE ALUNOS: Cadastro, Edição e Exclusão
+if(isset($_POST['adicionarAluno'])) {
+    $nome = $mysqli->real_escape_string($_POST['nomealuno']);
+    $senha = $mysqli->real_escape_string($_POST['senhaaluno']);
+    $email = $mysqli->real_escape_string($_POST['emailaluno'] ?? '');
+
+    if(isset($_POST['IDaluno'])) {
+        $id = intval($_POST['IDaluno']);
+        $mysqli->query("UPDATE alunos SET nome='$nome', Senha='$senha', Email='$email' WHERE IDaluno=$id");
+    } else {
+        $mysqli->query("INSERT INTO alunos (nome, Senha, Email) VALUES ('$nome', '$senha', '$email')");
+    }
+    header("Location: Professor.php#alunos");
+}
+
+if(isset($_GET['deletar_aluno'])) {
+    $id = intval($_GET['deletar_aluno']);
+    $mysqli->query("DELETE FROM alunos WHERE IDaluno = $id");
+    header("Location: Professor.php#alunos");
+}
+
+// 3. GESTÃO DE PROFESSORES: Cadastro e Exclusão
+if(isset($_POST['adicionarProfessor'])) {
+    $email = $mysqli->real_escape_string($_POST['emailProfessor']);
+    $senha = $mysqli->real_escape_string($_POST['senhaProfessor']);
+
+    if(isset($_POST['IDprofessor_edit'])) {
+        $id = intval($_POST['IDprofessor_edit']);
+        $mysqli->query("UPDATE professores SET Email='$email', Senha='$senha' WHERE IDprofessor=$id");
+    } else {
+        $mysqli->query("INSERT INTO professores (Email, Senha) VALUES ('$email', '$senha')");
+    }
+    header("Location: Professor.php");
+}
+
+if(isset($_GET['deletar_professor'])) {
+    $id = intval($_GET['deletar_professor']);
+    $mysqli->query("DELETE FROM professores WHERE IDprofessor = $id");
+    header("Location: Professor.php");
+}
+
+// 4. GESTÃO DE EMPRÉSTIMOS E DEVOLUÇÕES (Estoque Automático)
+// Registrar Empréstimo (Confirmar que o aluno levou o livro)
+if (isset($_GET['atualizar_emprestimoLivro']) && isset($_GET['atualizar_emprestimoAluno'])) {
+    $idlivro = intval($_GET['atualizar_emprestimoLivro']);
+    $idaluno = intval($_GET['atualizar_emprestimoAluno']);
+    
+    // Verifica se há estoque disponível
+    $res = $mysqli->query("SELECT Quantidade FROM livros WHERE IDlivro = $idlivro");
+    $livro = $res->fetch_assoc();
+
+    if ($livro['Quantidade'] > 0) {
+        // Status 1 = Emprestado. Define data de devolução para +7 dias.
+        $mysqli->query("UPDATE emprestimos SET atrasado = 1, data_devolucao = DATE_ADD(CURDATE(), INTERVAL 7 DAY) WHERE FK_IDaluno = $idaluno AND FK_IDlivro = $idlivro");
+        // Baixa no estoque
+        $mysqli->query("UPDATE livros SET Quantidade = Quantidade - 1 WHERE IDlivro = $idlivro");
+        echo "<script>alert('Empréstimo confirmado e estoque atualizado!'); window.location.href = 'Professor.php';</script>";
+    } else {
+        echo "<script>alert('Erro: Livro sem estoque disponível!'); window.location.href = 'Professor.php';</script>";
+    }
+    exit;
+}
+
+// Registrar Devolução
+if (isset($_GET['devolver_livro_id']) && isset($_GET['aluno_id'])) {
+    $idlivro = intval($_GET['devolver_livro_id']);
+    $idaluno = intval($_GET['aluno_id']);
+    
+    // Status 2 = Devolvido
+    $mysqli->query("UPDATE emprestimos SET atrasado = 2, data_devolucao = CURDATE() WHERE FK_IDaluno = $idaluno AND FK_IDlivro = $idlivro");
+    // Retorno ao estoque
+    $mysqli->query("UPDATE livros SET Quantidade = Quantidade + 1 WHERE IDlivro = $idlivro");
+    
+    echo "<script>alert('Devolução registrada e estoque restaurado!'); window.location.href = 'Professor.php';</script>";
+    exit;
+}
+
+// Criar registro de empréstimo (Novo)
+if(isset($_POST['criarEmprestimo'])) {
+    $idaluno = intval($_POST['FK_IDaluno']);
+    $idlivro = intval($_POST['FK_IDlivro']);
+    $mysqli->query("INSERT INTO emprestimos (FK_IDaluno, FK_IDlivro, data_emprestimo, atrasado) VALUES ($idaluno, $idlivro, CURDATE(), 0)");
+    header("Location: Professor.php");
+    exit;
+}
+
+// Deletar livro
 if (isset($_GET['deletar_livro'])){
     $id = intval($_GET['deletar_livro']);
     $sql_query = $mysqli->query("SELECT * FROM livros WHERE IDlivro = '$id'") or die($mysqli->error);

@@ -162,7 +162,7 @@
       <!-- BARRA DE AÇÕES -->
       <div class="books-toolbar">
         <div class="prof-actions-group">
-          <button class="btn-secondary" onclick="showModal('modalAddBook')">
+          <button class="btn-secondary" onclick="resetBookFormAction(); showModal('modalAddBook');">
             <i class="fas fa-plus"></i> Manual
           </button>
           <button class="btn-secondary" style="background: #ef4444; color: white;" onclick="showModal('modalUploadPdf')">
@@ -196,7 +196,11 @@
     <div class="modal-content" style="max-width: 500px;">
       <button class="close" onclick="hideModal('modalAddBook')">&times;</button>
       <h3>Cadastrar Novo Livro</h3>
-      <form id="addBookForm" onsubmit="salvarLivro(event)">
+      <form id="addBookForm" onsubmit="salvarLivro(event)" method="POST" action="../Back-End 30_5/Professor.php">
+        <!-- Campos de controle para o PHP -->
+        <input type="hidden" id="editBookId" name="IDlivro">
+        <input type="hidden" id="formAction" name="uploadLivro" value="1">
+
         <div class="form-group mb-3">
           <label class="fw-bold mb-1">ISBN (Busca Automática)</label>
           <div class="input-group">

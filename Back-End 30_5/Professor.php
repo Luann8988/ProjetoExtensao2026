@@ -1,27 +1,7 @@
 <?php
-
-include('conexao.php');
-session_start();
-
-// Lógica de Login do Professor
-if(isset($_POST['email']) && isset($_POST['senha'])) {
-    $email = $mysqli->real_escape_string($_POST['email']);
-    $senha = $mysqli->real_escape_string($_POST['senha']);
-
-    $sql_code = "SELECT * FROM professores WHERE Email = '$email' AND Senha = '$senha'";
-    $sql_query = $mysqli->query($sql_code) or die("Falha: " . $mysqli->error);
-
-    if($sql_query->num_rows == 1) {
-        $usuario = $sql_query->fetch_assoc();
-        $_SESSION['id_professor'] = $usuario['IDprofessor'];
-        $_SESSION['email_professor'] = $usuario['Email'];
-        
-        header("Location: Professor.php");
-        exit;
-    } else {
-        $erro = "E-mail ou senha incorretos!";
-    }
-}
+// O arquivo funcoes.php já inclui conexao.php e session_start()
+// Centralizar aqui garante que as variáveis $query_alunos, $query_dashboard, etc, fiquem disponíveis
+include('funcoes.php');
 
 //mostrar alunos
 $sql_alunos = "SELECT * FROM alunos";
@@ -32,12 +12,6 @@ $sql_emprestimos = "select * from emprestimos
 inner join livros on (emprestimos.FK_IDlivro = livros.IDlivro) 
 inner join alunos on (emprestimos.FK_IDaluno = alunos.IDaluno);";
                     
-$query_emprestimos = $mysqli->query($sql_emprestimos) or die($mysqli->error);
-$totalemprestimos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos")->fetch_assoc()['total'];
-$totalemprestimosativos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 1")->fetch_assoc()['total'];
-$totalemprestimosatrasados = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 4")->fetch_assoc()['total'];
-$totalemprestimosdevolvidos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado   = 2")->fetch_assoc()['total'];
-
 function nomearStatus($atrasado) {
     switch ($atrasado) {
         case 0:
@@ -89,24 +63,6 @@ o canpo atrasado da tabela emprestimos vai funcionar assim:
 4 = foi pego pelo aluno e ainda não devolveu, mas já passou da data de devolução
 
 */
-if(isset($_POST['uploadLivro'])) {
-
-        $titulo = $mysqli->real_escape_string($_POST['Titulo']);
-        $autor = $mysqli->real_escape_string($_POST['Autor']);
-        $descricao = $mysqli->real_escape_string($_POST['Descricao']);
-        $isbn = $mysqli->real_escape_string($_POST['ISBN']);
-        $quantidade = (int)$_POST['Quantidade'];
-    
-        $sql_insert_livro = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade) VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade')";
-        if ($mysqli->query($sql_insert_livro)) {
-            echo "<p>Livro cadastrado com sucesso!</p>";
-        } else {
-            echo "<p>Erro ao cadastrar livro: " . $mysqli->error . "</p>";
-        }
-
-
-
-}
 
 
 
@@ -162,6 +118,8 @@ if(isset($_FILES['arquivo'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Professor</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Adicionado para ícones e estilos de busca -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
     .error-message { color: red; text-align: center; margin-top: 10px; }
     </style>
@@ -243,7 +201,7 @@ if(isset($_FILES['arquivo'])){
                     </div>
                     <div class="data-section">
                         <div class="data-header">📋 Empréstimos Recentes</div>
-                        <table class="data-table">
+                        <table class="data-table" style="width:100%">
                             <thead><tr><th>Código</th><th>Aluno</th><th>Livro</th><th>Data Emp.</th><th>Data Dev.</th><th>Status</th></tr></thead>
                             <tbody id="listaEmprestimos">
                                 <?php
@@ -261,6 +219,13 @@ if(isset($_FILES['arquivo'])){
                                             <?php echo nomearStatus($emprestimos['atrasado']); ?>
                                         </a>
                                     </td>
+                                    <td>
+                                        <?php if($emprestimos['atrasado'] == 1 || $emprestimos['atrasado'] == 4): ?>
+                                            <a href="Professor.php?devolver_livro_id=<?php echo $emprestimos['IDlivro']; ?>&aluno_id=<?php echo $emprestimos['FK_IDaluno']; ?>" class="btn-primary" style="padding: 2px 5px; font-size: 11px; text-decoration: none;">Devolver</a>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
                                 <?php
                                 }}  
                                 ?>
@@ -273,7 +238,7 @@ if(isset($_FILES['arquivo'])){
                 <div id="alunosSection" class="section">
                     <div class="data-section">
                         <div class="data-header">👥 Alunos</div>
-                        <div class="grid" id="alunosGrid">
+                        <div class="grid" id="alunosGrid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px;">
                         <?php while($aluno = $query_alunos->fetch_assoc()): ?>
                             <div class="card book-card">
                                 <div class="card-content">
@@ -281,6 +246,9 @@ if(isset($_FILES['arquivo'])){
                                     <p>
                                         <span class="password-toggle" data-password="<?= htmlspecialchars($aluno['Senha']) ?>">••••••</span>
                                         <button type="button" class="btn-small" onclick="togglePassword(this)">Revelar</button>
+                                    </p>
+                                    <p>
+                                        <a href="Professor.php?deletar_aluno=<?php echo $aluno['IDaluno']; ?>" style="color:red; font-size:11px;" onclick="return confirm('Excluir aluno?')">Excluir</a>
                                     </p>
                                 </div>
                             </div>
@@ -298,26 +266,52 @@ if(isset($_FILES['arquivo'])){
                 <div id="livros" class="section">
                     <div class="data-section"><div class="data-header">📚 Livros</div>
 
-                    <div class="data-section"><!-- Formulário de upload de materia -->
+                    <div class="data-section" style="padding:15px;"><!-- Formulário de upload de materia -->
                         <form method='post' enctype="multipart/form-data" action="">
                             <p><input type="file" name="arquivo" id="arquivo"></p>
                             <button name="uploadMaterial" type="submit">Enviar</button>
                         </form>
                     </div>
 
-                    <div class="data-section"><!-- Formulário de upload de livros -->
-                        <form method='post' enctype="multipart/form-data" action="">
-                            <input type="string" name="Titulo" id="Titulo" placeholder="Título" required>
-                            <input type="string" name="Autor" id="Autor" placeholder="Autor" required>
-                            <input type="string" name="Descricao" id="Descricao" placeholder="Descrição" required>
-                            <input type="string" name="ISBN" id="ISBN" placeholder="ISBN" required>
-                            <input type="int" name="Quantidade" id="Quantidade" placeholder="Quantidade" required>
-                            <button name="uploadLivro" type="submit">Cadastrar Livro</button>
+                    <div class="data-section" style="padding:15px;"><!-- Formulário de upload de livros -->
+                        <form method='post' action="" id="addBookForm">
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="text" name="ISBN" id="newIsbn" placeholder="ISBN (Busca Automática)" style="flex: 1;">
+                                <button type="button" class="btn-search-isbn" onclick="buscarDadosGoogleBooks()" style="width: 50px;">🔍</button>
+                            </div>
+                            <input type="text" name="Titulo" id="newTitle" placeholder="Título" required>
+                            <input type="text" name="Autor" id="newAuthor" placeholder="Autor" required>
+                            <textarea name="Descricao" id="newDesc" placeholder="Descrição" style="width: 100%; margin-bottom: 10px;"></textarea>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" name="Categoria" id="newCategory" placeholder="Categoria" style="flex: 1;">
+                                <input type="number" name="Paginas" id="newPages" placeholder="Páginas" style="width: 80px;">
+                                <input type="number" name="Quantidade" placeholder="Qtd" value="1" style="width: 60px;">
+                            </div>
+                            <input type="hidden" name="CapaURL" id="newCoverUrl">
+                            <input type="hidden" name="PdfURL" id="newBookUrl">
+                            <button name="uploadLivro" type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Salvar Livro no Banco</button>
                         </form>
                     </div>
-                        <button class="btn-secondary" onclick="showModal('modalAddBook')">
-                            Adicionar Livro
-                        </button>
+
+                    <div class="data-section">
+                        <table class="data-table" style="width:100%">
+                            <thead><tr><th>ID</th><th>Título</th><th>Autor</th><th>Estoque</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                <?php 
+                                $query_livros = $mysqli->query("SELECT * FROM livros ORDER BY IDlivro DESC");
+                                while($livro = $query_livros->fetch_assoc()): ?>
+                                <tr>
+                                    <td><?php echo $livro['IDlivro']; ?></td>
+                                    <td><?php echo htmlspecialchars($livro['Titulo']); ?></td>
+                                    <td><?php echo htmlspecialchars($livro['Autor']); ?></td>
+                                    <td><?php echo $livro['Quantidade']; ?></td>
+                                    <td><a href="Professor.php?deletar_livro=<?php echo $livro['IDlivro']; ?>" style="color:red" onclick="return confirm('Excluir livro?')">Excluir</a></td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
                     </div>
                 </div>
 

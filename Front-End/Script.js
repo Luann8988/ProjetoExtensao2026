@@ -764,6 +764,14 @@ function editarLivro(id) {
     const book = library.books.find(b => b.id === id);
     if (!book) return;
     livroEmEdicaoId = id;
+
+    // Configura o formulário para edição no PHP
+    const hiddenId = document.getElementById('editBookId');
+    if (hiddenId) hiddenId.value = id;
+
+    const actionInput = document.getElementById('formAction');
+    if (actionInput) actionInput.name = 'editarLivro';
+
     document.getElementById('newTitle').value = book.title;
     document.getElementById('newAuthor').value = book.author;
     document.getElementById('newDesc').value = book.description || '';
@@ -774,40 +782,19 @@ function editarLivro(id) {
     atualizarPreview();
 }
 
-function salvarLivro(e) {
-    e.preventDefault();
-    const form = e.target;
-    const fd = new FormData(form);
-    const bookData = {
-        title: fd.get('Titulo'),
-        author: fd.get('Autor'),
-        description: fd.get('Descricao'),
-        category: fd.get('Categoria'),
-        image: fd.get('CapaURL'),
-        pdfFile: fd.get('PdfURL'),
-        isbn: fd.get('ISBN'),
-        totalCopies: parseInt(fd.get('Quantidade')) || 1
-    };
+function resetBookFormAction() {
+    const hiddenId = document.getElementById('editBookId');
+    if (hiddenId) hiddenId.value = '';
+    const actionInput = document.getElementById('formAction');
+    if (actionInput) actionInput.name = 'uploadLivro';
+    livroEmEdicaoId = null;
+    document.getElementById('addBookForm').reset();
+}
 
-    if (livroEmEdicaoId) {
-        const book = library.books.find(b => b.id === livroEmEdicaoId);
-        if (book) {
-            Object.assign(book, bookData);
-            book.availableCopies = bookData.totalCopies; // Reset estoque para simplificar
-        }
-        livroEmEdicaoId = null;
-        showToast('Livro atualizado!');
-    } else {
-        const newBook = new Book(Date.now(), bookData.title, bookData.author, bookData.image, bookData.pdfFile, bookData.description, bookData.isbn, bookData.totalCopies);
-        newBook.category = bookData.category;
-        library.books.push(newBook);
-        showToast('Livro adicionado!');
-    }
-    library.saveData();
-    renderProfessorBooks();
-    hideModal('modalAddBook');
-    form.reset();
-    document.getElementById('coverPreview').style.display = 'none';
+function salvarLivro(e) {
+    // O preventDefault foi removido para permitir a submissão real do formulário ao PHP.
+    // A persistência de dados agora é feita no banco de dados através do funcoes.php.
+    console.log("Enviando dados para o servidor...");
 }
 
 function salvarPdfManual(e) {
