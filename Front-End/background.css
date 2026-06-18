@@ -1,18 +1,13 @@
 body {
-  /* Imagem de fundo real + gradiente por cima para manter a legibilidade */
-  background-image:
-    linear-gradient(
-      180deg,
-      rgba(27, 20, 100, 0.70) 0%,
-      rgba(46, 49, 146, 0.55) 35%,
-      rgba(0, 0, 0, 0.55) 100%
-    ),
-    url('Imagens/fundo.jpg');
+  margin: 0;
+  min-height: 100vh;
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background: linear-gradient(
+    180deg,
+    #1a062e 0%,
+    var(--primary-dark) 50%,
+    #2b0a4d 100%
+  );
+
+  color: #fff;
 }
-
-
