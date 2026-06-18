@@ -61,7 +61,7 @@ class LoanManager {
       new Book(4, 'Senhora', 'José de Alencar', 'senhora.png', 'senhora.pdf', 'Romance urbano sobre amor, dinheiro e convenções sociais.', '9788570019012', 6, 4, 'Romance'),
       new Book(5, 'O Guarani', 'José de Alencar', 'guarani.png', 'guarani.pdf', 'Romance indianista ambientado no Brasil colonial.', '9788570010123', 5, 5, 'Aventura'),
       new Book(6, 'Iracema', 'José de Alencar', 'iracema.png', 'iracema.pdf', 'Romance indianista sobre a origem do Ceará.', '9788570012345', 4, 2, 'Romance'),
-      new Book(7, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'mulato.pdf', 'Romance naturalista sobre racismo e preconceito.', '9788570016780', 3, 1, 'Drama'),
+      new Book(7, 'O Mulato', 'Aluísio Azevedo', 'mulato.png', 'omulato.pdf', 'Romance naturalista sobre racismo e preconceito.', '9788570016780', 3, 1, 'Drama'),
       new Book(8, 'A Luneta Mágica', 'Machado de Assis', 'luneta.png', 'luneta.pdf', 'Conto fantástico sobre a percepção da realidade.', '9788570018900', 5, 4, 'Clássicos'),
       new Book(9, 'O Seminarista', 'Bernardo Guimarães', 'seminarista.png', 'seminarista.pdf', 'Romance sobre dilemas morais.', '9788570015670', 4, 2, 'Drama'),
     ];
