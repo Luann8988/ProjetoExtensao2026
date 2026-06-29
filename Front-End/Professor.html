@@ -17,9 +17,10 @@
     <h2>Portal do Professor</h2>
 
     <div id="loginErrorMessage" class="error-message"></div>
-    <form onsubmit="login(event)">
+    <form id="formLogin">
       <input type="text" id="usuario" placeholder="Usuário" required>
       <input type="password" id="senha" placeholder="Senha" required>
+      <a href="#" onclick="esqueciSenha()" style="display: block; margin-top: 15px; color: #fff; text-decoration: none; font-size: 14px;">Esqueci minha senha</a>
       <button type="submit">Entrar</button>
     </form>
 

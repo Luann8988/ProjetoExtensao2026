@@ -470,3 +470,53 @@ function afterStudentLogin() {
     }
     showBooks(); 
 }
+
+// ==================== CONTROLE DE LOGIN UNIFICADO ====================
+document.getElementById('formLogin')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const errorEl = document.getElementById('loginErrorMessage');
+    if (errorEl) errorEl.style.display = 'none';
+
+    const emailInput = document.getElementById('usuario')?.value.trim();
+    const senhaInput = document.getElementById('senha')?.value.trim();
+
+    if (!emailInput || !senhaInput) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('email', emailInput);
+    formData.append('senha', senhaInput);
+
+    // Rota correta apontando para a pasta paralela Back-End 08_06
+    fetch('../Back-End 08_06/login.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            alert(`Bem-vindo, ${data.nome}!`);
+
+            // Redirecionamento baseado no tipo retornado pelo banco
+            if (data.tipo === 'professor') {
+                window.location.href = 'Professor.html';
+            } else if (data.tipo === 'aluno') {
+                window.location.href = 'Aluno.html';
+            }
+        } else {
+            if (errorEl) {
+                errorEl.textContent = data.error;
+                errorEl.style.display = 'block';
+            } else {
+                alert(data.error);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro na requisição de login:', error);
+        alert('Erro de comunicação com o servidor.');
+    });
+});
