@@ -33,17 +33,32 @@ if(!isset($_SESSION['id_aluno'])) {
 }
 
 // Lógica de Login (Simplificada para o exemplo)
-if(isset($_POST['nome']) && isset($_POST['senha'])) {
-    $nome = $mysqli->real_escape_string($_POST['nome']);
-    $senha = $mysqli->real_escape_string($_POST['senha']);
-    $sql_code = "SELECT * FROM ALUNOS WHERE nome = '$nome' AND Senha = '$senha'";
-    $sql_query = $mysqli->query($sql_code);
-    if($sql_query->num_rows == 1) {
-        $usuario = $sql_query->fetch_assoc();
-        $_SESSION['id_aluno'] = $usuario['IDaluno'];
-        $_SESSION['nome_aluno'] = $usuario['nome'];
+if(isset($_POST['matricula']) && isset($_POST['senha'])) {
+    $matricula = $mysqli->real_escape_string($_POST['matricula']);
+    $senha = $_POST['senha'];
+
+    // Login de teste estático
+    if ($matricula === '98763867' && $senha === '17082006') {
+        $_SESSION['id_aluno'] = 999; // ID Fixo para o aluno de teste
+        $_SESSION['nome_aluno'] = 'Aluno de Teste';
         header("Location: Aluno.php");
         exit;
+    }
+    
+    $stmt = $mysqli->prepare("SELECT IDaluno, nome, Senha FROM alunos WHERE matricula = ?");
+    $stmt->bind_param("s", $matricula);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if($result->num_rows == 1) {
+        $usuario = $result->fetch_assoc();
+        // Verifica a senha usando password_verify
+        if (password_verify($senha, $usuario['Senha'])) {
+            $_SESSION['id_aluno'] = $usuario['IDaluno'];
+            $_SESSION['nome_aluno'] = $usuario['nome'];
+            header("Location: Aluno.php");
+            exit;
+        }
     }
 }
 
@@ -116,9 +131,10 @@ function nomearStatus($atrasado) {
     <div class="login-container">
         <form action="" method="POST">
             <h2>Acesso do Aluno</h2>
-            <input type="text" name="nome" placeholder="Seu Nome" required>
+            <input type="text" name="matricula" placeholder="Sua Matrícula" required>
             <input type="password" name="senha" placeholder="Sua Senha" required>
             <button type="submit">Entrar</button>
+            <a href="recuperar_senha.php" style="display: block; margin-top: 20px; font-size: 14px; color: #FFC20E; text-decoration: none; font-weight: 500;">Esqueci minha senha</a>
         </form>
     </div>
 <?php else: ?>

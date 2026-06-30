@@ -612,3 +612,125 @@ if (document.getElementById('professorContainer')) {
     // Chama a função a cada 10 segundos (10000 milissegundos)
     setInterval(fetchDashboardData, 10000);
 }
+
+// ================== VERIFICADOR DE FORÇA DE SENHA ==================
+
+/**
+ * Verifica a força de uma senha e atualiza a barra de progresso.
+ */
+function verificarForcaSenha() {
+    const senha = document.getElementById('nova_senha').value;
+    const forcaBarra = document.getElementById('password-strength-bar');
+    const forcaTexto = document.getElementById('password-strength-text');
+
+    let forca = 0;
+    let texto = 'Muito Fraca';
+    let cor = '#ef4444'; // Vermelho
+
+    // Critérios de força
+    if (senha.length >= 8) forca += 25;
+    if (senha.match(/[a-z]/)) forca += 15;
+    if (senha.match(/[A-Z]/)) forca += 20;
+    if (senha.match(/[0-9]/)) forca += 20;
+    if (senha.match(/[\W_]/)) forca += 20; // Caracteres especiais
+
+    if (forca < 40) {
+        texto = 'Fraca';
+        cor = '#ef4444'; // Vermelho
+    } else if (forca < 75) {
+        texto = 'Média';
+        cor = '#f59e0b'; // Laranja
+    } else {
+        texto = 'Forte';
+        cor = '#10b981'; // Verde
+    }
+
+    if (senha.length === 0) {
+        forca = 0;
+        texto = '';
+    }
+
+    if (forcaBarra && forcaTexto) {
+        forcaBarra.style.width = forca + '%';
+        forcaBarra.style.backgroundColor = cor;
+        forcaTexto.textContent = texto;
+        forcaTexto.style.color = cor;
+    }
+}
+
+// Adiciona o listener se o campo de senha existir
+const campoNovaSenha = document.getElementById('nova_senha');
+if (campoNovaSenha) {
+    campoNovaSenha.addEventListener('keyup', verificarForcaSenha);
+}
+
+// ================== FORMULÁRIO DE CONTATO (ALUNO) ==================
+
+async function enviarFormularioContato(event) {
+    event.preventDefault();
+    const form = document.getElementById('contactForm');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.innerHTML;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="loading"></span> Enviando...';
+
+    const formData = new FormData(form);
+    formData.append('enviar_contato_aluno', '1'); // Adiciona o gatilho para o PHP
+
+    try {
+        const response = await fetch('funcoes.php', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.ok) {
+            showToast(result.message, 'success');
+            form.reset();
+        } else {
+            showToast(result.error || 'Ocorreu um erro.', 'error');
+        }
+    } catch (error) {
+        showToast('Erro de conexão. Verifique sua internet.', 'error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+    }
+}
+
+/**
+ * Função de login para o front-end (Aluno.html e Professor.html).
+ * Verifica credenciais de teste antes de tentar o login normal.
+ */
+async function login(event) {
+    event.preventDefault();
+    const form = event.target;
+    const matricula = form.querySelector('#usuario').value;
+    const senha = form.querySelector('#senha').value;
+    const errorMessageDiv = form.querySelector('#loginErrorMessage');
+
+    // Credenciais de teste do Aluno
+    if (matricula === '98763867' && senha === '17082006') {
+        // Simula o login do aluno no front-end
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('alunoContainer').style.display = 'block';
+        // Você pode querer chamar funções de inicialização aqui, como showBooks()
+        return;
+    }
+
+    // Credenciais de teste do Professor
+    if (matricula === '8837297' && senha === '18031992') {
+        // Simula o login do professor no front-end
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('professorContainer').style.display = 'block';
+        // Você pode querer chamar funções de inicialização aqui, como carregarDashboard()
+        return;
+    }
+
+    // Se não forem credenciais de teste, exibe um erro (ou poderia prosseguir para um login via API)
+    if (errorMessageDiv) {
+        errorMessageDiv.textContent = 'Matrícula ou senha inválida. Use as credenciais de teste para acesso rápido.';
+        errorMessageDiv.style.display = 'block';
+    }
+}

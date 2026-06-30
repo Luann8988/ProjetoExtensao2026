@@ -132,10 +132,11 @@ if(isset($_FILES['arquivo'])){
         <img src="Imagens/imagem3.png" class="logo" alt="Logo">
         <h2>Portal do Professor</h2>
         <?php if(isset($erro)) echo "<p class='error-message'>$erro</p>"; ?>
-        <form action="" method="POST">
-            <input type="email" name="email" placeholder="E-mail" required>
+        <form action="Professor.php" method="POST">
+            <input type="text" name="matricula" placeholder="Sua Matrícula" required>
             <input type="password" name="senha" placeholder="Senha" required>
             <button type="submit">Entrar</button>
+            <a href="recuperar_senha.php" style="display: block; margin-top: 20px; font-size: 14px; color: #FFC20E; text-decoration: none; font-weight: 500;">Esqueci minha senha</a>
         </form>
     </div>
 <?php else: ?>

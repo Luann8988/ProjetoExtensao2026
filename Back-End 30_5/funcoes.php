@@ -3,20 +3,31 @@ include('conexao.php');
 session_start();
 
 // Lógica de Login do Professor
-if(isset($_POST['email']) && isset($_POST['senha'])) {
-    $email = $mysqli->real_escape_string($_POST['email']);
-    $senha = $mysqli->real_escape_string($_POST['senha']);
-
-    $sql_code = "SELECT * FROM professores WHERE Email = '$email' AND Senha = '$senha'";
-    $sql_query = $mysqli->query($sql_code) or die("Falha: " . $mysqli->error);
-
-    if($sql_query->num_rows == 1) {
-        $usuario = $sql_query->fetch_assoc();
-        $_SESSION['id_professor'] = $usuario['IDprofessor'];
-        $_SESSION['email_professor'] = $usuario['Email'];
-        
+if(isset($_POST['matricula']) && isset($_POST['senha'])) {
+    // Login de teste estático
+    if ($_POST['matricula'] === '8837297' && $_POST['senha'] === '18031992') {
+        $_SESSION['id_professor'] = 999; // ID Fixo para o professor de teste
+        $_SESSION['email_professor'] = 'Professor de Teste';
         header("Location: Professor.php");
         exit;
+    }
+
+    $matricula = $mysqli->real_escape_string($_POST['matricula']);
+    $senha = $_POST['senha'];
+    $stmt = $mysqli->prepare("SELECT IDprofessor, Email, Senha FROM professores WHERE matricula = ?");
+    $stmt->bind_param("s", $matricula);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if($result->num_rows == 1) {
+        $usuario = $result->fetch_assoc();
+        // Verifica a senha usando password_verify
+        if (password_verify($senha, $usuario['Senha'])) {
+            $_SESSION['id_professor'] = $usuario['IDprofessor'];
+            $_SESSION['email_professor'] = $usuario['Email'];
+            header("Location: Professor.php");
+            exit;
+        }
     } else {
         $erro = "E-mail ou senha incorretos!";
     }
@@ -346,4 +357,66 @@ if (isset($_GET['deletar_emprestimoLivro']) && isset($_GET['deletar_emprestimoAl
     }
     
     $stmt->close();
+}
+
+// 5. GESTÃO DO FORMULÁRIO DE CONTATO DO ALUNO
+if (isset($_POST['enviar_contato_aluno'])) {
+    header('Content-Type: application/json');
+    
+    // Segurança: Apenas alunos logados podem enviar
+    if (!isset($_SESSION['id_aluno'])) {
+        echo json_encode(['ok' => false, 'error' => 'Acesso não autorizado. Faça login novamente.']);
+        exit;
+    }
+
+    $id_aluno = $_SESSION['id_aluno'];
+    $assunto = $_POST['assunto'] ?? 'Sem Assunto';
+    $mensagem_aluno = $_POST['mensagem'] ?? '';
+
+    if (empty($mensagem_aluno)) {
+        echo json_encode(['ok' => false, 'error' => 'A mensagem não pode estar vazia.']);
+        exit;
+    }
+
+    // Busca o nome do aluno
+    $aluno_info = $mysqli->query("SELECT nome, Email FROM alunos WHERE IDaluno = $id_aluno")->fetch_assoc();
+    $nome_aluno = $aluno_info['nome'] ?? 'Aluno Desconhecido';
+    $email_aluno = $aluno_info['Email'] ?? 'email.nao.cadastrado@escola.com';
+
+    // Inclui e configura o PHPMailer
+    require 'vendor/autoload.php';
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        // Configurações do servidor SMTP (ex: Gmail)
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'bibliotecacouto16@gmail.com'; // SEU E-MAIL DO GMAIL
+        $mail->Password   = 'sua-senha-de-app';    // SUA SENHA DE APP GERADA
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = 465;
+        $mail->CharSet    = 'UTF-8';
+
+        // E-mail
+        $mail->setFrom('bibliotecacouto16@gmail.com', 'Portal da Biblioteca');
+        $mail->addAddress('bibliotecacouto16@gmail.com'); // E-mail do administrador
+        $mail->addReplyTo($email_aluno, $nome_aluno); // Facilita a resposta direta para o aluno
+        $mail->isHTML(true);
+        $mail->Subject = "Contato do Aluno: " . htmlspecialchars($assunto);
+
+        // Adiciona o anexo, se existir e for válido
+        if (isset($_FILES['anexo']) && $_FILES['anexo']['error'] == UPLOAD_ERR_OK) {
+            $mail->addAttachment($_FILES['anexo']['tmp_name'], $_FILES['anexo']['name']);
+        }
+
+        $mail->Body    = "<b>Aluno:</b> " . htmlspecialchars($nome_aluno) . " (ID: $id_aluno)<br><b>E-mail:</b> " . htmlspecialchars($email_aluno) . "<br><br><b>Mensagem:</b><br>" . nl2br(htmlspecialchars($mensagem_aluno));
+
+        $mail->send();
+        echo json_encode(['ok' => true, 'message' => 'Mensagem enviada com sucesso!']);
+    } catch (Exception $e) {
+        error_log("PHPMailer Error: " . $mail->ErrorInfo); // Log do erro no servidor
+        echo json_encode(['ok' => false, 'error' => 'Não foi possível enviar a mensagem. Tente novamente mais tarde.']);
+    }
+    exit;
 }

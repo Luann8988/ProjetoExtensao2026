@@ -20,6 +20,7 @@
       <input type="text" id="usuario" placeholder="Usuário" required>
       <input type="password" id="senha" placeholder="Senha" required>
       <button type="submit">Entrar</button>
+      <a href="../Back-End 30_5/recuperar_senha.php" style="display: block; margin-top: 20px; font-size: 14px; color: #FFC20E; text-decoration: none; font-weight: 500;">Esqueci minha senha</a>
     </form>
   </div>
 
@@ -143,14 +144,21 @@
             <div class="data-header">❓ Suporte e Ajuda</div>
             <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
               <p style="margin:0; font-size: 14px;">Precisa de ajuda com um livro ou erro no sistema?</p>
-              <div style="display: flex; gap: 10px;">
-                <a href="mailto:suporte.biblioteca@escola.mg.gov.br?subject=Ajuda%20Portal%20Aluno" class="btn-primary" style="text-decoration: none; flex: 1; text-align: center; padding: 10px; border-radius: 8px;">
-                  <i class="fas fa-envelope"></i> E-mail
-                </a>
-                <a href="https://wa.me/5532999999999?text=Olá!%20Sou%20aluno%20da%20biblioteca%20e%20preciso%20de%20ajuda." target="_blank" class="btn-secondary" style="text-decoration: none; flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-weight: bold;">
-                  <i class="fab fa-whatsapp"></i> WhatsApp
-                </a>
-              </div>
+              <form id="contactForm" onsubmit="enviarFormularioContato(event)">
+                <div class="form-group">
+                  <label for="contactSubject">Assunto</label>
+                  <input type="text" id="contactSubject" name="assunto" placeholder="Ex: Livro não encontrado, erro no empréstimo..." required>
+                </div>
+                <div class="form-group">
+                  <label for="contactMessage">Mensagem</label>
+                  <textarea id="contactMessage" name="mensagem" rows="4" placeholder="Descreva seu problema ou dúvida com o máximo de detalhes possível." required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="contactAttachment">Anexar Print (Opcional)</label>
+                  <input type="file" id="contactAttachment" name="anexo" accept="image/png, image/jpeg, image/gif" style="padding: 8px; background: #f1f5f9; border-color: #cbd5e1;">
+                </div>
+                <button type="submit" class="btn-primary w-100">Enviar Mensagem</button>
+              </form>
             </div>
           </div>
         </div>
