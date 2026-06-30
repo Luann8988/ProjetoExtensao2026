@@ -16,11 +16,11 @@
     <h2>Portal do Aluno</h2>
 
     <div id="loginErrorMessage" class="error-message"></div>
-    <form onsubmit="login(event)">
-      <input type="text" id="usuario" placeholder="Usuário" required>
-      <input type="password" id="senha" placeholder="Senha" required>
+    <form action="../Back-End 30_5/Aluno.php" method="POST">
+      <input type="text" id="usuario" name="matricula" placeholder="Sua Matrícula" required>
+      <input type="password" id="senha" name="senha" placeholder="Sua Senha" required>
       <button type="submit">Entrar</button>
-      <a href="../Back-End 30_5/recuperar_senha.php" style="display: block; margin-top: 20px; font-size: 14px; color: #FFC20E; text-decoration: none; font-weight: 500;">Esqueci minha senha</a>
+      <a href="../Back-End 30_5/recuperar_senha.php" class="link-esqueci-senha">Esqueci minha senha</a>
     </form>
   </div>
 

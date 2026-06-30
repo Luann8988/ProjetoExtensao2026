@@ -134,7 +134,7 @@ function nomearStatus($atrasado) {
             <input type="text" name="matricula" placeholder="Sua Matrícula" required>
             <input type="password" name="senha" placeholder="Sua Senha" required>
             <button type="submit">Entrar</button>
-            <a href="recuperar_senha.php" style="display: block; margin-top: 20px; font-size: 14px; color: #FFC20E; text-decoration: none; font-weight: 500;">Esqueci minha senha</a>
+            <a href="recuperar_senha.php" class="link-esqueci-senha">Esqueci minha senha</a>
         </form>
     </div>
 <?php else: ?>
