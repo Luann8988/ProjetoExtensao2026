@@ -149,19 +149,30 @@ function nomearStatus($atrasado) {
                         <div class="data-header">📚 Catálogo de Livros</div>
                         <div class="grid">
                         <?php while($livro = $query_livros->fetch_assoc()): ?>
-                            <div class="card book-card">
+                            <?php 
+                                // Prepara os dados do livro para o JavaScript
+                                $livro_json = htmlspecialchars(json_encode([
+                                    'IDlivro' => $livro['IDlivro'],
+                                    'Titulo' => $livro['Titulo'],
+                                    'Autor' => $livro['Autor'],
+                                    'Descricao' => $livro['Descricao'],
+                                    'CapaURL' => !empty($livro['CapaURL']) ? $livro['CapaURL'] : '../Front-End/Imagens/capa-padrao.png',
+                                    'PdfURL' => $livro['PdfURL'] ?? null,
+                                    'Quantidade' => (int)($livro['Quantidade'] ?? 0)
+                                ]), ENT_QUOTES, 'UTF-8');
+                            ?>
+                            <div class="card book-card" onclick="abrirModalLivro(<?= $livro_json ?>)">
+                                <?php
+                                    // Define a imagem da capa. Usa uma padrão se não houver.
+                                    $capaUrl = !empty($livro['CapaURL']) ? $livro['CapaURL'] : '../Front-End/Imagens/capa-padrao.png';
+                                    $disponivel = isset($livro['Quantidade']) && $livro['Quantidade'] > 0;
+                                ?>
+                                <img src="<?= htmlspecialchars($capaUrl) ?>" alt="Capa do livro <?= htmlspecialchars($livro['Titulo']) ?>" class="capa" style="height: 200px; object-fit: cover; border-radius: 8px 8px 0 0;">
                                 <div class="card-content">
                                     <h3><?= htmlspecialchars($livro['Titulo']) ?></h3>
                                     <p><strong><?= htmlspecialchars($livro['Autor']) ?></strong></p>
-                                    
-                                    <div class="actions">
-                                        
-                                        <form method="POST" action="">
-                                            <input type="hidden" name="id_livro" value="<?= $livro['IDlivro'] ?>">
-                                            <button name="solicitar_emprestimo" class="btn-emprestar" type="submit">Emprestar</button>
-                                        </form>
-                                    </div>
-                                    
+                                    <p class="small">Disponíveis: <strong><?= (int)($livro['Quantidade'] ?? 0) ?></strong></p>
+                                    <button class="btn-emprestar" style="width:100%; margin-top:10px;">Ver Detalhes</button>
                                 </div>
                             </div>
                         <?php endwhile; ?>
@@ -265,17 +276,24 @@ function nomearStatus($atrasado) {
         </footer>
     </div>
 
-    <div id="modalViewer" class="modal">
+    <!-- Modal de Detalhes do Livro -->
+    <div id="modalDetalhesLivro" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="fecharModal('modalViewer')">&times;</span>
-            <h2 id="viewTitulo"></h2>
-            <p><strong id="viewAutor"></strong></p>
-            <hr>
-            <p id="viewDescricao" style="margin: 15px 0;"></p>
-            <div id="containerPdf" style="display:none;">
-                <button class="btn-pdf" id="btnAbrirPdf">📖 Abrir PDF Completo</button>
+            <span class="close" onclick="fecharModal('modalDetalhesLivro')">&times;</span>
+            <div class="modal-body" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <img id="modalCapa" src="" alt="Capa do Livro" style="width: 150px; height: 220px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+                <div style="flex: 1; min-width: 250px;">
+                    <h2 id="modalTitulo" style="margin-top: 0;"></h2>
+                    <p><strong id="modalAutor"></strong></p>
+                    <p id="modalDisponibilidade" class="small"></p>
+                    <hr style="border-color: #444;">
+                    <p id="modalDescricao" style="font-size: 14px; color: #ccc; max-height: 80px; overflow-y: auto;"></p>
+                </div>
             </div>
-            <button class="btn-emprestar" id="btnEmprestarModal">Solicitar este Livro</button>
+            <div class="modal-footer" style="text-align: right; margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <a id="btnLerPdfModal" href="#" target="_blank" class="btn-pdf" style="display: none;">Ler PDF</a>
+                <button id="btnEmprestarModal" class="btn-emprestar">Solicitar Empréstimo</button>
+            </div>
         </div>
     </div>
 

@@ -74,6 +74,7 @@ $totalemprestimos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos")-
 $totalemprestimosativos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 1")->fetch_assoc()['total'];
 $totalemprestimosatrasados = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 4")->fetch_assoc()['total'];
 $totalemprestimosdevolvidos = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado   = 2")->fetch_assoc()['total'];
+$total_solicitacoes_pendentes = $mysqli->query("SELECT COUNT(*) as total FROM emprestimos WHERE atrasado = 0")->fetch_assoc()['total'];
 
 function nomearStatus($atrasado) {
     switch ($atrasado) {
@@ -116,30 +117,38 @@ if (isset($_GET['deletar_material'])){
 
 // 1. GESTÃO DE LIVROS: Cadastro, Edição e Exclusão
 if(isset($_POST['uploadLivro']) || isset($_POST['editarLivro'])) {
-        $titulo = $mysqli->real_escape_string($_POST['Titulo']);
-        $autor = $mysqli->real_escape_string($_POST['Autor']);
-        $descricao = $mysqli->real_escape_string($_POST['Descricao']);
-        $isbn = $mysqli->real_escape_string($_POST['ISBN']);
-        $quantidade = (int)$_POST['Quantidade'];
-        $categoria = $mysqli->real_escape_string($_POST['Categoria'] ?? 'Geral');
-        $paginas = (int)($_POST['Paginas'] ?? 0);
-        $capa = $mysqli->real_escape_string($_POST['CapaURL'] ?? '');
-        $pdf = $mysqli->real_escape_string($_POST['PdfURL'] ?? '');
+    $titulo = $_POST['Titulo'];
+    $autor = $_POST['Autor'];
+    $descricao = $_POST['Descricao'];
+    $isbn = $_POST['ISBN'];
+    $quantidade = (int)$_POST['Quantidade'];
+    $categoria = $_POST['Categoria'] ?? 'Geral';
+    $paginas = (int)($_POST['Paginas'] ?? 0);
+    $capa_url = $_POST['CapaURL'] ?? '';
+    $pdf_url = $_POST['PdfURL'] ?? '';
     
-        if(isset($_POST['editarLivro'])) {
-            $id = intval($_POST['IDlivro']);
-            $sql = "UPDATE livros SET Titulo='$titulo', Autor='$autor', Descricao='$descricao', ISBN='$isbn', Quantidade='$quantidade', Categoria='$categoria', Paginas='$paginas', CapaURL='$capa', PdfURL='$pdf' WHERE IDlivro=$id";
-            $msg = "atualizado";
-        } else {
-            $sql = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade, Categoria, Paginas, CapaURL, PdfURL) VALUES ('$titulo', '$autor', '$descricao', '$isbn', '$quantidade', '$categoria', '$paginas', '$capa', '$pdf')";
-            $msg = "cadastrado";
-        }
+    if(isset($_POST['editarLivro'])) {
+        $id = intval($_POST['IDlivro']);
+        // Usar prepared statements para UPDATE
+        $sql = "UPDATE livros SET Titulo=?, Autor=?, Descricao=?, ISBN=?, Quantidade=?, Categoria=?, Paginas=?, CapaURL=?, PdfURL=? WHERE IDlivro=?";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param("ssssisissi", $titulo, $autor, $descricao, $isbn, $quantidade, $categoria, $paginas, $capa_url, $pdf_url, $id);
+        $msg = "atualizado";
+    } else {
+        // Usar prepared statements para INSERT
+        $sql = "INSERT INTO livros (Titulo, Autor, Descricao, ISBN, Quantidade, Categoria, Paginas, CapaURL, PdfURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param("ssssisiss", $titulo, $autor, $descricao, $isbn, $quantidade, $categoria, $paginas, $capa_url, $pdf_url);
+        $msg = "cadastrado";
+    }
 
-        if ($mysqli->query($sql)) {
-            echo "<script>alert('Livro $msg com sucesso!'); window.location.href = 'Professor.php';</script>";
-        } else {
-            echo "<script>alert('Erro: " . $mysqli->error . "');</script>";
-        }
+    if ($stmt->execute()) {
+        echo "<script>alert('Livro $msg com sucesso!'); window.location.href = '../Front-End/Professor.html?tab=livros';</script>";
+    } else {
+        echo "<script>alert('Erro: " . $stmt->error . "');</script>";
+    }
+    $stmt->close();
+    exit; // É importante sair após o processamento do formulário
 }
 
 // 2. GESTÃO DE ALUNOS: Cadastro, Edição e Exclusão

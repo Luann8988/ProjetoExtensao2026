@@ -470,3 +470,145 @@ function afterStudentLogin() {
     }
     showBooks(); 
 }
+
+/**
+ * Abre um modal com os detalhes de um livro específico.
+ * @param {object} livro - O objeto do livro com todos os seus detalhes.
+ */
+function abrirModalLivro(livro) {
+    // Preenche os campos do modal com os dados do livro
+    document.getElementById('modalCapa').src = livro.CapaURL;
+    document.getElementById('modalCapa').alt = `Capa do livro ${livro.Titulo}`;
+    document.getElementById('modalTitulo').textContent = livro.Titulo;
+    document.getElementById('modalAutor').textContent = livro.Autor;
+    document.getElementById('modalDescricao').textContent = livro.Descricao || 'Descrição não disponível.';
+
+    const disponibilidadeEl = document.getElementById('modalDisponibilidade');
+    disponibilidadeEl.textContent = `Disponíveis: ${livro.Quantidade}`;
+
+    // Botão de Empréstimo
+    const btnEmprestar = document.getElementById('btnEmprestarModal');
+    const disponivel = livro.Quantidade > 0;
+    btnEmprestar.disabled = !disponivel;
+    btnEmprestar.textContent = disponivel ? 'Solicitar Empréstimo' : 'Esgotado';
+    // Define a ação do botão para submeter um formulário de empréstimo
+    btnEmprestar.onclick = () => {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'Aluno.php';
+        form.innerHTML = `
+            <input type="hidden" name="id_livro" value="${livro.IDlivro}">
+            <input type="hidden" name="solicitar_emprestimo" value="1">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    };
+
+    // Botão de Ler PDF
+    const btnPdf = document.getElementById('btnLerPdfModal');
+    btnPdf.style.display = livro.PdfURL ? 'inline-block' : 'none';
+    if (livro.PdfURL) btnPdf.href = livro.PdfURL;
+
+    // Exibe o modal
+    showModal('modalDetalhesLivro');
+}
+
+/**
+ * Fecha um modal pelo seu ID.
+ * @param {string} modalId - O ID do modal a ser fechado.
+ */
+function fecharModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// ================== ATUALIZAÇÃO EM TEMPO REAL (PROFESSOR) ==================
+
+let currentPendingCount = -1; // Inicia com -1 para forçar a primeira atualização
+
+/**
+ * Busca novos dados do dashboard (notificações e empréstimos) do servidor.
+ */
+async function fetchDashboardData() {
+    try {
+        const response = await fetch('api.php?action=get_dashboard_data');
+        if (!response.ok) {
+            console.error('Erro ao buscar dados do dashboard:', response.statusText);
+            return;
+        }
+        const data = await response.json();
+
+        // Se for a primeira vez, apenas define o contador inicial
+        if (currentPendingCount === -1) {
+            currentPendingCount = data.pending_count;
+        }
+
+        // Verifica se há novas solicitações
+        if (data.pending_count > currentPendingCount) {
+            playNotificationSound();
+        }
+
+        // Atualiza o contador e a lista
+        currentPendingCount = data.pending_count;
+        updateNotificationBadge(data.pending_count);
+        updateLoansTable(data.loans);
+
+    } catch (error) {
+        console.error('Falha na requisição de atualização:', error);
+    }
+}
+
+/**
+ * Toca o som de notificação.
+ */
+function playNotificationSound() {
+    const sound = document.getElementById('notification-sound');
+    if (sound) {
+        sound.currentTime = 0; // Reinicia o som se já estiver tocando
+        sound.play().catch(e => console.error("Erro ao tocar som:", e));
+    }
+}
+
+/**
+ * Atualiza o número no ícone de sino.
+ * @param {number} count - O número de notificações pendentes.
+ */
+function updateNotificationBadge(count) {
+    const badge = document.getElementById('notification-badge');
+    if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'block' : 'none';
+    }
+}
+
+/**
+ * Redesenha a tabela de empréstimos com os dados mais recentes.
+ * @param {Array} loans - A lista de objetos de empréstimo.
+ */
+function updateLoansTable(loans) {
+    const tbody = document.getElementById('listaEmprestimos');
+    if (!tbody) return;
+
+    // Limpa a tabela e a preenche com os novos dados
+    tbody.innerHTML = loans.map(loan => `
+        <tr>
+            <td>${loan.FK_IDaluno}</td>
+            <td>${loan.nome}</td>
+            <td>${loan.Titulo}</td>
+            <td>${loan.data_emprestimo}</td>
+            <td>${loan.data_devolucao || '---'}</td>
+            <td><a href="Professor.php?atualizar_emprestimoLivro=${loan.IDlivro}&atualizar_emprestimoAluno=${loan.FK_IDaluno}">${loan.status_nome}</a></td>
+            <td>
+                ${(loan.atrasado == 1 || loan.atrasado == 4) ? `<a href="Professor.php?devolver_livro_id=${loan.IDlivro}&aluno_id=${loan.FK_IDaluno}" class="btn-primary" style="padding: 2px 5px; font-size: 11px; text-decoration: none;">Devolver</a>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Inicia o processo de polling se estivermos na página do professor
+if (document.getElementById('professorContainer')) {
+    // Chama a função a cada 10 segundos (10000 milissegundos)
+    setInterval(fetchDashboardData, 10000);
+}

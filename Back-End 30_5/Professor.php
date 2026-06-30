@@ -149,6 +149,14 @@ if(isset($_FILES['arquivo'])){
                     <strong>Professor Gonçalves Couto</strong>
                 </div>
             </div>
+            <div class="notification-container" onclick="rolarParaSessao('dashboardSection', this)" style="cursor: pointer; position: relative; margin-right: 20px;">
+                <i class="fas fa-bell" style="font-size: 20px; color: #cbd5e1;"></i>
+                <?php if ($total_solicitacoes_pendentes > 0): ?>
+                    <span id="notification-badge" class="notification-badge" style="position: absolute; top: -5px; right: -10px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;">
+                        <?php echo $total_solicitacoes_pendentes; ?>
+                    </span>
+                <?php endif; ?>
+            </div>
             <input type="text" id="searchProf" placeholder="🔍 Buscar empréstimos...">
             <button onclick="window.location.href='logout.php'" class="btn-logout">Sair</button>
         </header>
@@ -203,32 +211,28 @@ if(isset($_FILES['arquivo'])){
                         <div class="data-header">📋 Empréstimos Recentes</div>
                         <table class="data-table" style="width:100%">
                             <thead><tr><th>Código</th><th>Aluno</th><th>Livro</th><th>Data Emp.</th><th>Data Dev.</th><th>Status</th></tr></thead>
-                            <tbody id="listaEmprestimos">
-                                <?php
-                                while($emprestimos = $query_dashboard->fetch_assoc()){
-                                    if ($emprestimos['atrasado'] == 0 || $emprestimos['atrasado'] == 1) {
-                                ?>
+                            <tbody id="listaEmprestimos">                                
+                                <?php while($emprestimos = $query_dashboard->fetch_assoc()): ?>
+                                    <?php if ($emprestimos['atrasado'] == 0 || $emprestimos['atrasado'] == 1 || $emprestimos['atrasado'] == 4): ?>
                                 <tr>
-                                    <td><a><?php echo $emprestimos['FK_IDaluno']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['nome']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['Titulo']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['data_emprestimo']; ?></a></td>
-                                    <td><a><?php echo $emprestimos['data_devolucao']; ?></a></td>
+                                    <td><?= htmlspecialchars($emprestimos['FK_IDaluno']) ?></td>
+                                    <td><?= htmlspecialchars($emprestimos['nome']) ?></td>
+                                    <td><?= htmlspecialchars($emprestimos['Titulo']) ?></td>
+                                    <td><?= htmlspecialchars($emprestimos['data_emprestimo']) ?></td>
+                                    <td><?= htmlspecialchars($emprestimos['data_devolucao']) ?></td>
                                     <td>
-                                        <a href="Professor.php?atualizar_emprestimoLivro=<?php echo $emprestimos['IDlivro'] . '&' . 'atualizar_emprestimoAluno=' . $emprestimos['FK_IDaluno']; ?>" onclick="return confirm('Tem certeza que deseja atualizar este emprestimo para pego?')">
-                                            <?php echo nomearStatus($emprestimos['atrasado']); ?>
+                                        <a href="Professor.php?atualizar_emprestimoLivro=<?= $emprestimos['IDlivro'] ?>&atualizar_emprestimoAluno=<?= $emprestimos['FK_IDaluno'] ?>" onclick="return confirm('Confirmar que o aluno pegou este livro?')">
+                                            <?= nomearStatus($emprestimos['atrasado']) ?>
                                         </a>
                                     </td>
                                     <td>
                                         <?php if($emprestimos['atrasado'] == 1 || $emprestimos['atrasado'] == 4): ?>
-                                            <a href="Professor.php?devolver_livro_id=<?php echo $emprestimos['IDlivro']; ?>&aluno_id=<?php echo $emprestimos['FK_IDaluno']; ?>" class="btn-primary" style="padding: 2px 5px; font-size: 11px; text-decoration: none;">Devolver</a>
-                                        <?php else: ?>
-                                            -
+                                            <a href="Professor.php?devolver_livro_id=<?= $emprestimos['IDlivro'] ?>&aluno_id=<?= $emprestimos['FK_IDaluno'] ?>" class="btn-primary" style="padding: 2px 5px; font-size: 11px; text-decoration: none;">Devolver</a>
                                         <?php endif; ?>
                                     </td>
-                                <?php
-                                }}  
-                                ?>
+                                </tr>
+                                    <?php endif; ?>
+                                <?php endwhile; ?>
                             </tbody>
                         </table>
                     </div>
@@ -242,7 +246,9 @@ if(isset($_FILES['arquivo'])){
                         <?php while($aluno = $query_alunos->fetch_assoc()): ?>
                             <div class="card book-card">
                                 <div class="card-content">
-                                    <h3><?= htmlspecialchars($aluno['nome']) ?></h3>
+                                    <h3>
+                                        <a href="aluno_detalhes.php?id=<?= $aluno['IDaluno'] ?>" style="text-decoration: none; color: inherit;" title="Ver detalhes de <?= htmlspecialchars($aluno['nome']) ?>"><?= htmlspecialchars($aluno['nome']) ?></a>
+                                    </h3>
                                     <p>
                                         <span class="password-toggle" data-password="<?= htmlspecialchars($aluno['Senha']) ?>">••••••</span>
                                         <button type="button" class="btn-small" onclick="togglePassword(this)">Revelar</button>
@@ -373,6 +379,9 @@ if(isset($_FILES['arquivo'])){
         window.professorId = <?php echo json_encode($_SESSION['id_professor']); ?>;
     </script>
 <?php endif; ?>
+
+<!-- Elemento de áudio para a notificação -->
+<audio id="notification-sound" src="https://www.myinstants.com/media/sounds/notification_fJzFih4.mp3" preload="auto"></audio>
 
 <script src="Script.js"></script>
 </body>

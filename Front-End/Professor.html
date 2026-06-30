@@ -230,7 +230,7 @@
         </div>
         <div class="form-group">
           <label>URL da Capa (Imagem)</label>
-          <input type="text" id="newCoverUrl" name="CapaURL" placeholder="Link da imagem..." oninput="atualizarPreview()">
+          <input type="text" id="newCoverUrl" name="CapaURL" placeholder="Link da imagem..." oninput="document.getElementById('coverPreview').src = this.value">
           <img id="coverPreview" class="image-preview" src="" alt="Preview">
         </div>
         <div class="form-group">
